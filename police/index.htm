@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sixside Police Department (SSPD)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      /* SSPD 专属的警务深蓝配色 */
+      --bg-primary: #070b12;
+      --bg-secondary: #0d131f;
+      --text-primary: #e8edf5;
+      --text-secondary: #8fa6c2;
+      --border-color: #1a2538;
+      --card-bg: #0d131f;
+      --card-border: #1c283d;
+      --btn-bg: #152033;
+      --accent-amber: #f39c12;
+      --accent-red: #e74c3c;
+      --accent-green: #2ecc71;
+    }
+    body.light {
+      --bg-primary: #f0f3f7;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a2634;
+      --text-secondary: #4a5c73;
+      --border-color: #c9d4e2;
+      --card-bg: #ffffff;
+      --card-border: #c9d4e2;
+      --btn-bg: #e2e8f0;
+    }
+    body {
+      font-family: 'Georgia', 'Times New Roman', Times, serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background 0.2s, color 0.2s;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    
+    /* 紧急联系顶栏 */
+    .emergency-banner {
+      background-color: #111;
+      color: #fff;
+      text-align: center;
+      padding: 0.6rem;
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border-bottom: 2px solid var(--accent-red);
+    }
+    .emergency-banner span.em { color: var(--accent-red); font-size: 1.2rem; }
+    .emergency-banner span.non-em { color: var(--accent-amber); }
+
+    .top-nav {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      flex-wrap: wrap;
+    }
+    .nav-left { display: flex; align-items: baseline; gap: 0.8rem; }
+    .home-button { font-size: 1.2rem; font-weight: bold; background: none; border: none; color: var(--text-primary); cursor: pointer; }
+    
+    /* 实时巡逻状态灯 */
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: monospace;
+      color: var(--accent-green);
+      font-size: 0.9rem;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .toolbar { display: flex; gap: 0.8rem; align-items: center; }
+    .btn-square { background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.4rem 1rem; cursor: pointer; color: var(--text-primary); font-family: inherit; }
+    .btn-square:hover { border-color: var(--text-secondary); }
+    
+    /* 辅助功能面板 (复用主站代码) */
+    .accessibility-wrapper { position: relative; }
+    .accessibility-toggle { background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 30px; padding: 0.2rem 0.6rem; cursor: pointer; font-size: 1.2rem; filter: grayscale(1) brightness(0.9); }
+    .accessibility-panel { position: absolute; top: 40px; right: 0; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.2rem; z-index: 900; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: 0.2s; }
+    .accessibility-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    
+    /* 英雄区 */
+    .hero { text-align: center; padding: 4rem 0 3rem; border-bottom: 1px solid var(--border-color); }
+    .hero h1 { font-size: 3.2rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+    .hero p { font-style: italic; color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 2rem; }
+    .hero-actions { display: flex; justify-content: center; gap: 1rem; }
+    .btn-ghost { background: transparent; border: 1px solid var(--text-secondary); color: var(--text-primary); padding: 0.6rem 1.5rem; border-radius: 30px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+    .btn-ghost:hover { background: var(--text-primary); color: var(--bg-primary); }
+
+    /* 数据仪表盘 */
+    .stats-container { display: flex; justify-content: center; gap: 3rem; margin: -2rem auto 3rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; max-width: 800px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .stat-item { text-align: center; }
+    .stat-value { font-family: monospace; font-size: 2rem; font-weight: bold; color: var(--text-primary); }
+    .stat-desc { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .stat-trend { color: var(--accent-green); font-size: 0.8rem; margin-left: 5px; }
+
+    .section-title { font-size: 1.6rem; border-left: 4px solid #4a6b8c; padding-left: 1rem; margin: 3rem 0 1.5rem; }
+    
+    /* 三列核心服务区 */
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 1.5rem; transition: 0.3s; }
+    
+    /* 悬赏名单特效 */
+    .card.wanted:hover { border-color: var(--accent-amber); box-shadow: 0 0 15px rgba(243, 156, 18, 0.15); transform: translateY(-2px); cursor: pointer; }
+    .wanted-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+    .wanted-item { display: flex; align-items: center; gap: 1rem; background: var(--btn-bg); padding: 0.5rem; border-radius: 4px; }
+    .wanted-img { width: 50px; height: 50px; background: #222; border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #666; }
+    .wanted-info h4 { font-size: 0.95rem; color: var(--accent-amber); }
+    .wanted-info p { font-size: 0.8rem; color: var(--text-secondary); }
+
+    /* 失物招领 */
+    .search-box { width: 100%; padding: 0.6rem; margin: 1rem 0; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: inherit; }
+    .lost-list { list-style: none; font-size: 0.9rem; }
+    .lost-list li { padding: 0.5rem 0; border-bottom: 1px dashed var(--border-color); display: flex; justify-content: space-between; }
+    .lost-list li span.date { color: var(--text-secondary); font-size: 0.8rem; }
+
+    /* 部门架构 */
+    .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+    .dept-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: 0.2s; }
+    .dept-card:hover { transform: translateY(-2px); border-color: #4a6b8c; }
+    .dept-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .dept-card .head { font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.5rem; }
+
+    .footer { margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; color: var(--text-secondary); }
+    
+    /* 鼠标高亮辅助功能 */
+    .highlight-cursor { cursor: none; }
+    .highlight-cursor:before { content: ''; position: fixed; top: var(--mouse-y, 0); left: var(--mouse-x, 0); width: 28px; height: 28px; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); }
+    body.cursor-red:before { background: rgba(231, 76, 60, 0.4); border: 1px solid #e74c3c; }
+    body.cursor-yellow:before { background: rgba(241, 196, 15, 0.4); border: 1px solid #f1c40f; }
+  </style>
+</head>
+<body>
+
+<div class="emergency-banner">
+  ⚠️ 紧急报警 (EMERGENCY): <span class="em">110</span> &nbsp;|&nbsp; 非紧急求助 (NON-EMERGENCY): <span class="non-em">009</span>
+</div>
+
+<div class="top-nav">
+  <div class="nav-left">
+    <button class="home-button" onclick="window.location.href='index.html'">Sixside</button>
+    <span style="color: var(--text-secondary);">|</span>
+    <span style="font-weight: bold;">Police Department (SSPD)</span>
+  </div>
+  
+  <div class="toolbar">
+    <div class="status-indicator" title="Police units are actively patrolling">
+      <div class="dot"></div>
+      ACTIVE PATROL 24/7/365
+    </div>
+    
+    <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 10px;"></div>
+    
+    <div class="accessibility-wrapper">
+      <div class="accessibility-toggle" id="accessibilityToggle" title="Accessibility">♿</div>
+      <div class="accessibility-panel" id="accessibilityPanel">
+        <h4 style="text-align:center; margin-bottom:1rem;">Accessibility</h4>
+        <label><input type="checkbox" id="themeToggleBox"> Light Mode</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>公正、专业、守护六面。</h1>
+    <p>Justice, Professionalism, Protecting Sixside.</p>
+    <div class="hero-actions">
+      <button class="btn-ghost">在线报案 (Report Online)</button>
+      <button class="btn-ghost">联系警员 (Contact Officer)</button>
+      <button class="btn-ghost">记录申请 (Record Request)</button>
+    </div>
+  </div>
+
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-value">17m 04s <span class="stat-trend">↓ 6s</span></div>
+      <div class="stat-desc">2025 Avg Response Time</div>
+    </div>
+    <div style="width: 1px; background: var(--border-color);"></div>
+    <div class="stat-item">
+      <div class="stat-value">98.2%</div>
+      <div class="stat-desc">Clearance Rate (破案率)</div>
+    </div>
+  </div>
+
+  <div class="section-title">公共服务 (Public Services)</div>
+  <div class="services-grid">
+    <div class="card wanted">
+      <h3 style="color: var(--accent-amber);">⚠️ 悬赏名单 (Wanted List)</h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">提供线索者最高可获 $50,000 奖励，身份绝对保密。</p>
+      <div class="wanted-list">
+        <div class="wanted-item">
+          <div class="wanted-img">Photo</div>
+          <div class="wanted-info">
+            <h4>#W-8829: 未知嫌疑人</h4>
+            <p>武装抢劫 (Armed Robbery)</p>
+          </div>
+        </div>
+        <div class="wanted-item">
+          <div class="wanted-img">Photo</div>
+          <div class="wanted-info">
+            <h4>#W-7104: J. Doe</h4>
+            <p>重大逃亡 (Felony Evasion)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔍 失物招领 (Lost & Found)</h3>
+      <input type="text" class="search-box" placeholder="搜索物品名称 / 编号 (e.g. 钥匙, 钱包)...">
+      <ul class="lost-list">
+        <li><span>黑色皮夹 (含证件)</span> <span class="date">Oct 12</span></li>
+        <li><span>DJI 无人机 (受损)</span> <span class="date">Oct 11</span></li>
+        <li><span>丰田汽车钥匙</span> <span class="date">Oct 09</span></li>
+        <li><span>登山背包 (蓝色)</span> <span class="date">Oct 05</span></li>
+      </ul>
+      <a href="#" style="display:block; margin-top:1rem; font-size:0.85rem; color:var(--text-secondary);">查看完整清单及认领流程 →</a>
+    </div>
+
+    <div class="card">
+      <h3>🤝 社区警务 (Community)</h3>
+      <p style="font-size: 0.9rem; margin-top: 0.5rem;">SSPD 致力于与六面省的居民建立信任。您的安全是我们首要的任务。</p>
+      <div style="margin-top: 1.5rem; background: var(--bg-primary); padding: 1rem; border-radius: 4px; border-left: 3px solid #4a6b8c;">
+        <h4 style="font-size: 0.9rem;">本月市政厅会议预告</h4>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">主题：冬季道路安全与社区防盗巡逻</p>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">时间：本周五 19:00</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">部门架构 (Command Structure)</div>
+  <div class="dept-grid">
+    <div class="dept-card">
+      <h3>局长办公室<br><span style="font-size:0.9rem; font-weight:normal;">Office of the Chief</span></h3>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem;">负责全局战略规划与跨部门协调。</p>
+      <div class="head">局长 (Chief): Marius van der Berg</div>
+    </div>
+    <div class="dept-card">
+      <h3>刑事调查局<br><span style="font-size:0.9rem; font-weight:normal;">Criminal Investigations</span></h3>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem;">负责重大刑事案件、重案组及法医联络。</p>
+      <div class="head">警长 (Captain): S. Miller</div>
+    </div>
+    <div class="dept-card">
+      <h3>交通管理组<br><span style="font-size:0.9rem; font-weight:normal;">Traffic Division</span></h3>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem;">负责六面省公路巡逻、事故处理及违章调度。</p>
+      <div class="head">主管 (Lieutenant): D. Silva</div>
+    </div>
+    <div class="dept-card">
+      <h3>后勤与记录处<br><span style="font-size:0.9rem; font-weight:normal;">Records & Property</span></h3>
+      <p style="font-size: 0.85rem; margin-top: 0.5rem;">处理档案申请、背景调查以及证物管理。</p>
+      <div class="head">主管 (Director): A. Chen</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>© 2025-2026 Sixside Police Department</p>
+  <p>Technical support and maintenance provided by Wareflame</p>
+  <p><a href="#" style="color:inherit;">Privacy Policy</a> | <a href="index.html" style="color:inherit;">Return to Gov Portal</a></p>
+</div>
+
+<script>
+  // 简易的明暗主题切换逻辑
+  const themeToggleBox = document.getElementById('themeToggleBox');
+  themeToggleBox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      document.body.classList.add('light');
+    } else {
+      document.body.classList.remove('light');
+    }
+  });
+
+  // 辅助面板弹窗
+  const toggleBtn = document.getElementById('accessibilityToggle');
+  const panel = document.getElementById('accessibilityPanel');
+  toggleBtn.onclick = () => panel.classList.toggle('show');
+</script>
+</body>
+</html>

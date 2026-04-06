@@ -33,8 +33,15 @@
             --btn-bg: #eef2f7;
         }
 
+        /* 语言特定字体 */
+        body.lang-en, body.lang-de, body.lang-ru {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+        body.lang-zh, body.lang-zh-classical, body.lang-zh-traditional {
+            font-family: system-ui, 'Segoe UI', 'Noto Sans CJK SC', sans-serif;
+        }
+
         body {
-            font-family: system-ui, 'Segoe UI', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.5;
@@ -46,12 +53,10 @@
             margin: 0 auto;
             padding: 0 2rem;
         }
+
         @keyframes fadeInPage {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        .page-fade {
-            animation: fadeInPage 0.4s ease-out;
         }
 
         .btn-square {
@@ -62,7 +67,6 @@
             font-size: 0.85rem;
             cursor: pointer;
             color: var(--text-primary);
-            transition: background 0.2s;
         }
 
         /* 弹窗 */
@@ -166,9 +170,7 @@
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-secondary);
         }
-        .accessibility-wrapper {
-            position: relative;
-        }
+        .accessibility-wrapper { position: relative; }
         .accessibility-toggle {
             background: var(--btn-bg);
             border: 1px solid var(--border-color);
@@ -179,23 +181,38 @@
         }
         .accessibility-panel {
             position: absolute;
-            top: 40px;
+            top: 45px;
             right: 0;
-            width: 260px;
+            width: 280px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 1.2rem;
             z-index: 900;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-8px);
             transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+            line-height: 1.6;
         }
         .accessibility-panel.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+        }
+        .accessibility-panel label {
+            display: block;
+            margin: 0.8rem 0 0.3rem;
+            font-size: 0.9rem;
+        }
+        .accessibility-panel input, .accessibility-panel select {
+            width: 100%;
+            padding: 0.3rem;
+            margin-top: 0.2rem;
+        }
+        .accessibility-panel button {
+            margin-top: 1rem;
+            width: 100%;
         }
 
         .header {
@@ -207,15 +224,6 @@
             flex-wrap: wrap;
         }
         .logo-large { max-width: 140px; }
-        .national-link {
-            font-size: 0.8rem;
-            background: var(--btn-bg);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            text-decoration: none;
-            color: var(--text-secondary);
-            margin-left: 1rem;
-        }
         .section { margin: 2.5rem 0; }
         .section h2 {
             font-size: 1.5rem;
@@ -241,6 +249,9 @@
             border-top: 1px solid var(--border-color);
             text-align: center;
             font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         /* 鼠标高亮 */
@@ -262,7 +273,7 @@
         .cursor-yellow:before { border: 2px solid #ffcc00; background: rgba(255,204,0,0.2); }
     </style>
 </head>
-<body>
+<body class="lang-en">
 
 <div id="langModal" class="modal-overlay">
     <div class="lang-modal">
@@ -303,8 +314,7 @@
     <div class="header">
         <div class="header-text">
             <h1 id="mainTitle">Sixside</h1>
-            <p id="mainSubtitle">The Enduring Spirit of the Mountains</p>
-            <a href="https://uplgov.github.io/national-portal/" target="_blank" class="national-link" id="nationalLink">UPL National Portal</a>
+            <p id="mainSubtitle" style="font-style: italic;">The Enduring Spirit of the Mountains</p>
         </div>
         <img src="SixsideLogo.png" alt="Sixside Logo" class="logo-large">
     </div>
@@ -331,352 +341,287 @@
         <p id="copyrightLine">© Sixside Provincial Government</p>
         <p id="techSupport">Technical support and maintenance provided by Wareflame</p>
         <p><a id="privacyLink">Privacy Policy</a> | <a id="licenseLink">Website License</a></p>
+        <p><a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLinkFooter">UPL National Portal</a></p>
     </div>
 </div>
 
 <script>
-    // 语言数据（完整）
-    const langData = {
-        en: {
-            modalTitle: "Choose Language", accessTitle: "Accessibility", contrastLabel: "Contrast", grayscaleLabel: "Grayscale", saturateLabel: "Saturation", cursorColorLabel: "Cursor Highlight Color", cursorRed: "Red", cursorYellow: "Yellow", cursorEnableLabel: "Enable Cursor Highlight",
-            mainTitle: "Sixside", mainSubtitle: "The Enduring Spirit of the Mountains", nationalLink: "UPL National Portal",
-            aboutTitle: "About Sixside", historyTitle: "History", historyText: "Generations have lived in harmony with this land. Deep valleys and enduring traditions define its identity.", geographyTitle: "Geography", geographyText: "Mountains, bamboo, vines, streams. Six irregular boundaries give the province its name.", populationTitle: "Population", populationText: "People of Sixside walk hidden paths, preserve ancient ways, and live close to the land.",
-            moreTitle: "Explore Sixside", newsTitle: "News", newsText: "Latest announcements, policies, government updates.", tourismTitle: "Tourism", tourismText: "Hiking routes, attractions, visitor guide.", galleryTitle: "Gallery", galleryText: "Photography, historical images, culture.",
-            copyrightLine: "© Sixside Provincial Government", techSupport: "Technical support and maintenance provided by Wareflame",
-            privacyText: "Privacy Policy\n\nSixside Government does not collect personal data without consent.", licenseText: "Website License\n\n© Sixside Provincial Government. All rights reserved."
-        },
-        "zh-simple": {
-            modalTitle: "选择语言", accessTitle: "辅助功能", contrastLabel: "对比度", grayscaleLabel: "灰度", saturateLabel: "饱和度", cursorColorLabel: "鼠标高亮颜色", cursorRed: "红色", cursorYellow: "黄色", cursorEnableLabel: "开启鼠标高亮",
-            mainTitle: "Sixside", mainSubtitle: "山魂永驻", nationalLink: "UPL 国家门户",
-            aboutTitle: "关于 Sixside", historyTitle: "历史", historyText: "世代与这片土地和谐共生，深谷与传承铸就其坚韧。", geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。六条不规则的边界赋予省名。", populationTitle: "人口", populationText: "Sixside 的人民行走于隐秘小径，守护古老方式，与土地相连。",
-            moreTitle: "探索 Sixside", newsTitle: "新闻公开", newsText: "最新公告、政策解读、政府动态。", tourismTitle: "旅游", tourismText: "徒步路线、景点推荐、访客指南。", galleryTitle: "画廊", galleryText: "摄影作品、历史影像、风土人情。",
-            copyrightLine: "© Sixside 省政府", techSupport: "技术支持与维护由 Wareflame 提供",
-            privacyText: "隐私政策\n\nSixside 政府不会在未经同意的情况下收集个人数据。", licenseText: "网站许可协议\n\n© Sixside 省政府。保留所有权利。"
-        },
-        "zh-traditional": {
-            modalTitle: "選擇語言", accessTitle: "輔助功能", contrastLabel: "對比度", grayscaleLabel: "灰度", saturateLabel: "飽和度", cursorColorLabel: "鼠標高亮顏色", cursorRed: "紅色", cursorYellow: "黃色", cursorEnableLabel: "開啟鼠標高亮",
-            mainTitle: "Sixside", mainSubtitle: "山魂永駐", nationalLink: "UPL 國家門戶",
-            aboutTitle: "關於 Sixside", historyTitle: "歷史", historyText: "世代與這片土地和諧共生，深谷與傳承鑄就其堅韌。", geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。六條不規則的邊界賦予省名。", populationTitle: "人口", populationText: "Sixside 的人民行走於隱秘小徑，守護古老方式，與土地相連。",
-            moreTitle: "探索 Sixside", newsTitle: "新聞公開", newsText: "最新公告、政策解讀、政府動態。", tourismTitle: "旅遊", tourismText: "徒步路線、景點推薦、訪客指南。", galleryTitle: "畫廊", galleryText: "攝影作品、歷史影像、風土人情。",
-            copyrightLine: "© Sixside 省政府", techSupport: "技術支持與維護由 Wareflame 提供",
-            privacyText: "隱私政策\n\nSixside 政府不會在未經同意的情況下收集個人數據。", licenseText: "網站許可協議\n\n© Sixside 省政府。保留所有權利。"
-        },
-        "zh-classical": {
-            modalTitle: "擇語", accessTitle: "輔功", contrastLabel: "對比", grayscaleLabel: "灰階", saturateLabel: "飽和", cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黃", cursorEnableLabel: "啟鼠標",
-            mainTitle: "Sixside", mainSubtitle: "山魂永駐", nationalLink: "UPL 國門",
-            aboutTitle: "六面志", historyTitle: "史", historyText: "世代與此土相諧，深谷古風，鑄其韌。", geographyTitle: "地", geographyText: "群山、竹、藤、溪。六界不規，故名六面。", populationTitle: "民", populationText: "六面之民，行於隱徑，守古法，親於土。",
-            moreTitle: "覽六面", newsTitle: "新聞", newsText: "公告、政解、府動。", tourismTitle: "遊", tourismText: "步道、景點、訪客指南。", galleryTitle: "畫苑", galleryText: "影像、史圖、風土。",
-            copyrightLine: "© 六面省政府", techSupport: "技護由 Wareflame 供之",
-            privacyText: "隱私之律\n\n六面省府不擅自收民之息。", licenseText: "許可之章\n\n© 六面省府。悉權保留。"
-        },
-        de: {
-            modalTitle: "Sprache wählen", accessTitle: "Barrierefreiheit", contrastLabel: "Kontrast", grayscaleLabel: "Graustufen", saturateLabel: "Sättigung", cursorColorLabel: "Mausfarbe", cursorRed: "Rot", cursorYellow: "Gelb", cursorEnableLabel: "Maus hervorheben",
-            mainTitle: "Sixside", mainSubtitle: "Der ewige Geist der Berge", nationalLink: "UPL Nationalportal",
-            aboutTitle: "Über Sixside", historyTitle: "Geschichte", historyText: "Generationen lebten im Einklang mit diesem Land.", geographyTitle: "Geografie", geographyText: "Berge, Bambus, Reben, Bäche.", populationTitle: "Bevölkerung", populationText: "Menschen gehen verborgene Pfade.",
-            moreTitle: "Sixside entdecken", newsTitle: "Nachrichten", newsText: "Ankündigungen, Politik.", tourismTitle: "Tourismus", tourismText: "Wanderwege, Sehenswürdigkeiten.", galleryTitle: "Galerie", galleryText: "Fotografie, Kultur.",
-            copyrightLine: "© Provinzregierung Sixside", techSupport: "Technische Unterstützung durch Wareflame",
-            privacyText: "Datenschutz\n\nSixside erhebt keine personenbezogenen Daten.", licenseText: "Lizenz\n\n© Sixside Provinzregierung."
-        },
-        ru: {
-            modalTitle: "Выберите язык", accessTitle: "Спец. возможности", contrastLabel: "Контраст", grayscaleLabel: "Ч/б", saturateLabel: "Насыщенность", cursorColorLabel: "Цвет курсора", cursorRed: "Красный", cursorYellow: "Жёлтый", cursorEnableLabel: "Включить подсветку",
-            mainTitle: "Sixside", mainSubtitle: "Вечный дух гор", nationalLink: "Национальный портал UPL",
-            aboutTitle: "О Sixside", historyTitle: "История", historyText: "Поколения жили в гармонии с землёй.", geographyTitle: "География", geographyText: "Горы, бамбук, ручьи.", populationTitle: "Население", populationText: "Люди ходят скрытыми тропами.",
-            moreTitle: "Исследовать Sixside", newsTitle: "Новости", newsText: "Объявления, политика.", tourismTitle: "Туризм", tourismText: "Маршруты, достопримечательности.", galleryTitle: "Галерея", galleryText: "Фото, история, культура.",
-            copyrightLine: "© Правительство Sixside", techSupport: "Техподдержка: Wareflame",
-            privacyText: "Конфиденциальность\n\nSixside не собирает данные без согласия.", licenseText: "Лицензия\n\n© Sixside. Все права защищены."
-        }
-    };
-
-    let currentLang = 'en';
-    let pendingLang = null;
-    let isAnimating = false;
-
-    function applyLanguage(lang, animateMain = true) {
-        const data = langData[lang];
-        if (!data) return;
-        document.getElementById('modalTitle').innerText = data.modalTitle;
-        document.getElementById('accessTitle').innerText = data.accessTitle;
-        document.getElementById('contrastLabel').innerHTML = `${data.contrastLabel} <span id="contrastVal">${contrastSlider.value}</span>`;
-        document.getElementById('grayscaleLabel').innerHTML = `${data.grayscaleLabel} <span id="grayscaleVal">${grayscaleSlider.value}</span>`;
-        document.getElementById('saturateLabel').innerHTML = `${data.saturateLabel} <span id="saturateVal">${saturateSlider.value}</span>`;
-        document.getElementById('cursorColorLabel').innerText = data.cursorColorLabel;
-        document.getElementById('cursorRed').innerText = data.cursorRed;
-        document.getElementById('cursorYellow').innerText = data.cursorYellow;
-        document.getElementById('cursorEnableLabel').innerText = data.cursorEnableLabel;
-        document.getElementById('mainTitle').innerText = data.mainTitle;
-        document.getElementById('mainSubtitle').innerText = data.mainSubtitle;
-        document.getElementById('nationalLink').innerText = data.nationalLink;
-        document.getElementById('aboutTitle').innerText = data.aboutTitle;
-        document.getElementById('historyTitle').innerText = data.historyTitle;
-        document.getElementById('historyText').innerText = data.historyText;
-        document.getElementById('geographyTitle').innerText = data.geographyTitle;
-        document.getElementById('geographyText').innerText = data.geographyText;
-        document.getElementById('populationTitle').innerText = data.populationTitle;
-        document.getElementById('populationText').innerText = data.populationText;
-        document.getElementById('moreTitle').innerText = data.moreTitle;
-        document.getElementById('newsTitle').innerText = data.newsTitle;
-        document.getElementById('newsText').innerText = data.newsText;
-        document.getElementById('tourismTitle').innerText = data.tourismTitle;
-        document.getElementById('tourismText').innerText = data.tourismText;
-        document.getElementById('galleryTitle').innerText = data.galleryTitle;
-        document.getElementById('galleryText').innerText = data.galleryText;
-        document.getElementById('copyrightLine').innerHTML = data.copyrightLine;
-        document.getElementById('techSupport').innerHTML = data.techSupport;
-        window.privacyMsg = data.privacyText;
-        window.licenseMsg = data.licenseText;
-        localStorage.setItem('sixside_lang', lang);
-        currentLang = lang;
-        if (animateMain) {
-            const content = document.getElementById('mainContent');
-            content.style.animation = 'none';
-            content.offsetHeight;
-            content.style.animation = 'fadeInPage 0.4s ease-out';
-        }
-    }
-
-    function switchWithAnimation(langCode, welcomeText) {
-        if (isAnimating) return;
-        isAnimating = true;
-        const blast = document.createElement('div');
-        blast.className = 'welcome-blast';
-        blast.innerText = welcomeText;
-        document.body.appendChild(blast);
-        setTimeout(() => {
-            blast.remove();
-            applyLanguage(langCode, true);
-            const modal = document.getElementById('lang modal = document.getElementById('langModal');
-            modal.classList.remove('show');
-            isAnimating =Modal');
-            modal.classList.remove('show');
-            isAnimating = false;
-        }, 100 false;
-        }, 1000);
-    }
-
-    function0);
-    }
-
-    function buildLang buildLangButtons(container, withThemeButtons(container, withTheme = false) {
- = false) {
-        container        container.innerHTML =.innerHTML = '';
-        const languages '';
-        const languages = [
- = [
-            {            { code: 'zh code: 'zh-classical-classical', label', label: ': '文言',文言', welcome: welcome: '汝 '汝安'安' },
-            { code },
-            { code: ': 'zh-traditional',zh-traditional', label: '繁体字', welcome: '歡迎 label: '繁体字', welcome: '歡迎' },
-' },
-            {            { code: code: 'zh 'zh-simple', label-simple', label: ': '简体文言', welcome: '简体文言', welcome: '你好' },
-           你好' },
-            { { code: 'en', code: ' label:en', label: 'English', welcome 'English', welcome: ': 'Hello'Hello' },
-            { code },
-            { code: ': 'de', label:de', 'De label: 'Deutsch',utsch', welcome: 'Hallo' welcome: 'Hallo' },
+    (function() {
+        const langData = {
+            en: {
+                modalTitle: "Choose Language", accessTitle: "Accessibility", contrastLabel: "Contrast", grayscaleLabel: "Grayscale", saturateLabel: "Saturation", cursorColorLabel: "Cursor Highlight Color", cursorRed: "Red", cursorYellow: "Yellow", cursorEnableLabel: "Enable Cursor Highlight",
+                mainTitle: "Sixside", mainSubtitle: "The Enduring Spirit of the Mountains",
+                aboutTitle: "About Sixside", historyTitle: "History", historyText: "Generations have lived in harmony with this land. Deep valleys and enduring traditions define its identity.", geographyTitle: "Geography", geographyText: "Mountains, bamboo, vines, streams. Six irregular boundaries give the province its name.", populationTitle: "Population", populationText: "People of Sixside walk hidden paths, preserve ancient ways, and live close to the land.",
+                moreTitle: "Explore Sixside", newsTitle: "News", newsText: "Latest announcements, policies, government updates.", tourismTitle: "Tourism", tourismText: "Hiking routes, attractions, visitor guide.", galleryTitle: "Gallery", galleryText: "Photography, historical images, culture.",
+                copyrightLine: "© Sixside Provincial Government", techSupport: "Technical support and maintenance provided by Wareflame",
+                privacyText: "Privacy Policy\n\nSixside Government does not collect personal data without consent.", licenseText: "Website License\n\n© Sixside Provincial Government. All rights reserved.",
+                themeToggle: "Dark/Light", langToggle: "Language"
             },
-            { code { code: ': 'ru', label:ru', label: 'Р 'Русскийусский', welcome', welcome: ': 'ЗдравствуЗдравствуйте'йте' }
+            "zh-simple": {
+                modalTitle: "选择语言", accessTitle: "辅助功能", contrastLabel: "对比度", grayscaleLabel: "灰度", saturateLabel: "饱和度", cursorColorLabel: "鼠标高亮颜色", cursorRed: "红色", cursorYellow: "黄色", cursorEnableLabel: "开启鼠标高亮",
+                mainTitle: "Sixside", mainSubtitle: "山魂永驻",
+                aboutTitle: "关于 Sixside", historyTitle: "历史", historyText: "世代与这片土地和谐共生，深谷与传承铸就其坚韧。", geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。六条不规则的边界赋予省名。", populationTitle: "人口", populationText: "Sixside 的人民行走于隐秘小径，守护古老方式，与土地相连。",
+                moreTitle: "探索 Sixside", newsTitle: "新闻公开", newsText: "最新公告、政策解读、政府动态。", tourismTitle: "旅游", tourismText: "徒步路线、景点推荐、访客指南。", galleryTitle: "画廊", galleryText: "摄影作品、历史影像、风土人情。",
+                copyrightLine: "© Sixside 省政府", techSupport: "技术支持与维护由 Wareflame 提供",
+                privacyText: "隐私政策\n\nSixside 政府不会在未经同意的情况下收集个人数据。", licenseText: "网站许可协议\n\n© Sixside 省政府。保留所有权利。",
+                themeToggle: "深色/浅色", langToggle: "语言"
+            },
+            "zh-traditional": {
+                modalTitle: "選擇語言", accessTitle: "輔助功能", contrastLabel: "對比度", grayscaleLabel: "灰度", saturateLabel: "飽和度", cursorColorLabel: "鼠標高亮顏色", cursorRed: "紅色", cursorYellow: "黃色", cursorEnableLabel: "開啟鼠標高亮",
+                mainTitle: "Sixside", mainSubtitle: "山魂永駐",
+                aboutTitle: "關於 Sixside", historyTitle: "歷史", historyText: "世代與這片土地和諧共生，深谷與傳承鑄就其堅韌。", geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。六條不規則的邊界賦予省名。", populationTitle: "人口", populationText: "Sixside 的人民行走於隱秘小徑，守護古老方式，與土地相連。",
+                moreTitle: "探索 Sixside", newsTitle: "新聞公開", newsText: "最新公告、政策解讀、政府動態。", tourismTitle: "旅遊", tourismText: "徒步路線、景點推薦、訪客指南。", galleryTitle: "畫廊", galleryText: "攝影作品、歷史影像、風土人情。",
+                copyrightLine: "© Sixside 省政府", techSupport: "技術支持與維護由 Wareflame 提供",
+                privacyText: "隱私政策\n\nSixside 政府不會在未經同意的情況下收集個人數據。", licenseText: "網站許可協議\n\n© Sixside 省政府。保留所有權利。",
+                themeToggle: "深色/淺色", langToggle: "語言"
+            },
+            "zh-classical": {
+                modalTitle: "擇語", accessTitle: "輔功", contrastLabel: "對比", grayscaleLabel: "灰階", saturateLabel: "飽和", cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黃", cursorEnableLabel: "啟鼠標",
+                mainTitle: "Sixside", mainSubtitle: "山魂永駐",
+                aboutTitle: "六面志", historyTitle: "史", historyText: "世代與此土相諧，深谷古風，鑄其韌。", geographyTitle: "地", geographyText: "群山、竹、藤、溪。六界不規，故名六面。", populationTitle: "民", populationText: "六面之民，行於隱徑，守古法，親於土。",
+                moreTitle: "覽六面", newsTitle: "新聞", newsText: "公告、政解、府動。", tourismTitle: "遊", tourismText: "步道、景點、訪客指南。", galleryTitle: "畫苑", galleryText: "影像、史圖、風土。",
+                copyrightLine: "© 六面省政府", techSupport: "技護由 Wareflame 供之",
+                privacyText: "隱私之律\n\n六面省府不擅自收民之息。", licenseText: "許可之章\n\n© 六面省府。悉權保留。",
+                themeToggle: "深淺", langToggle: "語"
+            },
+            de: {
+                modalTitle: "Sprache wählen", accessTitle: "Barrierefreiheit", contrastLabel: "Kontrast", grayscaleLabel: "Graustufen", saturateLabel: "Sättigung", cursorColorLabel: "Mausfarbe", cursorRed: "Rot", cursorYellow: "Gelb", cursorEnableLabel: "Maus hervorheben",
+                mainTitle: "Sixside", mainSubtitle: "Der ewige Geist der Berge",
+                aboutTitle: "Über Sixside", historyTitle: "Geschichte", historyText: "Generationen lebten im Einklang mit diesem Land.", geographyTitle: "Geografie", geographyText: "Berge, Bambus, Reben, Bäche.", populationTitle: "Bevölkerung", populationText: "Menschen gehen verborgene Pfade.",
+                moreTitle: "Sixside entdecken", newsTitle: "Nachrichten", newsText: "Ankündigungen, Politik.", tourismTitle: "Tourismus", tourismText: "Wanderwege, Sehenswürdigkeiten.", galleryTitle: "Galerie", galleryText: "Fotografie, Kultur.",
+                copyrightLine: "© Provinzregierung Sixside", techSupport: "Technische Unterstützung durch Wareflame",
+                privacyText: "Datenschutz\n\nSixside erhebt keine personenbezogenen Daten.", licenseText: "Lizenz\n\n© Sixside Provinzregierung.",
+                themeToggle: "Dunkel/Hell", langToggle: "Sprache"
+            },
+            ru: {
+                modalTitle: "Выберите язык", accessTitle: "Спец. возможности", contrastLabel: "Контраст", grayscaleLabel: "Ч/б", saturateLabel: "Насыщенность", cursorColorLabel: "Цвет курсора", cursorRed: "Красный", cursorYellow: "Жёлтый", cursorEnableLabel: "Включить подсветку",
+                mainTitle: "Sixside", mainSubtitle: "Вечный дух гор",
+                aboutTitle: "О Sixside", historyTitle: "История", historyText: "Поколения жили в гармонии с землёй.", geographyTitle: "География", geographyText: "Горы, бамбук, ручьи.", populationTitle: "Население", populationText: "Люди ходят скрытыми тропами.",
+                moreTitle: "Исследовать Sixside", newsTitle: "Новости", newsText: "Объявления, политика.", tourismTitle: "Туризм", tourismText: "Маршруты, достопримечательности.", galleryTitle: "Галерея", galleryText: "Фото, история, культура.",
+                copyrightLine: "© Правительство Sixside", techSupport: "Техподдержка: Wareflame",
+                privacyText: "Конфиденциальность\n\nSixside не собирает данные без согласия.", licenseText: "Лицензия\n\n© Sixside. Все права защищены.",
+                themeToggle: "Тёмный/Светлый", langToggle: "Язык"
+            }
+        };
+
+        let currentLang = 'en';
+        let isAnimating = false;
+        const modal = document.getElementById('langModal');
+        const langContainer = document.getElementById('langButtonsContainer');
+        const themeSelectionDiv = document.getElementById('themeSelection');
+        const mainContent = document.getElementById('mainContent');
+
+        function applyLanguage(lang, animateMain = true) {
+            const data = langData[lang];
+            if (!data) return;
+            // 更新 body 的 class 以切换字体族
+            document.body.className = `lang-${lang}`;
+            // 更新所有文本
+            document.getElementById('modalTitle').innerText = data.modalTitle;
+            document.getElementById('accessTitle').innerText = data.accessTitle;
+            document.getElementById('contrastLabel').innerHTML = `${data.contrastLabel} <span id="contrastVal">${document.getElementById('contrastSlider')?.value || '1.0'}</span>`;
+            document.getElementById('grayscaleLabel').innerHTML = `${data.grayscaleLabel} <span id="grayscaleVal">${document.getElementById('grayscaleSlider')?.value || '0'}</span>`;
+            document.getElementById('saturateLabel').innerHTML = `${data.saturateLabel} <span id="saturateVal">${document.getElementById('saturateSlider')?.value || '1.0'}</span>`;
+            document.getElementById('cursorColorLabel').innerText = data.cursorColorLabel;
+            document.getElementById('cursorRed').innerText = data.cursorRed;
+            document.getElementById('cursorYellow').innerText = data.cursorYellow;
+            document.getElementById('cursorEnableLabel').innerText = data.cursorEnableLabel;
+            document.getElementById('mainTitle').innerText = data.mainTitle;
+            document.getElementById('mainSubtitle').innerText = data.mainSubtitle;
+            document.getElementById('aboutTitle').innerText = data.aboutTitle;
+            document.getElementById('historyTitle').innerText = data.historyTitle;
+            document.getElementById('historyText').innerText = data.historyText;
+            document.getElementById('geographyTitle').innerText = data.geographyTitle;
+            document.getElementById('geographyText').innerText = data.geographyText;
+            document.getElementById('populationTitle').innerText = data.populationTitle;
+            document.getElementById('populationText').innerText = data.populationText;
+            document.getElementById('moreTitle').innerText = data.moreTitle;
+            document.getElementById('newsTitle').innerText = data.newsTitle;
+            document.getElementById('newsText').innerText = data.newsText;
+            document.getElementById('tourismTitle').innerText = data.tourismTitle;
+            document.getElementById('tourismText').innerText = data.tourismText;
+            document.getElementById('galleryTitle').innerText = data.galleryTitle;
+            document.getElementById('galleryText').innerText = data.galleryText;
+            document.getElementById('copyrightLine').innerHTML = data.copyrightLine;
+            document.getElementById('techSupport').innerHTML = data.techSupport;
+            // 更新右上角按钮文字
+            document.getElementById('themeToggleBtn').innerText = data.themeToggle;
+            document.getElementById('langReopenBtn').innerText = data.langToggle;
+            window.privacyMsg = data.privacyText;
+            window.licenseMsg = data.licenseText;
+            localStorage.setItem('sixside_lang', lang);
+            currentLang = lang;
+            if (animateMain && mainContent) {
+                mainContent.style.animation = 'none';
+                mainContent.offsetHeight;
+                mainContent.style.animation = 'fadeInPage 0.4s ease-out';
+            }
         }
-        ];
-        ];
-        languages.forEach(lang languages.forEach(lang => {
- => {
-            const            const btn = document.createElement btn = document.createElement('div('div');
-            btn.class');
-            btn.className =Name = 'lang-option 'lang-option';
-           ';
-            btn.innerHTML = `< btn.innerHTML = `<span>span>${lang${lang.label}</span><.label}</span><div classdiv class="lang-welcome="lang-welcome">${">${lang.wlang.welcome}</divelcome}</div>>`;
-           `;
-            btn.addEventListener('click btn.addEventListener('click', ()', () => {
- => {
-                const welcomeDiv                const welcomeDiv = btn = btn.querySelector('.lang-w.querySelector('.lang-welcome');
-elcome');
-                switch                switchWithAnimation(langWithAnimation(lang.code,.code, welcomeDiv.inner welcomeDiv.innerText);
-           Text);
+
+        function switchWithAnimation(langCode, welcomeText) {
+            if (isAnimating) return;
+            isAnimating = true;
+            const blast = document.createElement('div');
+            blast.className = 'welcome-blast';
+            blast.innerText = welcomeText;
+            document.body.appendChild(blast);
+            setTimeout(() => {
+                blast.remove();
+                applyLanguage(langCode, true);
+                if (modal) modal.classList.remove('show');
+                isAnimating = false;
+            }, 1000);
+        }
+
+        function buildLangButtons(container) {
+            if (!container) return;
+            container.innerHTML = '';
+            const languages = [
+                { code: 'zh-classical', label: '文言', welcome: '汝安' },
+                { code: 'zh-traditional', label: '繁体字', welcome: '歡迎' },
+                { code: 'zh-simple', label: '简体文言', welcome: '你好' },
+                { code: 'en', label: 'English', welcome: 'Hello' },
+                { code: 'de', label: 'Deutsch', welcome: 'Hallo' },
+                { code: 'ru', label: 'Русский', welcome: 'Здравствуйте' }
+            ];
+            languages.forEach(lang => {
+                const btn = document.createElement('div');
+                btn.className = 'lang-option';
+                btn.innerHTML = `<span>${lang.label}</span><div class="lang-welcome">${lang.welcome}</div>`;
+                btn.addEventListener('click', () => {
+                    const welcomeDiv = btn.querySelector('.lang-welcome');
+                    switchWithAnimation(lang.code, welcomeDiv.innerText);
+                });
+                container.appendChild(btn);
             });
+        }
+
+        buildLangButtons(langContainer);
+        if (modal) modal.classList.add('show');
+
+        document.querySelectorAll('[data-theme]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.getAttribute('data-theme');
+                if (theme === 'light') document.body.classList.add('light');
+                else document.body.classList.remove('light');
+                localStorage.setItem('sixside_theme', theme);
             });
-            container container.appendChild.appendChild((btnbtn);
         });
-);
-        });
-    }
 
-    const modal = document.getElementById('langModal');
-    }
-
-    const modal = document.getElementById('langModal');
-    const langContainer = document.getElementById    const langContainer = document.getElementById('lang('langButtonsContainerButtonsContainer');
-   ');
-    const theme const themeSelectionDiv = documentSelectionDiv = document.getElementById('.getElementById('themeSelection');
-
-   themeSelection');
-
-    buildLangButtons(langContainer buildLang, trueButtons(langContainer, true);
-    modal);
-    modal.classList.add('.classList.add('show');
-
-show');
-
-    document    document.querySelectorAll.querySelectorAll('[data-theme('[data-theme]').]').forEach(forEach(btn =>btn => {
-        {
-        btn.addEventListener btn.addEventListener('click', ()('click', () => {
- => {
-            const            const theme = theme = btn.getAttribute(' btn.getAttribute('data-thedata-theme');
-me');
-            if (theme === '            if (theme === 'light') document.bodylight') document.body.classList.add.classList.add('light('light');
-            else document');
-            else document.body.classList.body.classList.remove('light');
-.remove('light');
-            localStorage            localStorage.setItem('.setItem('sixside_sixside_theme',theme', theme);
-        });
- theme);
-        });
-    });
-
-    });
-
-    const    const savedTheme = localStorage savedTheme = localStorage.getItem('.getItem('sixsidesixside_theme');
-   _theme');
-    if ( if (savedTheme ===savedTheme === 'light 'light') document') document.body.classList.add('.body.classList.add('light');
-light');
-    else    else if (saved if (savedTheme ===Theme === 'dark') document 'dark') document.body.classList.body.classList.remove('.remove('light');
-   light');
-    else {
+        const savedTheme = localStorage.getItem('sixside_theme');
+        if (savedTheme === 'light') document.body.classList.add('light');
+        else if (savedTheme === 'dark') document.body.classList.remove('light');
         else {
-        const prefers const prefersDark =Dark = window.matchMedia(' window.matchMedia('(pre(prefers-colorfers-color-scheme:-scheme: dark) dark)').matches;
-        if').matches;
-        if (! (!prefersDark)prefersDark) document.body document.body.classList.add('light.classList.add('light');
-   ');
-    }
-
-    const saved }
-
-    const savedLang =Lang = localStorage.getItem localStorage.getItem('six('sixside_lang');
-side_lang');
-    if    if (s (savedLangavedLang && lang && langData[savedLangData[savedLang]) {
-        apply]) {
-        applyLanguage(savedLanguage(savedLang,Lang, false);
-        modal false);
-        modal.classList.remove.classList.remove('show');
-   ('show');
-    }
-
-    }
-
-    document.getElementById('lang document.getElementById('langReopenReopenBtn').onclickBtn').onclick = () = () => {
-        theme => {
-        themeSelectionDiv.style.display = 'SelectionDiv.style.display = 'none';
-none';
-        build        buildLangButtons(langLangButtons(langContainer,Container, false);
-        modal false);
-        modal.classList.add.classList.add('show');
-   ('show');
-    };
-    };
-    document.getElementById('theme document.getElementById('themeToggleBtn').onclick =ToggleBtn').onclick = () => {
- () => {
-               const isLight = const isLight = document.body document.body.classList.contains.classList.contains('light('light');
-        if (');
-        if (isLightisLight) document) document.body.classList.remove('light');
-.body.classList.remove('light');
-        else        else document.body document.body.classList.add('light.classList.add('light');
-       ');
-        localStorage.set localStorage.setItem('sixsideItem('sixside_theme_theme', isLight ?', isLight ? 'dark 'dark' : 'light' : 'light');
-   ');
-    };
-
-    };
-
-    // 辅助功能 // 辅助功能滑块（滑块（防抖防抖）
-    const contrast）
-    const contrastSlider =Slider = document.getElementById('contr document.getElementById('contrastSlider');
-   astSlider');
-    const grayscaleSlider const grayscaleSlider = document = document.getElementById('grayscale.getElementById('grayscaleSlider');
-Slider');
-    const saturate    const saturateSlider =Slider = document.getElementById document.getElementById('saturateSlider');
-('saturateSlider');
-    const    const contrastVal = document contrastVal = document.getElementById('.getElementById('contrastVal');
-contrastVal');
-    const    const grayscale grayscaleVal = document.getElementByIdVal = document.getElementById('gra('grayscaleVal');
-   yscaleVal');
-    const sat const saturateValurateVal = document.getElementById(' = document.getElementById('satursaturateVal');
-   ateVal');
-    let filter let filterTimeout;
-    functionTimeout;
-    function applyFilters applyFilters() {
-        const c() {
-        const c = = contrastSlider.value;
- contrastSlider.value;
-        const        const g = g = grayscaleSlider.value grayscale;
-        const sSlider.value = saturateSlider;
-        const s = sat.value;
-urateSlider.value;
-        document.body.style        document.body.style.filter = `contr.filter = `contrast(${cast(${c}) gra}) grayscale($yscale(${g{g}) sat}) saturate($urate(${s{s})`;
-})`;
-        contrast        contrastVal.innerText =Val.innerText = c;
- c;
-        grayscaleVal.innerText        grayscaleVal.inner = gText = g;
-       ;
-        saturateVal.innerText = saturateVal.innerText = s;
-    }
-    function s;
-    }
-    function handleSliderInput handleSliderInput() {
-       () {
-        if (filterTimeout) clearTimeout(filterTimeout);
- if (filterTimeout) clearTimeout(filterTimeout);
-        filterTimeout = setTimeout(applyFilters        filterTimeout = setTimeout(applyFilters, , 16);
-    }
-    contrastSlider.addEventListener('input', handleSliderInput);
-   16);
-    }
-    contrastSlider.addEventListener('input', handleSliderInput);
-    grayscaleSlider.addEventListener('input', handle grayscaleSlider.addEventListener('input', handleSliderInput);
-    saturateSlider.addEventListener('input', handleSliderInput);
-    applyFilters();
-
-    const cursorCheckbox = document.getElementById('cursorCheckbox');
-    const cursorColorSelect = document.getElementById('cursorColorSelect');
-    let cursorActive = false;
-    function updateCursor() {
-        if (cursorActive) {
-            document.body.classList.add('highlight-cursor');
-            const color = cursorColorSelect.value;
-            document.body.classList.remove('cursor-red', 'cursor-yellow');
-            document.body.classList.add(`cursor-${color}`);
-        } else {
-            document.body.classList.remove('highlight-cursor', 'cursor-red', 'cursor-yellow');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (!prefersDark) document.body.classList.add('light');
         }
-    }
-    cursorCheckbox.addEventListener('change', (e) => {
-        cursorActive = e.target.checked;
-        updateCursor();
-    });
-    cursorColorSelect.addEventListener('change', () => { if (cursorActive) updateCursor(); });
-    document.addEventListener('mousemove', (e) => {
-        if (cursorActive) {
-            document.body.style.setProperty('--mouse-x', e.clientX + 'px');
-            document.body.style.setProperty('--mouse-y', e.clientY + 'px');
+
+        const savedLang = localStorage.getItem('sixside_lang');
+        if (savedLang && langData[savedLang]) {
+            applyLanguage(savedLang, false);
+            if (modal) modal.classList.remove('show');
         }
-    });
-    document.getElementById('resetAccessibilityBtn').onclick = () => {
-        contrastSlider.value = '1';
-        grayscaleSlider.value = '0';
-        saturateSlider.value = '1';
+
+        document.getElementById('langReopenBtn').onclick = () => {
+            if (themeSelectionDiv) themeSelectionDiv.style.display = 'none';
+            buildLangButtons(langContainer);
+            if (modal) modal.classList.add('show');
+        };
+        document.getElementById('themeToggleBtn').onclick = () => {
+            const isLight = document.body.classList.contains('light');
+            if (isLight) document.body.classList.remove('light');
+            else document.body.classList.add('light');
+            localStorage.setItem('sixside_theme', isLight ? 'dark' : 'light');
+        };
+
+        // 辅助功能滑块
+        const contrastSlider = document.getElementById('contrastSlider');
+        const grayscaleSlider = document.getElementById('grayscaleSlider');
+        const saturateSlider = document.getElementById('saturateSlider');
+        const contrastVal = document.getElementById('contrastVal');
+        const grayscaleVal = document.getElementById('grayscaleVal');
+        const saturateVal = document.getElementById('saturateVal');
+        let filterTimeout;
+        function applyFilters() {
+            const c = contrastSlider.value;
+            const g = grayscaleSlider.value;
+            const s = saturateSlider.value;
+            document.body.style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
+            if (contrastVal) contrastVal.innerText = c;
+            if (grayscaleVal) grayscaleVal.innerText = g;
+            if (saturateVal) saturateVal.innerText = s;
+        }
+        function handleSliderInput() {
+            if (filterTimeout) clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(applyFilters, 16);
+        }
+        if (contrastSlider) contrastSlider.addEventListener('input', handleSliderInput);
+        if (grayscaleSlider) grayscaleSlider.addEventListener('input', handleSliderInput);
+        if (saturateSlider) saturateSlider.addEventListener('input', handleSliderInput);
         applyFilters();
-        cursorCheckbox.checked = false;
-        cursorActive = false;
-        updateCursor();
-    };
 
-    const toggleBtn = document.getElementById('accessibilityToggle');
-    const panel = document.getElementById('accessibilityPanel');
-    toggleBtn.onclick = () => {
-        panel.classList.toggle('show');
-    };
+        const cursorCheckbox = document.getElementById('cursorCheckbox');
+        const cursorColorSelect = document.getElementById('cursorColorSelect');
+        let cursorActive = false;
+        function updateCursor() {
+            if (cursorActive) {
+                document.body.classList.add('highlight-cursor');
+                const color = cursorColorSelect.value;
+                document.body.classList.remove('cursor-red', 'cursor-yellow');
+                document.body.classList.add(`cursor-${color}`);
+            } else {
+                document.body.classList.remove('highlight-cursor', 'cursor-red', 'cursor-yellow');
+            }
+        }
+        if (cursorCheckbox) {
+            cursorCheckbox.addEventListener('change', (e) => {
+                cursorActive = e.target.checked;
+                updateCursor();
+            });
+        }
+        if (cursorColorSelect) {
+            cursorColorSelect.addEventListener('change', () => { if (cursorActive) updateCursor(); });
+        }
+        document.addEventListener('mousemove', (e) => {
+            if (cursorActive) {
+                document.body.style.setProperty('--mouse-x', e.clientX + 'px');
+                document.body.style.setProperty('--mouse-y', e.clientY + 'px');
+            }
+        });
 
-    document.getElementById('privacyLink').onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
-    document.getElementById('licenseLink').onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
-    document.getElementById('newsCard').onclick = () => alert('新闻公开页面建设中。');
-    document.getElementById('tourismCard').onclick = () => alert('旅游页面建设中。');
-    document.getElementById('galleryCard').onclick = () => alert('画廊页面建设中。');
+        const resetBtn = document.getElementById('resetAccessibilityBtn');
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                if (contrastSlider) contrastSlider.value = '1';
+                if (grayscaleSlider) grayscaleSlider.value = '0';
+                if (saturateSlider) saturateSlider.value = '1';
+                applyFilters();
+                if (cursorCheckbox) cursorCheckbox.checked = false;
+                cursorActive = false;
+                updateCursor();
+            };
+        }
+
+        const toggleBtn = document.getElementById('accessibilityToggle');
+        const panel = document.getElementById('accessibilityPanel');
+        if (toggleBtn && panel) {
+            toggleBtn.onclick = () => {
+                panel.classList.toggle('show');
+            };
+        }
+
+        const privacyLink = document.getElementById('privacyLink');
+        const licenseLink = document.getElementById('licenseLink');
+        if (privacyLink) privacyLink.onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
+        if (licenseLink) licenseLink.onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
+
+        const newsCard = document.getElementById('newsCard');
+        const tourismCard = document.getElementById('tourismCard');
+        const galleryCard = document.getElementById('galleryCard');
+        if (newsCard) newsCard.onclick = () => alert('新闻公开页面建设中。');
+        if (tourismCard) tourismCard.onclick = () => alert('旅游页面建设中。');
+        if (galleryCard) galleryCard.onclick = () => alert('画廊页面建设中。');
+    })();
 </script>
 </body>
 </html>

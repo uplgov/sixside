@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sixside Police Department | SSPD</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -43,7 +45,7 @@
       background: #000;
       color: #fff;
       border-bottom: 2px solid var(--accent-red);
-      padding: 8px 20px;
+      padding: 10px 20px;
       font-family: monospace;
       font-size: 0.85rem;
       text-align: center;
@@ -52,27 +54,32 @@
       display: flex;
       justify-content: center;
       gap: 30px;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
       align-items: center;
     }
     .emergency-num { color: var(--accent-red); font-size: 1.2rem; font-weight: bold; }
-    .emergency-notice { font-size: 0.75rem; color: #888; letter-spacing: 0.5px; }
-
-    /* 闪烁高亮标签 */
-    .alert-blink {
+    
+    /* 报警按钮设计 */
+    .report-btn {
       background: var(--accent-red);
       color: white;
-      padding: 2px 8px;
-      font-size: 0.7rem;
+      border: none;
+      padding: 4px 12px;
+      font-family: monospace;
+      font-size: 0.75rem;
       font-weight: bold;
-      margin-left: 8px;
-      animation: alert-flash 1s infinite;
-      border-radius: 2px;
+      cursor: pointer;
+      margin-left: 10px;
+      animation: alert-flash-slow 2s infinite; /* 调慢闪烁 */
+      text-transform: uppercase;
     }
-    @keyframes alert-flash {
+    .report-btn.amber { background: var(--accent-amber); animation: alert-flash-slow 2.5s infinite; }
+    @keyframes alert-flash-slow {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
+      50% { opacity: 0.2; }
     }
+
+    .emergency-notice { font-size: 0.7rem; color: #666; letter-spacing: 0.5px; line-height: 1.4; }
 
     /* 导航栏 */
     .top-nav {
@@ -98,68 +105,104 @@
     }
     @keyframes dot-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    .tool-btn {
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      color: var(--text-primary); padding: 5px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
+    /* 弹出表单层 */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 2000; display: none;
+      overflow-y: auto; padding: 20px;
     }
+    .report-modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      max-width: 600px; margin: 20px auto;
+      padding: 30px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .checkbox-item { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    
+    #map { height: 200px; width: 100%; background: #000; margin-bottom: 10px; border: 1px solid var(--border-color); }
+    .location-info { font-family: monospace; font-size: 0.8rem; color: var(--accent-green); margin-bottom: 10px; }
+    
+    .btn-action { width: 100%; padding: 12px; border: 1px solid var(--border-color); cursor: pointer; font-family: inherit; margin-top: 10px; }
+    .btn-submit { background: var(--accent-red); color: white; border: none; font-weight: bold; }
+    .btn-cancel { background: transparent; color: var(--text-secondary); }
 
-    /* 英雄区 */
+    /* 英雄区与统计 */
     .hero { text-align: center; padding: 60px 0; border-bottom: 1px solid var(--border-color); }
-    .hero h1 { font-size: 2.8rem; margin-bottom: 15px; font-weight: normal; letter-spacing: 1px; }
+    .hero h1 { font-size: 2.8rem; margin-bottom: 15px; font-weight: normal; }
     .hero p { color: var(--text-secondary); font-style: italic; max-width: 800px; margin: 0 auto 40px; }
 
-    /* 数据显示 */
     .stats-container {
       display: grid; grid-template-columns: 1fr 1px 1fr; 
       max-width: 700px; margin: -30px auto 50px;
       background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .stat-box { text-align: center; }
     .stat-val { font-size: 2rem; font-family: monospace; font-weight: bold; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-top: 5px; display: block; }
-    
-    /* 下降箭头 */
-    .trend-down {
-      display: inline-block;
-      width: 0; height: 0; 
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 12px solid var(--accent-green);
-      margin-left: 10px;
-      vertical-align: middle;
-    }
-    .trend-text { font-size: 0.8rem; color: var(--accent-green); font-family: monospace; }
+    .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; vertical-align: middle; }
+    .trend-text { color: var(--accent-green); font-size: 0.8rem; font-family: monospace; }
 
-    /* 内容布局 */
     .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 50px; }
     .section-title { font-size: 1.4rem; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
-
-    /* 卡片样式 */
     .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 25px; margin-bottom: 20px; }
-    .wanted-item { display: flex; gap: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; }
-    .photo-box { width: 70px; height: 90px; background: #000; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #444; border: 1px solid #333; }
-
-    .lost-input { width: 100%; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; margin-bottom: 20px; font-family: inherit; }
-    .lost-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .lost-table td { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-    .date-col { text-align: right; color: var(--text-secondary); font-family: monospace; }
 
     footer { text-align: center; padding: 60px 0; color: var(--text-secondary); font-size: 0.8rem; border-top: 1px solid var(--border-color); margin-top: 80px; }
   </style>
 </head>
 <body>
 
+<div class="modal-overlay" id="reportModal">
+  <div class="report-modal">
+    <h2 id="modalTitle" style="margin-bottom: 20px; letter-spacing: 1px;">REPORT EMERGENCY</h2>
+    
+    <div class="form-group">
+      <label>所需支援 (可多选 / REQUIRED SERVICES):</label>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" name="service" value="police"> 警察 (POLICE)</label>
+        <label class="checkbox-item"><input type="checkbox" name="service" value="rescue"> 救援 (RESCUE)</label>
+        <label class="checkbox-item"><input type="checkbox" name="service" value="fire"> 火灾 (FIRE)</label>
+        <label class="checkbox-item"><input type="checkbox" name="service" value="medical"> 医疗 (MEDICAL)</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>当前位置 (LOCATION):</label>
+      <div id="map"></div>
+      <div class="location-info" id="locationStatus">等待定位获取...</div>
+      <button class="btn-action" style="background: var(--btn-bg); color: #fff;" onclick="getLocation()">获取当前位置 (GET POSITION)</button>
+    </div>
+
+    <div class="form-group">
+      <label>你在户外或者警员可见的地方吗？ (VISIBLE IN OPEN AREA?)</label>
+      <select class="btn-action" style="background: var(--bg-primary); text-align: left; color: #fff;">
+        <option value="">-- 请选择 (OPTIONAL) --</option>
+        <option value="yes">是 (YES)</option>
+        <option value="no">否 (NO)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>联系方式 (CONTACT INFO - OPTIONAL):</label>
+      <input type="text" placeholder="电话或姓名" class="btn-action" style="background: var(--bg-primary); text-align: left; color: #fff;">
+    </div>
+
+    <button class="btn-action btn-submit" onclick="submitReport()">立即求救 (SEND CALL FOR HELP)</button>
+    <button class="btn-action btn-cancel" onclick="closeModal()">取消 (CANCEL)</button>
+  </div>
+</div>
+
 <div class="emergency-top-bar">
   <div class="emergency-main">
     <div>
       EMERGENCY: <span class="emergency-num">110</span>
-      <span class="alert-blink">REPORT EMERGENCY</span>
+      <button class="report-btn" onclick="openModal('EMERGENCY')">REPORT EMERGENCY</button>
     </div>
     <div style="width:1px; height:15px; background:#444;"></div>
     <div>
       NON-EMERGENCY: <span class="emergency-num" style="color:var(--accent-amber)">009</span>
-      <span class="alert-blink" style="background:var(--accent-amber)">REPORT INCIDENT</span>
+      <button class="report-btn amber" onclick="openModal('NON-EMERGENCY')">REPORT NON-EMERGENCY</button>
     </div>
   </div>
   <div class="emergency-notice">
@@ -168,15 +211,12 @@
 </div>
 
 <nav class="top-nav">
-  <div class="nav-brand">
-    SIXSIDE <span>| POLICE DEPARTMENT</span>
-  </div>
+  <div class="nav-brand">SIXSIDE <span>| POLICE DEPARTMENT</span></div>
   <div class="nav-tools">
     <div class="patrol-status">
       <div class="blink-dot"></div> ACTIVE PATROL 24/7/365
     </div>
     <button class="tool-btn" onclick="document.body.classList.toggle('light')">DARK/LIGHT</button>
-    <button class="tool-btn">LANGUAGE</button>
   </div>
 </nav>
 
@@ -206,47 +246,13 @@
     <section>
       <h2 class="section-title">WANTED LIST</h2>
       <div class="card">
-        <div class="wanted-item">
-          <div class="photo-box">PHOTO</div>
-          <div>
-            <h3 style="color:var(--accent-red); font-size:1rem;">ID #8829: UNKNOWN SUSPECT</h3>
-            <p style="font-size:0.85rem; margin:5px 0;">Case: Armed Robbery at North Peak District.</p>
-            <p style="font-size:0.8rem; color:var(--accent-amber);">BOUNTY: $50,000</p>
-          </div>
-        </div>
-        <div class="wanted-item">
-          <div class="photo-box">PHOTO</div>
-          <div>
-            <h3 style="color:var(--accent-red); font-size:1rem;">ID #7104: JOHN DOE</h3>
-            <p style="font-size:0.85rem; margin:5px 0;">Case: Felony Evasion and Public Endangerment.</p>
-            <p style="font-size:0.8rem; color:var(--accent-amber);">BOUNTY: $25,000</p>
-          </div>
-        </div>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">加载中或暂无更新...</p>
       </div>
     </section>
-
     <aside>
       <h2 class="section-title">LOST & FOUND</h2>
       <div class="card">
-        <input type="text" class="lost-input" placeholder="Search items...">
-        <table class="lost-table">
-          <tr>
-            <td>Leather Wallet</td>
-            <td class="date-col">OCT 12</td>
-          </tr>
-          <tr>
-            <td>DJI Drone (Damaged)</td>
-            <td class="date-col">OCT 11</td>
-          </tr>
-          <tr>
-            <td>Toyota Car Keys</td>
-            <td class="date-col">OCT 09</td>
-          </tr>
-          <tr>
-            <td>Hiking Backpack</td>
-            <td class="date-col">OCT 05</td>
-          </tr>
-        </table>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">暂无遗失报告记录。</p>
       </div>
     </aside>
   </div>
@@ -256,6 +262,58 @@
   <p>© 2025-2026 SIXSIDE POLICE DEPARTMENT</p>
   <p>Technical support and maintenance provided by Wareflame</p>
 </footer>
+
+<script>
+  let map, marker;
+
+  function openModal(type) {
+    document.getElementById('modalTitle').innerText = 'REPORT ' + type;
+    document.getElementById('reportModal').style.display = 'block';
+    if (!map) {
+      initMap();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('reportModal').style.display = 'none';
+  }
+
+  function initMap() {
+    // 默认定位在六面省中心 (模拟坐标)
+    map = L.map('map').setView([45.523, -122.676], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+  }
+
+  function getLocation() {
+    const status = document.getElementById('locationStatus');
+    if (!navigator.geolocation) {
+      status.innerText = "您的设备不支持地理定位。";
+      return;
+    }
+    status.innerText = "正在定位中...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        status.innerText = `已定位: 纬度 ${lat.toFixed(4)}, 经度 ${lon.toFixed(4)}`;
+        
+        map.setView([lat, lon], 16);
+        if (marker) map.removeLayer(marker);
+        marker = L.marker([lat, lon]).addTo(map);
+      },
+      () => {
+        status.innerText = "无法获取定位，请确保GPS已开启并允许权限。";
+      }
+    );
+  }
+
+  function submitReport() {
+    alert("请求已加密发送至最近的巡逻单位。请留在原地并保持手机畅通。");
+    closeModal();
+  }
+</script>
 
 </body>
 </html>

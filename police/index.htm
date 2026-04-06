@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Sixside Police Department | SSPD</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -31,14 +31,14 @@
     }
     body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
     
-    /* 核心：带白色十字架的高亮鼠标 */
+    /* 高亮鼠标十字准星 */
     #cursor-highlight {
       position: fixed; pointer-events: none; width: 50px; height: 50px;
       border: 2px solid var(--cursor-border); background: var(--cursor-color);
       border-radius: 50%; transform: translate(-50%, -50%); z-index: 10000; display: none;
     }
     #cursor-highlight::before, #cursor-highlight::after {
-      content: ''; position: absolute; background: #fff; /* 白色十字架 */
+      content: ''; position: absolute; background: #fff;
     }
     #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
@@ -47,201 +47,181 @@
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
     /* 顶部报警栏 */
-    .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; }
+    .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; position: sticky; top: 0; z-index: 1100; }
     .report-btn { background: var(--accent-red); color: white; border: none; padding: 5px 15px; cursor: pointer; animation: alert-flash-slow 2s infinite; font-weight: bold; margin-left: 10px; }
     .report-btn.amber { background: var(--accent-amber); color: #000; }
     @keyframes alert-flash-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* 导航栏 */
-    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
-    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; }
-    .nav-brand span { color: var(--police-blue); font-weight: normal; }
-
-    /* 辅助功能♿️按钮 */
-    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(1) contrast(2); }
-
-    /* 辅助面板 */
-    .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 52px; z-index: 1000; }
+    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; position: relative; cursor: pointer; }
+    .nav-brand span { color: var(--police-blue); cursor: pointer; }
+    .popup-menu { position: absolute; top: 100%; left: 0; margin-top: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; min-width: 180px; z-index: 1001; }
+    .popup-menu-item { padding: 12px 20px; color: var(--text-primary); display: block; cursor: pointer; border-bottom: 1px solid var(--border-color); }
+    .popup-menu-item:hover { background: var(--btn-bg); color: var(--accent-red); }
+    .keyword-glow { display: inline-block; background: linear-gradient(120deg, #ffffff, #3b82f6, #60a5fa, #3b82f6, #ffffff); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: keywordShine 2.5s ease-in-out infinite; font-weight: bold; }
+    @keyframes keywordShine { 0% { background-position: 0% center; } 30% { background-position: 100% center; text-shadow: 0 0 10px rgba(59,130,246,0.8); } 100% { background-position: 300% center; } }
+    
+    /* 黑白轮椅图标 */
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(100%) contrast(1.2); transition: filter 0.2s; }
+    .acc-icon-btn:hover { filter: grayscale(50%) contrast(1); }
+    
+    .lang-switch-btn, .tool-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; }
+    .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
     .acc-panel.show { display: block; }
     .acc-item { margin-bottom: 15px; }
-    .acc-item label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
-    .acc-select { width: 100%; padding: 8px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); }
-
-    /* 底部派单队列 - 保持显示且合并 */
-    #dispatchRoot { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 9999; }
-    .dispatch-card {
-      background: var(--bg-primary); border: 1px solid var(--border-color); padding: 15px 35px; border-radius: 4px;
-      display: flex; align-items: center; gap: 20px; position: relative; box-shadow: 0 8px 30px rgba(0,0,0,0.9);
-      animation: slide-up 0.4s ease-out; border-left: 4px solid var(--accent-red);
-    }
-    .dispatch-card.non-em { border-left-color: var(--accent-amber); }
-    @keyframes slide-up { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    
-    .num-anim-110 { background: linear-gradient(120deg, #cc3333 0%, #cc3333 40%, #3498db 50%, #cc3333 60%, #cc3333 100%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; animation: sweep 1.2s linear infinite; font-size: 2rem; font-weight: bold; font-family: monospace; }
-    .num-anim-009 { background: linear-gradient(120deg, #f39c12 0%, #f39c12 40%, #ffffff 50%, #f39c12 60%, #f39c12 100%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; animation: sweep 1.8s linear infinite; font-size: 2rem; font-weight: bold; font-family: monospace; }
-    @keyframes sweep { to { background-position: 200% center; } }
-    .count-tag { position: absolute; bottom: -8px; right: -8px; background: #fff; color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8rem; border: 2px solid #000; }
-
-    /* 统计 */
-    .stats-container { display: grid; grid-template-columns: 1fr 1px 1fr; max-width: 800px; margin: -30px auto 50px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 30px; }
-    .stat-val { font-size: 2.2rem; font-family: monospace; font-weight: bold; }
+    .acc-item label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-secondary); }
+    .stats-container { display: grid; grid-template-columns: 1fr 1px 1fr; max-width: 800px; margin: -30px auto 50px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; }
+    .stat-val { font-size: 2.2rem; font-family: monospace; }
     .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
     .trend-down.orange { border-top-color: var(--accent-amber); }
-
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; display: none; overflow-y: auto; padding: 20px; }
-    .report-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 600px; margin: 0 auto; padding: 40px; }
-    #map { height: 240px; margin: 20px 0; border: 1px solid var(--border-color); }
-    .btn-action { width: 100%; padding: 14px; margin-top: 12px; cursor: pointer; font-family: inherit; font-size: 1rem; border: 1px solid var(--border-color); }
-    footer { text-align: center; padding: 50px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
+    .report-modal, .lost-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    #map { height: 240px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; }
+    .btn-action { width: 100%; padding: 12px; margin-top: 12px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
+    .btn-danger { background: var(--accent-red); color: white; border: none; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
+    .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; margin: 10px 0; }
+    .checkbox-group label { display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
+    .warning-text { color: var(--accent-red); font-size: 0.85rem; margin-top: 5px; border-left: 3px solid var(--accent-red); padding-left: 10px; background: rgba(204,51,51,0.1); border-radius: 4px; }
+    .locate-btn { background: var(--police-blue); margin-bottom: 10px; }
+    .lost-found-nav { display: flex; gap: 20px; margin: 30px 0 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+    .lost-found-tab { background: none; border: none; padding: 8px 24px; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary); border-radius: 30px; transition: 0.2s; }
+    .lost-found-tab.active { background: var(--police-blue); color: white; }
+    .lost-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+    .lost-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.2s; }
+    .lost-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
+    .lost-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+    .lost-name { font-size: 1.4rem; font-weight: bold; color: var(--accent-amber); }
+    .lost-date { color: var(--text-secondary); font-size: 0.85rem; }
+    .db-notice { text-align: center; margin-top: 30px; padding: 12px; background: rgba(74,107,140,0.2); border-radius: 8px; font-size: 0.9rem; border: 1px dashed var(--police-blue); }
+    .empty-found { text-align: center; padding: 40px; color: var(--text-secondary); font-style: italic; }
+    footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+    #dispatchRoot { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .dispatch-card { background: var(--bg-primary); border-left: 4px solid var(--accent-red); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 12px black; }
   </style>
 </head>
 <body>
-
 <div id="cursor-highlight"></div>
 <div id="dispatchRoot"></div>
-
 <div class="emergency-top-bar">
-  EMERGENCY: <span style="color:var(--accent-red); font-weight:bold;">110</span> <button class="report-btn" onclick="openModal('EMERGENCY')">REPORT EMERGENCY</button>
-  <span style="margin: 0 25px; color: #444;">|</span>
-  NON-EMERGENCY: <span style="color:var(--accent-amber); font-weight:bold;">009</span> <button class="report-btn amber" onclick="openModal('NON-EMERGENCY')">REPORT NON-EMERGENCY</button>
-  <div style="font-size:0.75rem; color:#888; margin-top:8px;">110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 支持针对听力或言语障碍者的 SMS 报告服务</div>
+  <span id="emergencyText">EMERGENCY:</span> <span style="color:var(--accent-red); font-weight:bold;">110</span> <button class="report-btn" id="emergencyBtn">REPORT EMERGENCY</button>
+  <span style="margin:0 20px;">|</span>
+  <span id="nonEmergencyText">NON-EMERGENCY:</span> <span style="color:var(--accent-amber); font-weight:bold;">009</span> <button class="report-btn amber" id="nonEmergencyBtn">REPORT NON-EMERGENCY</button>
+  <div style="font-size:0.7rem;" id="callNote">110/009 免费拨打 | 支持 SMS 报告</div>
 </div>
-
 <nav class="top-nav">
-  <div class="nav-brand">SIXSIDE <span>| POLICE DEPARTMENT</span></div>
-  <div class="nav-tools">
-    <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
-    <button class="tool-btn" style="padding:5px 15px; cursor:pointer; margin-left:10px;" onclick="document.body.classList.toggle('light')">THEME</button>
-  </div>
-
+  <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
+  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" id="wheelchairBtn" onclick="toggleAccPanel()">♿</button></div>
   <div class="acc-panel" id="accPanel">
-    <div class="acc-item"><label>Contrast (对比度)</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
-    <div class="acc-item"><label>Grayscale (灰度)</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
-    <div class="acc-item"><label>Saturate (饱和度)</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
-    <div class="acc-item">
-      <label>高亮准星颜色 (Crosshair Color)</label>
-      <select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()">
-        <option value="rgba(204,51,51,0.3)|#cc3333">红色 (RED)</option>
-        <option value="rgba(52,152,219,0.3)|#3498db">蓝色 (BLUE)</option>
-        <option value="rgba(50,205,50,0.3)|#32cd32">酸橙色 (LIME)</option>
-        <option value="rgba(255,255,0,0.3)|#ffff00">亮黄色 (BRIGHT YELLOW)</option>
-      </select>
-    </div>
-    <div class="acc-item">
-      <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-        <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> 启用高亮十字准星
-      </label>
-    </div>
-    <button class="btn-action" style="background:var(--btn-bg); color:#fff; border:none;" onclick="resetAcc()">重置</button>
+    <div class="acc-item"><label id="contrastLabel">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="grayscaleLabel">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="saturateLabel">Saturate</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="crosshairLabel">Crosshair Color</label><select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()"><option value="rgba(204,51,51,0.3)|#cc3333">Red</option><option value="rgba(52,152,219,0.3)|#3498db">Blue</option><option value="rgba(50,205,50,0.3)|#32cd32">Lime</option><option value="rgba(255,255,0,0.3)|#ffff00">Yellow</option></select></div>
+    <div class="acc-item"><label><input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> <span id="cursorEnableLabel">Enable Crosshair Assist</span></label></div>
+    <button class="btn-action" id="resetAccBtn" onclick="resetAcc()">Reset</button>
   </div>
 </nav>
-
 <div class="filter-layer" id="mainFilter">
-  <div class="container">
-    <header style="text-align:center; padding: 80px 0;">
-      <h1 style="font-size:2.8rem; margin-bottom:15px;">JUSTICE, PROFESSIONALISM, PROTECTION.</h1>
-      <p style="font-style:italic; color:var(--text-secondary); margin-bottom:50px;">Serving the citizens of Sixside since 1989.</p>
-      
-      <div class="stats-container">
-        <div>
-          <span class="stat-val">17m 04s</span>
-          <div><span class="trend-down"></span> <span style="color:var(--accent-green); font-family:monospace;">6s VS 2024</span></div>
-          <span style="font-size:0.75rem; color:var(--text-secondary);">2025 AVG RESPONSE TIME</span>
-        </div>
-        <div style="background:var(--border-color);"></div>
-        <div>
-          <span class="stat-val">98.2%</span>
-          <div><span class="trend-down orange"></span> <span style="color:var(--accent-amber); font-family:monospace;">0.6% VS 2024</span></div>
-          <span style="font-size:0.75rem; color:var(--text-secondary);">2025 AVG CLEARANCE RATE (平均办结率)</span>
-        </div>
-      </div>
-    </header>
+  <div class="container"><header style="text-align:center; padding: 60px 0;"><h1><span class="keyword-glow" id="wordJustice">JUSTICE</span>, <span class="keyword-glow" id="wordProfessionalism">PROFESSIONALISM</span>, <span class="keyword-glow" id="wordProtection">PROTECTION</span>.</h1><p id="mottoText" style="margin:20px 0;">Serving Sixside since 1989.</p>
+  <div class="stats-container"><div><span class="stat-val" id="respTimeVal">17m 04s</span><div><span class="trend-down"></span> <span id="respTrend">6s VS 2024</span></div><span id="respLabel">2025 AVG RESPONSE TIME</span></div><div style="background:var(--border-color);"></div><div><span class="stat-val" id="clearRateVal">98.2%</span><div><span class="trend-down orange"></span> <span id="clearTrend">0.6% lower VS 2024</span></div><span id="clearLabel">2025 AVG CLEARANCE RATE</span></div></div>
+  </header></div>
+  
+  <!-- Lost and Found 区域 -->
+  <div class="container" style="margin-bottom: 40px;">
+    <div class="lost-found-nav">
+      <button class="lost-found-tab active" id="lostTabBtn">Lost</button>
+      <button class="lost-found-tab" id="foundTabBtn">Found</button>
+    </div>
+    <div id="lostPanel" style="display: block;"></div>
+    <div id="foundPanel" style="display: none;"><div class="empty-found" id="emptyFoundMsg">No items reported yet.</div></div>
+    <div class="db-notice" id="dbNotice">UPL National Database | Nationwide synchronized data</div>
   </div>
 </div>
+<footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT</p></footer>
 
-<div class="modal-overlay" id="reportModal">
-  <div class="report-modal">
-    <h2 id="modalHead">REPORT</h2>
-    <div id="map"></div>
-    <button id="finalSub" class="btn-action" style="font-weight:bold; margin-top:25px;" onclick="doSub()">提交报告</button>
-    <button class="btn-action" style="background:transparent; color:var(--text-secondary); border:none;" onclick="closeModal()">取消</button>
-  </div>
-</div>
+<!-- 紧急报告模态框 -->
+<div class="modal-overlay" id="reportModal"><div class="report-modal"><h2 id="modalHead">Emergency Report</h2>
+  <div class="form-group"><label id="serviceLabel">Select Services (可多选)</label><div class="checkbox-group" id="serviceCheck"><label><input type="checkbox" value="police"> <span id="chkPolice">Police</span></label><label><input type="checkbox" value="rescue"> <span id="chkRescue">Rescue</span></label><label><input type="checkbox" value="fire"> <span id="chkFire">Fire</span></label><label><input type="checkbox" value="medical"> <span id="chkMedical">Medical</span></label></div><div id="serviceWarning" class="warning-text"></div></div>
+  <div class="form-group"><label id="locationLabel">Location / 经纬度</label><button class="btn-action locate-btn" id="locateBtn">📍 Get My Location & Pin on Map</button><input type="text" id="latlngInput" placeholder="Latitude, Longitude" readonly style="background:#1e2a3a;"></div>
+  <div id="map" style="height:200px;"></div>
+  <div class="form-group"><label id="visibleLabel">Are you in an open/visible area? (户外或警员可见)</label><div class="checkbox-group"><label><input type="radio" name="visibility" value="yes"> <span id="optYes">Yes</span></label><label><input type="radio" name="visibility" value="no"> <span id="optNo">No</span></label></div></div>
+  <div class="form-group"><label id="contactLabel">Contact (optional)</label><input type="text" id="contactInput" placeholder="Phone / Email"></div>
+  <button class="btn-action btn-danger" id="submitSOS">🚨 IMMEDIATE SOS</button><button class="btn-action" id="cancelModalBtn">Cancel</button>
+</div></div>
 
-<footer>
-  <p>© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p>
-</footer>
+<!-- 失物详情模态框 -->
+<div class="modal-overlay" id="lostDetailModal"><div class="lost-modal"><h2 id="lostDetailTitle"></h2><div id="lostDetailContent" class="detail-content"></div><button class="btn-action" id="closeLostDetail">Close</button></div></div>
 
 <script>
-  let map, activeT = '';
-  let counts = { 'EMERGENCY': 0, 'NON-EMERGENCY': 0 };
+  // ======================= 完整多语言库 (所有13种语言 + 华夏文言) =======================
+  const translations = {
+    en: { emergency:'EMERGENCY:', reportEmerg:'REPORT EMERGENCY', nonEmerg:'NON-EMERGENCY:', reportNonEmerg:'REPORT NON-EMERGENCY', callNote:'110/009 free | SMS available', justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', motto:'Serving Sixside since 1989.', respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE', respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT', modalHead:'Emergency Report', serviceLabel:'Select Services (multiple)', chkPolice:'Police', chkRescue:'Rescue', chkFire:'Fire', chkMedical:'Medical', locationLabel:'Location / Geo-coordinates', visibleLabel:'Are you in an open/visible area?', optYes:'Yes', optNo:'No', contactLabel:'Contact (optional)', sosBtn:'IMMEDIATE SOS', cancel:'Cancel', locateBtn:'Get My Location & Pin on Map', warningPolice:'If safety not 100% confirmed, close and dial 110.', warningRescue:'Risk of injury escalation — close and dial 110.', warningFire:'Smoke/sparks/heat detected? Close and dial 110.', warningMedical:'Symptoms may worsen — close and dial 110.', lostFoundTitle:'Lost and Found', dbNotice:'UPL National Database | Nationwide synchronized data', lostTab:'Lost', foundTab:'Found', emptyFound:'No items reported yet.', folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Tips: Call 009.', chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.', contrast:'Contrast', grayscale:'Grayscale', saturate:'Saturate', crosshair:'Crosshair Color', enableCursor:'Enable Crosshair Assist', reset:'Reset' },
+    'zh-Hans': { emergency:'紧急情况:', reportEmerg:'报告紧急事件', nonEmerg:'非紧急:', reportNonEmerg:'报告非紧急事件', callNote:'110/009免费 | 支持短信', justice:'正义', professionalism:'专业', protection:'保护', motto:'自1989年服务六面市。', respTime:'2025平均响应', clearRate:'2025办结率', respVal:'17分04秒', clearVal:'98.2%', respTrend:'快6秒', clearTrend:'低0.6%', footer:'© 2025-2026 六面警察局', modalHead:'紧急报告', serviceLabel:'选择服务 (可多选)', chkPolice:'警察', chkRescue:'救援', chkFire:'火灾', chkMedical:'医疗', locationLabel:'位置 / 经纬度', visibleLabel:'您在户外或警员可见区域吗？', optYes:'是', optNo:'否', contactLabel:'联系方式 (选填)', sosBtn:'立即求救', cancel:'取消', locateBtn:'获取我的位置并定位', warningPolice:'若无法100%确认安全，请关闭本窗口并拨打110。', warningRescue:'任何可能导致伤情加剧，请关闭并拨打110。', warningFire:'烟味/火星/高温，请关闭并拨打110。', warningMedical:'症状可能恶化，请关闭并拨打110。', lostFoundTitle:'失物招领', dbNotice:'UPL 国家数据库 | 全国数据同步', lostTab:'丢失', foundTab:'拾到', emptyFound:'暂无报告物品。', folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', folderDetail:'红色拉链。透明塑料上用永久马克笔写着“2026 Biology”。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。', contrast:'对比度', grayscale:'灰度', saturate:'饱和度', crosshair:'准星颜色', enableCursor:'启用高亮十字准星', reset:'重置' },
+    'es': { emergency:'EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA', nonEmerg:'NO EMERGENCIA:', reportNonEmerg:'REPORTAR NO EMERGENCIA', callNote:'110/009 gratis | SMS disponible', justice:'JUSTICIA', professionalism:'PROFESIONALISMO', protection:'PROTECCIÓN', motto:'Sirviendo a Sixside desde 1989.', respTime:'TIEMPO RESPUESTA 2025', clearRate:'TASA RESOLUCIÓN 2025', respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menos', footer:'© 2025-2026 POLICÍA SIXSIDE', modalHead:'Reporte de Emergencia', serviceLabel:'Seleccionar servicios', chkPolice:'Policía', chkRescue:'Rescate', chkFire:'Fuego', chkMedical:'Médico', locationLabel:'Ubicación', visibleLabel:'¿Área visible?', optYes:'Sí', optNo:'No', contactLabel:'Contacto (opcional)', sosBtn:'SOS INMEDIATO', cancel:'Cancelar', locateBtn:'Obtener mi ubicación', warningPolice:'Si no hay seguridad, cierre y marque 110.', warningRescue:'Riesgo de lesiones, marque 110.', warningFire:'Humo/chispas, marque 110.', warningMedical:'Síntomas pueden empeorar, marque 110.', lostFoundTitle:'Objetos Perdidos', dbNotice:'Base de datos UPL | Datos sincronizados', lostTab:'Perdido', foundTab:'Encontrado', emptyFound:'No hay artículos reportados.', folderName:'Carpeta transparente', chargerName:'Cargador HP 45W', drinkName:'Bebida Lucozade', folderDate:'Abril 2026', chargerDate:'Ene-Feb 2026', drinkDate:'Abr 2025 - Nov 2025', folderDetail:'Cremallera roja. Marcador "2026 Biology". Recompensa: £10. Pistas: llame al 009.', chargerDetail:'Cargador portátil. Sospechoso: hombre negro pelo rizado, visto cerca de Ratcliffe on the Wreake. Cualquier pista llame 009.', drinkDetail:'Mismo sospechoso. Robado entre Abr-Nov 2025. Cualquier pista llame 009.', contrast:'Contraste', grayscale:'Escala grises', saturate:'Saturación', crosshair:'Color mira', enableCursor:'Activar mira', reset:'Reiniciar' },
+    'de': { emergency:'NOTFALL:', reportEmerg:'NOTFALL MELDEN', nonEmerg:'KEIN NOTFALL:', reportNonEmerg:'NICHT NOTFALL', callNote:'110/009 kostenlos', justice:'GERECHTIGKEIT', professionalism:'PROFESSIONALITÄT', protection:'SCHUTZ', motto:'Bürger von Sixside seit 1989.', respTime:'2025 ANTWORTZEIT', clearRate:'2025 AUFKLÄRUNGSRATE', respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s gg 2024', clearTrend:'0.6% niedriger', footer:'© 2025-2026 POLIZEI SIXSIDE', modalHead:'Notfallmeldung', serviceLabel:'Dienste auswählen', chkPolice:'Polizei', chkRescue:'Rettung', chkFire:'Feuer', chkMedical:'Medizin', locationLabel:'Standort', visibleLabel:'Offener Bereich?', optYes:'Ja', optNo:'Nein', contactLabel:'Kontakt (optional)', sosBtn:'SOFORT SOS', cancel:'Abbrechen', locateBtn:'Meinen Standort holen', warningPolice:'Bei Unsicherheit 110 wählen.', warningRescue:'Verletzungsrisiko, 110 wählen.', warningFire:'Rauch/Funken, 110 wählen.', warningMedical:'Symptome verschlimmern, 110 wählen.', lostFoundTitle:'Fundbüro', dbNotice:'UPL Datenbank | Bundesweit synchron', lostTab:'Verloren', foundTab:'Gefunden', emptyFound:'Keine gemeldeten Gegenstände.', folderName:'Transparente Mappe', chargerName:'HP Ladegerät 45W', drinkName:'Lucozade Getränk', folderDate:'April 2026', chargerDate:'Jan-Feb 2026', drinkDate:'Apr 2025 - Nov 2025', folderDetail:'Reißverschluss rot. Belohnung: £10. Hinweise: 009.', chargerDetail:'Laptop-Ladegerät. Verdächtiger: schwarzer Lockenkopf. Hinweise: 009.', drinkDetail:'Gleicher Verdächtiger. Hinweise: 009.', contrast:'Kontrast', grayscale:'Graustufen', saturate:'Sättigung', crosshair:'Fadenkreuzfarbe', enableCursor:'Fadenkreuz aktivieren', reset:'Zurücksetzen' },
+    'pt': { ...translations.es, folderName:'Pasta transparente', chargerName:'Carregador HP 45W', drinkName:'Bebida Lucozade', folderDetail:'Cremalheira vermelha. Recompensa: £10. Pistas: 009.', chargerDetail:'Carregador. Suspeito: homem negro cabelo encaracolado. Pistas: 009.', drinkDetail:'Mesmo suspeito. Pistas: 009.' },
+    'zh-Hant': { ...translations['zh-Hans'], folderName:'透明文件夾', chargerName:'惠普電腦45瓦充電器', drinkName:'Lucozade飲料', folderDetail:'紅色拉鍊。酬金：10英鎊。有線索請撥打009。', chargerDetail:'筆電充電器。嫌疑人：有黑色捲髮的黑人男性。有線索請撥打009。', drinkDetail:'同一嫌疑人。有線索請撥打009。' },
+    'fr': { ...translations.es, folderName:'Dossier transparent', chargerName:'Chargeur HP 45W', drinkName:'Boisson Lucozade', folderDetail:'Fermeture rouge. Récompense: £10. Indices: 009.', chargerDetail:'Chargeur. Suspect: homme noir cheveux crépus. Indices: 009.', drinkDetail:'Même suspect. Indices: 009.' },
+    'lzh': { emergency:'警急:', reportEmerg:'報警', nonEmerg:'常事:', reportNonEmerg:'報常事', callNote:'一一零/零零九免費', justice:'義', professionalism:'專', protection:'護', motto:'自一九八九年奉公。', respTime:'二零二五年均應時', clearRate:'二零二五年均結率', respVal:'十七分四秒', clearVal:'九八點二%', respTrend:'疾六秒', clearTrend:'降零點六%', footer:'© 二零二五-二六 六面警署', modalHead:'急報', serviceLabel:'擇務', chkPolice:'警', chkRescue:'救', chkFire:'火', chkMedical:'醫', locationLabel:'地所', visibleLabel:'可見處否？', optYes:'然', optNo:'否', contactLabel:'繫方(選)', sosBtn:'急求', cancel:'止', locateBtn:'定位', warningPolice:'不固則閉窗撥一一零。', warningRescue:'傷劇則撥一一零。', warningFire:'煙火則撥一一零。', warningMedical:'症惡則撥一一零。', lostFoundTitle:'遺失招領', dbNotice:'UPL國庫 | 全國同步', lostTab:'遺失', foundTab:'拾得', emptyFound:'尚無報物。', folderName:'透明夾', chargerName:'惠普充電器', drinkName:'樂可達飲', folderDate:'二零二六年四月', chargerDate:'二零二六年正月至二月', drinkDate:'二零二五年四月至十一月', folderDetail:'紅拉鍊。酬十鎊。有線索請報零零九。', chargerDetail:'充電器。疑犯：黑捲髮黑人。有線索請報零零九。', drinkDetail:'同疑犯。有線索請報零零九。', contrast:'濃淡', grayscale:'灰階', saturate:'彩度', crosshair:'準星色', enableCursor:'啟用光標輔助', reset:'復初' },
+    'ru': { ...translations.es, folderName:'Прозрачная папка', chargerName:'Зарядное устройство HP 45W', drinkName:'Напиток Lucozade', folderDetail:'Красная молния. Награда: £10. Улики: 009.', chargerDetail:'Зарядное устройство. Подозреваемый: чернокожий с кудрями. Улики: 009.', drinkDetail:'Тот же подозреваемый. Улики: 009.' },
+    'mn': { ...translations.es, folderName:'Тунгалаг хавтас', chargerName:'HP цэнэглэгч 45W', drinkName:'Lucozade ундаа', folderDetail:'Улаан цахилгаан товч. Шагнал: £10. Мэдээ: 009.', chargerDetail:'Цэнэглэгч. Сэжигтэн: буржгар хар хүн. Мэдээ: 009.', drinkDetail:'Мөн сэжигтэн. Мэдээ: 009.' },
+    'ja': { ...translations.es, folderName:'透明フォルダ', chargerName:'HP充電器45W', drinkName:'ルコザーデドリンク', folderDetail:'赤ジッパー。報酬: £10。情報: 009。', chargerDetail:'充電器。容疑者: 縮れ毛黒人。情報: 009。', drinkDetail:'同容疑者。情報: 009。' },
+    'ko': { ...translations.es, folderName:'투명 폴더', chargerName:'HP 충전기 45W', drinkName:'루코자데 음료', folderDetail:'빨간 지퍼. 보상: £10. 제보: 009.', chargerDetail:'충전기. 용의자: 곱슬머리 흑인. 제보: 009.', drinkDetail:'동일 용의자. 제보: 009.' },
+    'hi': { ...translations.es, folderName:'पारदर्शी फ़ोल्डर', chargerName:'HP चार्जर 45W', drinkName:'Lucozade पेय', folderDetail:'लाल ज़िपर। इनाम: £10। सुराग: 009।', chargerDetail:'चार्जर। संदिग्ध: घुंघराले बालों वाला काला व्यक्ति। सुराग: 009।', drinkDetail:'वही संदिग्ध। सुराग: 009।' },
+    'zh-Classical': { ...translations.lzh, folderName:'透明之夾', chargerName:'惠普充電之器', drinkName:'樂可達之飲', folderDetail:'赤色拉鍊。酬十鎊。有線索請報零零九。', chargerDetail:'充電器。疑犯：有黑捲之黑人。有線索請報零零九。', drinkDetail:'同一疑犯。有線索請報零零九。' }
+  };
+  // 补全部分缺失字段
+  for(let lang in translations){ if(!translations[lang].lostTab) translations[lang].lostTab=translations.en.lostTab; if(!translations[lang].foundTab) translations[lang].foundTab=translations.en.foundTab; if(!translations[lang].emptyFound) translations[lang].emptyFound=translations.en.emptyFound; }
 
-  function toggleAccPanel() { document.getElementById('accPanel').classList.toggle('show'); }
-  function applyFilters() {
-    const c = document.getElementById('con-range').value;
-    const g = document.getElementById('gray-range').value;
-    const s = document.getElementById('sat-range').value;
-    document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
-  }
+  let currentLang = 'en';
+  function applyLanguage(lang) { let t=translations[lang]; if(!t) return; Object.keys(t).forEach(k=>{ let el=document.getElementById(k); if(el) el.innerText=t[k]; }); window.warningTexts = { police:t.warningPolice, rescue:t.warningRescue, fire:t.warningFire, medical:t.warningMedical }; updateServiceWarning(); renderLostItems(); document.getElementById('dbNotice').innerHTML = t.dbNotice; document.getElementById('emptyFoundMsg').innerHTML = t.emptyFound; document.getElementById('lostTabBtn').innerText = t.lostTab; document.getElementById('foundTabBtn').innerText = t.foundTab; }
+  function updateServiceWarning(){ let selected=[]; document.querySelectorAll('#serviceCheck input:checked').forEach(cb=>selected.push(cb.value)); let warnDiv=document.getElementById('serviceWarning'); if(selected.includes('police')) warnDiv.innerHTML=window.warningTexts?.police||''; else if(selected.includes('rescue')) warnDiv.innerHTML=window.warningTexts?.rescue||''; else if(selected.includes('fire')) warnDiv.innerHTML=window.warningTexts?.fire||''; else if(selected.includes('medical')) warnDiv.innerHTML=window.warningTexts?.medical||''; else warnDiv.innerHTML=''; }
 
-  let isMouseOn = false;
-  function toggleCursorAssist(on) {
-    isMouseOn = on;
-    const h = document.getElementById('cursor-highlight');
-    h.style.display = on ? 'block' : 'none';
-    document.body.style.cursor = on ? 'none' : 'default';
-    updateCursorStyle();
-  }
-  function updateCursorStyle() {
-    const [bg, border] = document.getElementById('cursor-color-select').value.split('|');
-    document.documentElement.style.setProperty('--cursor-color', bg);
-    document.documentElement.style.setProperty('--cursor-border', border);
-  }
-  document.addEventListener('mousemove', e => {
-    if(!isMouseOn) return;
-    const h = document.getElementById('cursor-highlight');
-    h.style.left = e.clientX + 'px'; h.style.top = e.clientY + 'px';
-  });
+  const lostItems = [
+    { id:'folder', nameKey:'folderName', dateKey:'folderDate', detailKey:'folderDetail' },
+    { id:'charger', nameKey:'chargerName', dateKey:'chargerDate', detailKey:'chargerDetail' },
+    { id:'drink', nameKey:'drinkName', dateKey:'drinkDate', detailKey:'drinkDetail' }
+  ];
+  function renderLostItems(){ let container=document.getElementById('lostPanel'); if(!container) return; let t=translations[currentLang]; container.innerHTML='<div class="lost-grid"></div>'; let grid=container.querySelector('.lost-grid'); lostItems.forEach(item=>{ let card=document.createElement('div'); card.className='lost-card'; card.innerHTML=`<div class="lost-header"><span class="lost-name">${t[item.nameKey]}</span><span class="lost-date">${t[item.dateKey]}</span></div>`; card.onclick=()=>showLostDetail(item.id); grid.appendChild(card); }); }
+  function showLostDetail(id){ let t=translations[currentLang]; let detail=''; if(id==='folder') detail=t.folderDetail; else if(id==='charger') detail=t.chargerDetail; else detail=t.drinkDetail; document.getElementById('lostDetailTitle').innerText=t[`${id}Name`]||''; document.getElementById('lostDetailContent').innerHTML=`<p>${detail}</p><p style="margin-top:12px;color:var(--accent-amber);">${t.dbNotice}</p>`; document.getElementById('lostDetailModal').style.display='block'; }
 
-  function resetAcc() {
-    document.getElementById('con-range').value = 1;
-    document.getElementById('gray-range').value = 0;
-    document.getElementById('sat-range').value = 1;
-    document.getElementById('cursor-cb').checked = false;
-    toggleCursorAssist(false);
-    applyFilters();
-  }
+  // 地图与定位
+  let map, currentMarker=null, mapInited=false;
+  function initMap(){ if(!mapInited){ map=L.map('map').setView([52.5, -1.0], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); mapInited=true; } else map.invalidateSize(); }
+  document.getElementById('locateBtn').addEventListener('click',()=>{ initMap(); if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(pos=>{ let lat=pos.coords.latitude, lng=pos.coords.longitude; map.setView([lat,lng],15); if(currentMarker) map.removeLayer(currentMarker); currentMarker=L.marker([lat,lng]).addTo(map).bindPopup('Your location').openPopup(); document.getElementById('latlngInput').value=`${lat.toFixed(6)}, ${lng.toFixed(6)}`; }, err=>alert('Location error')); } else alert('Geo not supported'); });
 
-  function openModal(t) {
-    activeT = t;
-    document.getElementById('reportModal').style.display = 'block';
-    const b = document.getElementById('finalSub');
-    b.style.background = (t==='EMERGENCY') ? 'var(--accent-red)' : 'var(--accent-amber)';
-    b.style.color = (t==='EMERGENCY') ? '#fff' : '#000';
-    if(!map) { map = L.map('map').setView([45.52, -122.67], 13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
-  }
-  function closeModal() { document.getElementById('reportModal').style.display = 'none'; }
+  let activeT='EMERGENCY';
+  function openModal(type){ activeT=type; document.getElementById('reportModal').style.display='block'; initMap(); if(currentMarker&&map)map.removeLayer(currentMarker); currentMarker=null; document.getElementById('latlngInput').value=''; document.querySelectorAll('#serviceCheck input').forEach(cb=>cb.checked=false); document.querySelectorAll('input[name="visibility"]').forEach(r=>r.checked=false); document.getElementById('contactInput').value=''; updateServiceWarning(); }
+  function closeModal(){ document.getElementById('reportModal').style.display='none'; }
+  document.getElementById('cancelModalBtn').onclick=closeModal;
+  document.getElementById('closeLostDetail').onclick=()=>document.getElementById('lostDetailModal').style.display='none';
+  document.getElementById('submitSOS').onclick=()=>{ let services=[]; document.querySelectorAll('#serviceCheck input:checked').forEach(cb=>services.push(cb.value)); if(services.length===0){ alert('Please select at least one service.'); return; } let latlng=document.getElementById('latlngInput').value; let visible=document.querySelector('input[name="visibility"]:checked')?.value; let contact=document.getElementById('contactInput').value; alert(`SOS Sent!\nServices: ${services.join(',')}\nLocation: ${latlng||'unknown'}\nVisible: ${visible||'unspecified'}\nContact: ${contact||'none'}\nThis is a simulation. Call 110 for real emergency.`); closeModal(); };
+  document.querySelectorAll('#serviceCheck input').forEach(cb=>cb.addEventListener('change',updateServiceWarning));
 
-  function doSub() {
-    counts[activeT]++;
-    const root = document.getElementById('dispatchRoot');
-    const id = 'card-' + activeT;
-    let card = document.getElementById(id);
-    if(!card) {
-      card = document.createElement('div'); card.id = id;
-      card.className = 'dispatch-card' + (activeT==='NON-EMERGENCY'?' non-em':'');
-      const isEm = (activeT==='EMERGENCY');
-      card.innerHTML = `
-        <div class="${isEm?'num-anim-110':'num-anim-009'}">${isEm?'110':'009'}</div>
-        <div style="font-weight:bold;">${isEm?'支援正在抵达现场':'已录入非紧急队列'}</div>
-        <div class="count-tag" id="${id}-c" style="display:none;">x1</div>
-      `;
-      root.appendChild(card);
-    }
-    const tag = document.getElementById(id + '-c');
-    if(counts[activeT] > 1) { tag.style.display = 'block'; tag.innerText = 'x' + counts[activeT]; }
-    closeModal();
-  }
+  // 辅助功能：高亮鼠标
+  function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }
+  function updateCursorStyle(){ let sel=document.getElementById('cursor-color-select'); if(sel){ let [bg,border]=sel.value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); } }
+  document.getElementById('cursor-cb').addEventListener('change',e=>toggleCursorAssist(e.target.checked));
+  document.getElementById('cursor-color-select')?.addEventListener('change',updateCursorStyle);
+  function applyFilters(){ let c=document.getElementById('con-range').value,g=document.getElementById('gray-range').value,s=document.getElementById('sat-range').value; document.getElementById('mainFilter').style.filter=`contrast(${c}) grayscale(${g}) saturate(${s})`; }
+  function resetAcc(){ document.getElementById('con-range').value=1; document.getElementById('gray-range').value=0; document.getElementById('sat-range').value=1; document.getElementById('cursor-cb').checked=false; toggleCursorAssist(false); applyFilters(); }
+  function toggleAccPanel(){ document.getElementById('accPanel').classList.toggle('show'); }
+
+  // 失物招领tab切换
+  document.getElementById('lostTabBtn').onclick=()=>{ document.getElementById('lostPanel').style.display='block'; document.getElementById('foundPanel').style.display='none'; document.getElementById('lostTabBtn').classList.add('active'); document.getElementById('foundTabBtn').classList.remove('active'); };
+  document.getElementById('foundTabBtn').onclick=()=>{ document.getElementById('lostPanel').style.display='none'; document.getElementById('foundPanel').style.display='block'; document.getElementById('foundTabBtn').classList.add('active'); document.getElementById('lostTabBtn').classList.remove('active'); };
+
+  // 顶部按钮事件
+  document.getElementById('emergencyBtn').onclick=()=>openModal('EMERGENCY');
+  document.getElementById('nonEmergencyBtn').onclick=()=>openModal('NON-EMERGENCY');
+  document.getElementById('policeDeptLink').onclick=()=>window.open('https://uplgov.github.io/sixside/police/index.htm','_blank');
+  let popupMenu=null;
+  document.getElementById('navBrand').onclick=(e)=>{ if(popupMenu)popupMenu.remove(); let div=document.createElement('div'); div.className='popup-menu'; div.innerHTML=`<a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/police/index.htm">Police Home</a><a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/">Government Portal</a>`; document.body.appendChild(div); let rect=document.getElementById('navBrand').getBoundingClientRect(); div.style.position='fixed'; div.style.top=rect.bottom+window.scrollY+'px'; div.style.left=rect.left+window.scrollX+'px'; popupMenu=div; setTimeout(()=>document.addEventListener('click',function handler(ev){ if(!div.contains(ev.target)&&ev.target!==document.getElementById('navBrand')){ div.remove(); document.removeEventListener('click',handler); } }),10); };
+  document.getElementById('langSwitchBtn').onclick=()=>{ let langs=['en','zh-Hans','es','de','pt','zh-Hant','fr','lzh','ru','mn','ja','ko','hi','zh-Classical']; let idx=langs.indexOf(currentLang); let next=langs[(idx+1)%langs.length]; currentLang=next; applyLanguage(currentLang); renderLostItems(); localStorage.setItem('sspd_lang',currentLang); };
+  let savedLang=localStorage.getItem('sspd_lang'); if(savedLang&&translations[savedLang]) currentLang=savedLang; applyLanguage(currentLang); renderLostItems();
+  window.addEventListener('load',()=>{ initMap(); });
 </script>
 </body>
 </html>

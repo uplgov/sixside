@@ -1,407 +1,583 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sixside GOV Portal</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg-primary: #0a0f1a;
-            --bg-secondary: #10161f;
-            --text-primary: #e8edf5;
-            --text-secondary: #9aaebf;
-            --border-color: #1f2a36;
-            --card-bg: #10161f;
-            --card-border: #222c38;
-            --btn-bg: #1e2a3a;
-        }
-
-        body.light {
-            --bg-primary: #f4f6f9;
-            --bg-secondary: #ffffff;
-            --text-primary: #1a2634;
-            --text-secondary: #3a4a5e;
-            --border-color: #d0d8e4;
-            --card-bg: #ffffff;
-            --card-border: #dce2ec;
-            --btn-bg: #eef2f7;
-        }
-
-        body {
-            font-family: system-ui, 'Segoe UI', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* 顶部导航栏 */
-        .top-nav {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .nav-left {
-            display: flex;
-            align-items: baseline;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .home-button {
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-decoration: none;
-            color: var(--text-primary);
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        .nav-divider {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-        }
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .nav-link:hover {
-            color: var(--text-primary);
-        }
-        .toolbar {
-            display: flex;
-            gap: 0.8rem;
-            align-items: center;
-        }
-        .btn-square {
-            background: var(--btn-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.3rem 0.8rem;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-        .accessibility-wrapper { position: relative; }
-        .accessibility-toggle {
-            background: var(--btn-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 0.2rem 0.6rem;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        .accessibility-panel {
-            position: absolute;
-            top: 35px;
-            right: 0;
-            width: 260px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            z-index: 900;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px);
-            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
-        }
-        .accessibility-panel.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        /* 页面内容 */
-        .hero {
-            padding: 2rem 0;
-        }
-        .hero h1 {
-            font-size: 2.5rem;
-        }
-        .section-title {
-            font-size: 1.8rem;
-            border-left: 4px solid #5f7f9e;
-            padding-left: 1rem;
-            margin: 2rem 0 1rem;
-        }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 1.2rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: var(--text-secondary);
-        }
-        .card h3 {
-            margin-bottom: 0.5rem;
-        }
-        .card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .footer {
-            margin-top: 3rem;
-            padding: 1.5rem 0;
-            border-top: 1px solid var(--border-color);
-            text-align: center;
-            font-size: 0.8rem;
-        }
-        .detail-section {
-            margin: 2rem 0;
-            padding: 1rem;
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--card-border);
-        }
-        .back-home {
-            display: inline-block;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sixside GOV Portal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #10161f;
+      --text-primary: #e8edf5;
+      --text-secondary: #9aaebf;
+      --border-color: #1f2a36;
+      --card-bg: #10161f;
+      --card-border: #222c38;
+      --btn-bg: #1e2a3a;
+    }
+    body.light {
+      --bg-primary: #f4f6f9;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a2634;
+      --text-secondary: #3a4a5e;
+      --border-color: #d0d8e4;
+      --card-bg: #ffffff;
+      --card-border: #dce2ec;
+      --btn-bg: #eef2f7;
+    }
+    body {
+      font-family: 'Georgia', 'Times New Roman', Times, serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      transition: background 0.2s, color 0.2s;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .top-nav {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      flex-wrap: wrap;
+    }
+    .nav-left { display: flex; align-items: baseline; gap: 0.5rem; }
+    .home-button { font-size: 1.2rem; font-weight: bold; background: none; border: none; color: var(--text-primary); cursor: pointer; }
+    .nav-divider { color: var(--text-secondary); }
+    .current-location { color: var(--text-secondary); }
+    .toolbar { display: flex; gap: 0.8rem; align-items: center; }
+    .btn-square { background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.3rem 0.8rem; cursor: pointer; color: var(--text-primary); }
+    .accessibility-wrapper { position: relative; }
+    .accessibility-toggle {
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 0.2rem 0.6rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      filter: grayscale(1) brightness(0.9);
+    }
+    .accessibility-panel {
+      position: absolute; top: 40px; right: 0; width: 320px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.2rem;
+      z-index: 900;
+      opacity: 0; visibility: hidden; transform: translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+    .accessibility-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .accessibility-panel h4 { font-size: 1.1rem; margin-bottom: 1rem; text-align: center; }
+    .accessibility-panel label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.3rem; }
+    .accessibility-panel input { width: 100%; margin: 0.2rem 0; cursor: pointer; }
+    .accessibility-panel select { width: 100%; padding: 0.3rem; margin: 0.2rem 0; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; }
+    .accessibility-panel button { width: 100%; margin-top: 1rem; padding: 0.4rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; color: var(--text-primary); }
+    .hero { display: flex; align-items: center; justify-content: space-between; padding: 2rem 0; gap: 2rem; flex-wrap: wrap; }
+    .hero-text h1 { font-size: 3.5rem; }
+    .logo-large { max-width: 220px; height: auto; }
+    .section-title { font-size: 1.8rem; border-left: 4px solid #5f7f9e; padding-left: 1rem; margin: 2rem 0 1rem; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: 0.2s; }
+    .card:hover { transform: translateY(-2px); border-color: var(--text-secondary); }
+    .view-all-btn { display: inline-block; margin: 0.5rem 0 1rem; padding: 0.5rem 1.2rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 30px; cursor: pointer; }
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px); z-index: 1100; display: flex; align-items: center; justify-content: center;
+    }
+    .all-depts-modal, .lang-modal { background: var(--bg-secondary); border-radius: 16px; max-width: 700px; width: 85%; max-height: 80vh; overflow-y: auto; padding: 1.5rem; }
+    .lang-modal { max-width: 400px; text-align: center; }
+    .lang-option { position: relative; display: block; width: 100%; margin: 0.5rem 0; padding: 0.5rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; color: var(--text-primary); }
+    .lang-welcome { position: absolute; left: 50%; top: -28px; transform: translateX(-50%); background: var(--card-border); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .lang-option:hover .lang-welcome { opacity: 1; }
+    .footer { margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.8rem; }
+    .detail-section { margin: 2rem 0; padding: 1.5rem; background: var(--card-bg); border-radius: 12px; }
+    .back-home { display: inline-block; margin-bottom: 1rem; cursor: pointer; color: var(--text-secondary); }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; }
+    .highlight-cursor { cursor: none; }
+    .highlight-cursor:before { content: ''; position: fixed; top: var(--mouse-y, 0); left: var(--mouse-x, 0); width: 28px; height: 28px; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); }
+  </style>
 </head>
 <body>
-
 <div class="top-nav">
-    <div class="nav-left">
-        <button class="home-button" id="homeBtn">Sixside</button>
-        <span class="nav-divider">|</span>
-        <a href="#" class="nav-link" data-page="home">主页</a>
-        <a href="#" class="nav-link" data-page="pd">警察局</a>
-        <a href="#" class="nav-link" data-page="hes">HESS</a>
-        <a href="#" class="nav-link" data-page="maffa">MAFFA</a>
+  <div class="nav-left">
+    <button class="home-button" id="homeBtn">Sixside</button>
+    <span class="nav-divider">|</span>
+    <span class="current-location" id="currentLocation">Home</span>
+  </div>
+  <div class="toolbar">
+    <div class="accessibility-wrapper">
+      <div class="accessibility-toggle" id="accessibilityToggle">♿</div>
+      <div class="accessibility-panel" id="accessibilityPanel">
+        <h4 id="accessTitle">辅助功能</h4>
+        <label id="contrastLabel">对比度 <span id="contrastVal">1.0</span></label>
+        <input type="range" id="contrastSlider" min="0.5" max="2" step="0.01" value="1">
+        <label id="grayscaleLabel">灰度 <span id="grayscaleVal">0</span></label>
+        <input type="range" id="grayscaleSlider" min="0" max="1" step="0.01" value="0">
+        <label id="saturateLabel">饱和度 <span id="saturateVal">1.0</span></label>
+        <input type="range" id="saturateSlider" min="0" max="2" step="0.01" value="1">
+        <label id="cursorColorLabel">鼠标高亮颜色</label>
+        <select id="cursorColorSelect">
+          <option value="red" id="cursorRed">红色</option>
+          <option value="yellow" id="cursorYellow">黄色</option>
+        </select>
+        <label><input type="checkbox" id="cursorCheckbox"> <span id="cursorEnableLabel">开启鼠标高亮</span></label>
+        <button id="resetAccessibilityBtn" class="btn-square">恢复默认</button>
+      </div>
     </div>
-    <div class="toolbar">
-        <div class="accessibility-wrapper">
-            <div class="accessibility-toggle" id="accessibilityToggle">♿</div>
-            <div class="accessibility-panel" id="accessibilityPanel">
-                <h4>辅助功能</h4>
-                <label>对比度 <span id="contrastVal">1.0</span></label>
-                <input type="range" id="contrastSlider" min="0.5" max="2" step="0.01" value="1">
-                <label>灰度 <span id="grayscaleVal">0</span></label>
-                <input type="range" id="grayscaleSlider" min="0" max="1" step="0.01" value="0">
-                <label>饱和度 <span id="saturateVal">1.0</span></label>
-                <input type="range" id="saturateSlider" min="0" max="2" step="0.01" value="1">
-                <label><input type="checkbox" id="cursorCheckbox"> 鼠标高亮</label>
-                <button id="resetAccessibilityBtn">恢复默认</button>
-            </div>
-        </div>
-        <button class="btn-square" id="themeToggleBtn">深色/浅色</button>
-        <button class="btn-square" id="langReopenBtn">语言</button>
-    </div>
+    <button class="btn-square" id="themeToggleBtn">Dark/Light</button>
+    <button class="btn-square" id="langReopenBtn">Language</button>
+  </div>
 </div>
 
 <div class="container" id="mainContent">
-    <div class="hero" id="homeView">
-        <h1>Sixside</h1>
-        <p style="font-style: italic;">The Enduring Spirit of the Mountains</p>
-        <div class="section-title">Government & Agencies</div>
-        <div class="card-grid" id="departmentsGrid"></div>
-        <div class="section-title">Other Offices</div>
-        <div class="card-grid" id="otherOfficesGrid"></div>
+  <div id="homeView">
+    <div class="hero">
+      <div class="hero-text">
+        <h1 id="mainTitle">Sixside</h1>
+        <p id="mainSubtitle" style="font-style: italic;">The Enduring Spirit of the Mountains</p>
+      </div>
+      <img src="SixsideLogo.png" alt="Sixside Logo" class="logo-large" id="logoImg">
     </div>
-    <div id="detailView" style="display: none;"></div>
+    <div class="section-title" id="aboutTitle">About Sixside</div>
+    <div class="card-grid" id="aboutGrid"></div>
+    <div class="section-title" id="govTitle">Government & Agencies</div>
+    <div class="card-grid" id="featuredDepts"></div>
+    <div class="view-all-btn" id="viewAllBtn">View All Departments</div>
+    <div class="section-title" id="otherTitle">Other Offices</div>
+    <div class="card-grid" id="otherOfficesGrid"></div>
+  </div>
+  <div id="detailView" style="display: none;"></div>
 </div>
 
 <div class="footer">
-    <p>© Sixside Provincial Government</p>
-    <p>Technical support by Wareflame</p>
-    <p><a href="#" id="privacyLink">Privacy Policy</a> | <a href="#" id="licenseLink">License</a></p>
-    <p><a href="https://uplgov.github.io/national-portal/" target="_blank">UPL National Portal</a></p>
+  <p id="copyrightLine">© Sixside Provincial Government</p>
+  <p id="techSupportLine">Technical support and maintenance provided by Wareflame</p>
+  <p><a href="#" id="privacyLink">Privacy</a> | <a href="#" id="licenseLink">Licence</a> | <a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLink">UPL National Portal</a></p>
 </div>
 
 <script>
-    // 部门数据（独立页面）
-    const departments = [
-        { id: "governor", name: "Governor's Office", head: "Governor Amina Okonkwo", desc: "Executive leadership, intergovernmental relations, and provincial strategy." },
-        { id: "pd", name: "Sixside PD", head: "Chief Marius van der Berg", desc: "Public safety, patrol, crime prevention, and community policing." },
-        { id: "pser", name: "Public Safety & Emergency Response", head: "Director Mei Lin", desc: "Firefighting, mountain rescue, ambulance dispatch, disaster coordination." },
-        { id: "hes", name: "HESS Office", head: "Minister Fatima Al-Hassan", desc: "Health (HSDS), Education, Social Care, and Family Support." },
-        { id: "maffa", name: "MAFFA", head: "Secretary Kenji Tanaka", desc: "Mining, Agriculture, Forestry, Fisheries Administration." },
-        { id: "hl", name: "HL Trust", head: "Curator Eleanor Ashworth", desc: "Heritage protection, hiking routes, cultural preservation." }
-    ];
-    const otherOffices = [
-        { name: "Provincial Council", head: "Speaker Janusz Kowalski", desc: "Legislative body, budget approval, citizen representation." },
-        { name: "Justice Office", head: "Judge Priya Patel", desc: "Legal affairs, dispute resolution, minor offenses." },
-        { name: "Land & Housing Office", head: "Director Carlos Fernández", desc: "Land registry, housing allocation, property rights." },
-        { name: "Transport & Infrastructure", head: "Engineer Solveig Haugen", desc: "Roads, public toilets, stations, and port maintenance." }
-    ];
+  // ======================= 部门数据 =======================
+  const allDepts = [
+    { id: "governor", nameEn: "Governor's Office", head: "Amina Okonkwo", descEn: "Executive leadership.",
+      nameZhSimple: "省长办公室", nameZhClassical: "省長辦公室", nameZhTraditional: "省長辦公室", nameZhHuaxia: "省長之署",
+      nameEs: "Oficina del Gobernador", namePt: "Gabinete do Governador", nameDe: "Büro des Gouverneurs",
+      nameFr: "Cabinet du Gouverneur", nameRu: "Канцелярия губернатора", nameMn: "Засаг даргын тамгын газар",
+      descZhSimple: "行政领导", descZhClassical: "行政治理", descZhTraditional: "行政領導", descZhHuaxia: "行政治理",
+      descEs: "Liderazgo ejecutivo", descPt: "Liderança executiva", descDe: "Exekutivführung",
+      descFr: "Direction exécutive", descRu: "Руководство", descMn: "Гүйцэтгэх удирдлага" },
+    { id: "pd", nameEn: "Sixside PD", head: "Marius van der Berg", descEn: "Public safety, patrol.",
+      nameZhSimple: "六面警察局", nameZhClassical: "六面警察局", nameZhTraditional: "六面警察局", nameZhHuaxia: "六面警察署",
+      nameEs: "Policía de Sixside", namePt: "Polícia de Sixside", nameDe: "Polizei Sixside",
+      nameFr: "Police de Sixside", nameRu: "Полиция Sixside", nameMn: "Sixside цагдаа",
+      descZhSimple: "公共安全、巡逻", descZhClassical: "治安、巡邏", descZhTraditional: "公共安全、巡邏", descZhHuaxia: "治安巡邏",
+      descEs: "Seguridad pública, patrullaje", descPt: "Segurança pública, patrulha", descDe: "Öffentliche Sicherheit",
+      descFr: "Sécurité publique, patrouille", descRu: "Общественная безопасность", descMn: "Олон нийтийн аюулгүй байдал" },
+    { id: "pser", nameEn: "Public Safety & Emergency", head: "Mei Lin", descEn: "Fire, rescue, ambulance.",
+      nameZhSimple: "公共安全与应急", nameZhClassical: "公共安全與應急", nameZhTraditional: "公共安全與應急", nameZhHuaxia: "公安應急署",
+      nameEs: "Seguridad Pública y Emergencias", namePt: "Segurança Pública e Emergência", nameDe: "Öffentliche Sicherheit und Notfall",
+      nameFr: "Sécurité publique et urgences", nameRu: "Общественная безопасность и чрезвычайные ситуации", nameMn: "Олон нийтийн аюулгүй байдал ба онцгой байдал",
+      descZhSimple: "消防、救援、救护", descZhClassical: "消防、救援、救護", descZhTraditional: "消防、救援、救護", descZhHuaxia: "消防救護",
+      descEs: "Bomberos, rescate, ambulancia", descPt: "Bombeiros, resgate, ambulância", descDe: "Feuerwehr, Rettung",
+      descFr: "Incendie, secours, ambulance", descRu: "Пожарная охрана, спасение", descMn: "Гал, аврах, түргэн тусламж" },
+    { id: "hes", nameEn: "HESS Office", head: "Fatima Al-Hassan", descEn: "Health, Education, Social Care and Support.",
+      nameZhSimple: "健康、教育、社会关怀和社会支持部", nameZhClassical: "健康、教育、社會關懷和社會支持部", nameZhTraditional: "健康、教育、社會關懷和社會支持部", nameZhHuaxia: "康教社安部",
+      nameEs: "Oficina de Salud, Educación, Asistencia Social", namePt: "Gabinete da Saúde, Educação, Apoio Social", nameDe: "Amt für Gesundheit, Bildung, Soziales",
+      nameFr: "Bureau de la Santé, de l'Éducation et du Soutien Social", nameRu: "Управление здравоохранения, образования и социальной поддержки", nameMn: "Эрүүл мэнд, боловсрол, нийгмийн халамжийн газар",
+      descZhSimple: "健康、教育、社会关怀和社会支持", descZhClassical: "健康、教育、社會關懷和社會支持", descZhTraditional: "健康、教育、社會關懷和社會支持", descZhHuaxia: "康教社安",
+      descEs: "Salud, Educación, Asistencia Social", descPt: "Saúde, Educação, Apoio Social", descDe: "Gesundheit, Bildung, Soziales",
+      descFr: "Santé, Éducation, Soutien social", descRu: "Здравоохранение, образование, социальная поддержка", descMn: "Эрүүл мэнд, боловсрол, нийгмийн халамж" },
+    { id: "maffa", nameEn: "MAFFA", head: "Kenji Tanaka", descEn: "Mining, Agriculture, Forestry, Fisheries.",
+      nameZhSimple: "矿农林渔管理局", nameZhClassical: "礦農林漁管理局", nameZhTraditional: "礦農林漁管理局", nameZhHuaxia: "礦農林漁署",
+      nameEs: "Administración de Minería, Agricultura, Silvicultura, Pesca", namePt: "Administração de Mineração, Agricultura, Florestas, Pescas", nameDe: "Verwaltung für Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei",
+      nameFr: "Administration des mines, de l'agriculture, des forêts et de la pêche", nameRu: "Управление горнодобывающей промышленности, сельского хозяйства, лесного хозяйства и рыболовства", nameMn: "Уул уурхай, хөдөө аж ахуй, ой, загасны захиргаа",
+      descZhSimple: "矿业、农业、林业、渔业", descZhClassical: "礦業、農業、林業、漁業", descZhTraditional: "礦業、農業、林業、漁業", descZhHuaxia: "礦農林漁",
+      descEs: "Minería, Agricultura, Silvicultura, Pesca", descPt: "Mineração, Agricultura, Florestas, Pescas", descDe: "Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei",
+      descFr: "Mines, agriculture, forêts, pêche", descRu: "Горнодобывающая промышленность, сельское хозяйство, лесное хозяйство, рыболовство", descMn: "Уул уурхай, хөдөө аж ахуй, ой, загас" },
+    { id: "sra", nameEn: "Sixside Revenue Authority", head: "Carlos Fernández", descEn: "Taxation, fiscal policy.",
+      nameZhSimple: "六面财政收入署", nameZhClassical: "六面財政收入署", nameZhTraditional: "六面財政收入署", nameZhHuaxia: "六面財政署",
+      nameEs: "Autoridad Fiscal de Sixside", namePt: "Autoridade Fiscal de Sixside", nameDe: "Steuerbehörde Sixside",
+      nameFr: "Autorité fiscale de Sixside", nameRu: "Налоговое управление Sixside", nameMn: "Sixside татварын газар",
+      descZhSimple: "税收、财政政策", descZhClassical: "稅收、財政政策", descZhTraditional: "稅收、財政政策", descZhHuaxia: "稅財政",
+      descEs: "Impuestos, política fiscal", descPt: "Impostos, política fiscal", descDe: "Steuern, Finanzpolitik",
+      descFr: "Impôts, politique fiscale", descRu: "Налоги, фискальная политика", descMn: "Татвар, санхүүгийн бодлого" },
+    { id: "hl", nameEn: "HL Trust", head: "Eleanor Ashworth", descEn: "Heritage, hiking routes.",
+      nameZhSimple: "遗产与土地信托", nameZhClassical: "遺產與土地信託", nameZhTraditional: "遺產與土地信託", nameZhHuaxia: "遺產信託",
+      nameEs: "Fideicomiso de Patrimonio y Tierras", namePt: "Fideicomisso de Património e Terras", nameDe: "Stiftung für Kulturerbe und Land",
+      nameFr: "Fiducie du patrimoine et des terres", nameRu: "Трастовый фонд наследия и земель", nameMn: "Өв ба газрын итгэл",
+      descZhSimple: "遗产、徒步路线", descZhClassical: "遺產、徒步路線", descZhTraditional: "遺產、徒步路線", descZhHuaxia: "遺產步道",
+      descEs: "Patrimonio, rutas de senderismo", descPt: "Património, rotas de caminhada", descDe: "Kulturerbe, Wanderwege",
+      descFr: "Patrimoine, sentiers de randonnée", descRu: "Наследие, туристические маршруты", descMn: "Өв, явган аялалын зам" }
+  ];
 
-    function renderHome() {
-        const grid = document.getElementById('departmentsGrid');
-        const otherGrid = document.getElementById('otherOfficesGrid');
-        grid.innerHTML = departments.map(d => `
-            <div class="card" data-id="${d.id}">
-                <h3>${d.name}</h3>
-                <p>${d.desc.substring(0, 80)}...</p>
-                <p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${d.head}</p>
-            </div>
-        `).join('');
-        otherGrid.innerHTML = otherOffices.map(o => `
-            <div class="card">
-                <h3>${o.name}</h3>
-                <p>${o.desc}</p>
-                <p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${o.head}</p>
-            </div>
-        `).join('');
-        document.querySelectorAll('.card[data-id]').forEach(card => {
-            card.addEventListener('click', () => showDetail(card.getAttribute('data-id')));
-        });
-    }
+  const otherOffices = [
+    { nameEn: "Provincial Council", head: "Janusz Kowalski", descEn: "Legislature, budget.",
+      nameZhSimple: "省议会", nameZhClassical: "省議會", nameZhTraditional: "省議會", nameZhHuaxia: "省議會",
+      nameEs: "Consejo Provincial", namePt: "Conselho Provincial", nameDe: "Provinzrat",
+      nameFr: "Conseil provincial", nameRu: "Провинциальный совет", nameMn: "Мужийн зөвлөл",
+      descZhSimple: "立法、预算", descZhClassical: "立法、預算", descZhTraditional: "立法、預算", descZhHuaxia: "立法預算",
+      descEs: "Legislatura, presupuesto", descPt: "Legislatura, orçamento", descDe: "Legislative, Haushalt",
+      descFr: "Législature, budget", descRu: "Законодательство, бюджет", descMn: "Хууль тогтоомж, төсөв" },
+    { nameEn: "Justice Office", head: "Priya Patel", descEn: "Legal affairs.",
+      nameZhSimple: "司法办公室", nameZhClassical: "司法辦公室", nameZhTraditional: "司法辦公室", nameZhHuaxia: "司法署",
+      nameEs: "Oficina de Justicia", namePt: "Gabinete da Justiça", nameDe: "Justizamt",
+      nameFr: "Cabinet de la Justice", nameRu: "Юридическое управление", nameMn: "Хуулийн газар",
+      descZhSimple: "法律事务", descZhClassical: "法律事務", descZhTraditional: "法律事務", descZhHuaxia: "律法事",
+      descEs: "Asuntos legales", descPt: "Assuntos legais", descDe: "Rechtliche Angelegenheiten",
+      descFr: "Affaires juridiques", descRu: "Юридические вопросы", descMn: "Хуулийн асуудал" },
+    { nameEn: "Land & Housing", head: "Solveig Haugen", descEn: "Land registry, housing.",
+      nameZhSimple: "土地与住房办公室", nameZhClassical: "土地與住房辦公室", nameZhTraditional: "土地與住房辦公室", nameZhHuaxia: "地宅署",
+      nameEs: "Oficina de Tierras y Vivienda", namePt: "Gabinete de Terras e Habitação", nameDe: "Amt für Land und Wohnungswesen",
+      nameFr: "Bureau des terres et du logement", nameRu: "Управление земельных ресурсов и жилья", nameMn: "Газар, орон сууцны газар",
+      descZhSimple: "土地登记、住房", descZhClassical: "土地登記、住房", descZhTraditional: "土地登記、住房", descZhHuaxia: "地契宅",
+      descEs: "Registro de tierras, vivienda", descPt: "Registo de terras, habitação", descDe: "Grundbuch, Wohnungswesen",
+      descFr: "Registre foncier, logement", descRu: "Земельный кадастр, жильё", descMn: "Газрын бүртгэл, орон сууц" },
+    { nameEn: "Transport & Infrastructure", head: "Wei Chen", descEn: "Roads, public toilets.",
+      nameZhSimple: "交通与基础设施管理局", nameZhClassical: "交通與基礎設施管理局", nameZhTraditional: "交通與基礎設施管理局", nameZhHuaxia: "交通基建署",
+      nameEs: "Administración de Transporte e Infraestructura", namePt: "Administração de Transportes e Infraestrutura", nameDe: "Verwaltung für Verkehr und Infrastruktur",
+      nameFr: "Administration des transports et des infrastructures", nameRu: "Управление транспорта и инфраструктуры", nameMn: "Тээвэр, дэд бүтцийн газар",
+      descZhSimple: "道路、公共厕所", descZhClassical: "道路、公共廁所", descZhTraditional: "道路、公共廁所", descZhHuaxia: "道公廁",
+      descEs: "Carreteras, baños públicos", descPt: "Estradas, sanitários públicos", descDe: "Straßen, öffentliche Toiletten",
+      descFr: "Routes, toilettes publiques", descRu: "Дороги, общественные туалеты", descMn: "Зам, нийтийн жорлон" }
+  ];
 
-    function showDetail(id) {
-        const dept = departments.find(d => d.id === id);
-        if (!dept) return;
-        document.getElementById('homeView').style.display = 'none';
-        const detailDiv = document.getElementById('detailView');
-        detailDiv.innerHTML = `
-            <div class="detail-section">
-                <div class="back-home" id="backHomeBtn">← 返回首页</div>
-                <h2>${dept.name}</h2>
-                <p><strong>Head:</strong> ${dept.head}</p>
-                <p>${dept.desc}</p>
-                <p>Full operational details and contact information can be found on the internal government portal.</p>
-            </div>
-        `;
-        detailDiv.style.display = 'block';
-        document.getElementById('backHomeBtn').onclick = () => {
-            detailDiv.style.display = 'none';
-            document.getElementById('homeView').style.display = 'block';
-        };
-    }
+  const featuredIds = ["governor", "pd", "hes"];
 
-    function goHome() {
-        document.getElementById('detailView').style.display = 'none';
-        document.getElementById('homeView').style.display = 'block';
-    }
+  // 语言顺序和配置
+  const langOrder = ["en", "es", "pt", "de", "zh-simple", "zh-classical", "zh-traditional", "zh-huaxia", "fr", "ru", "mn"];
+  const langData = {
+    en: { name: "English", welcome: "Welcome", code: "en",
+      mainTitle: "Sixside", mainSubtitle: "The Enduring Spirit of the Mountains",
+      aboutTitle: "About Sixside", historyTitle: "History", historyText: "Generations have lived in harmony with this land.",
+      geographyTitle: "Geography", geographyText: "Mountains, bamboo, vines, streams.",
+      populationTitle: "Population", populationText: "People walk hidden paths, preserve ancient ways.",
+      govTitle: "Government & Agencies", otherTitle: "Other Offices",
+      viewAllBtn: "View All Departments", copyrightLine: "© Sixside Provincial Government",
+      techSupportLine: "Technical support and maintenance provided by Wareflame",
+      nationalLink: "UPL National Portal", privacyText: "Privacy: No data collected.", licenseText: "All rights reserved.",
+      themeToggle: "Dark/Light", langToggle: "Language",
+      accessTitle: "Accessibility", contrastLabel: "Contrast", grayscaleLabel: "Grayscale", saturateLabel: "Saturation",
+      cursorColorLabel: "Cursor Highlight Colour", cursorRed: "Red", cursorYellow: "Yellow", cursorEnableLabel: "Enable Cursor Highlight",
+      resetBtn: "Reset Default" },
+    es: { name: "Español", welcome: "Hola", code: "es",
+      mainTitle: "Sixside", mainSubtitle: "El espíritu eterno de las montañas",
+      aboutTitle: "Sobre Sixside", historyTitle: "Historia", historyText: "Generaciones han vivido en armonía con esta tierra.",
+      geographyTitle: "Geografía", geographyText: "Montañas, bambú, vides, arroyos.",
+      populationTitle: "Población", populationText: "La gente camina por senderos ocultos.",
+      govTitle: "Gobierno y Agencias", otherTitle: "Otras Oficinas",
+      viewAllBtn: "Ver todos los departamentos", copyrightLine: "© Gobierno Provincial de Sixside",
+      techSupportLine: "Soporte técnico y mantenimiento proporcionados por Wareflame",
+      nationalLink: "Portal Nacional UPL", privacyText: "Privacidad: No se recopilan datos.", licenseText: "Todos los derechos reservados.",
+      themeToggle: "Oscuro/Claro", langToggle: "Idioma",
+      accessTitle: "Accesibilidad", contrastLabel: "Contraste", grayscaleLabel: "Escala de grises", saturateLabel: "Saturación",
+      cursorColorLabel: "Color del cursor", cursorRed: "Rojo", cursorYellow: "Amarillo", cursorEnableLabel: "Activar resaltado del cursor",
+      resetBtn: "Restaurar predeterminado" },
+    pt: { name: "Português", welcome: "Olá", code: "pt",
+      mainTitle: "Sixside", mainSubtitle: "O espírito eterno das montanhas",
+      aboutTitle: "Sobre Sixside", historyTitle: "História", historyText: "Gerações viveram em harmonia com esta terra.",
+      geographyTitle: "Geografia", geographyText: "Montanhas, bambu, vinhas, riachos.",
+      populationTitle: "População", populationText: "As pessoas andam por caminhos escondidos.",
+      govTitle: "Governo e Agências", otherTitle: "Outros Escritórios",
+      viewAllBtn: "Ver todos os departamentos", copyrightLine: "© Governo Provincial de Sixside",
+      techSupportLine: "Suporte técnico e manutenção fornecidos por Wareflame",
+      nationalLink: "Portal Nacional UPL", privacyText: "Privacidade: nenhum dado coletado.", licenseText: "Todos os direitos reservados.",
+      themeToggle: "Escuro/Claro", langToggle: "Idioma",
+      accessTitle: "Acessibilidade", contrastLabel: "Contraste", grayscaleLabel: "Escala de cinza", saturateLabel: "Saturação",
+      cursorColorLabel: "Cor do cursor", cursorRed: "Vermelho", cursorYellow: "Amarelo", cursorEnableLabel: "Ativar destaque do cursor",
+      resetBtn: "Restaurar padrão" },
+    de: { name: "Deutsch", welcome: "Hallo", code: "de",
+      mainTitle: "Sixside", mainSubtitle: "Der ewige Geist der Berge",
+      aboutTitle: "Über Sixside", historyTitle: "Geschichte", historyText: "Generationen lebten im Einklang mit diesem Land.",
+      geographyTitle: "Geografie", geographyText: "Berge, Bambus, Reben, Bäche.",
+      populationTitle: "Bevölkerung", populationText: "Menschen gehen verborgene Pfade.",
+      govTitle: "Regierung & Behörden", otherTitle: "Andere Ämter",
+      viewAllBtn: "Alle Abteilungen anzeigen", copyrightLine: "© Sixside Provinzregierung",
+      techSupportLine: "Technische Unterstützung und Wartung durch Wareflame",
+      nationalLink: "UPL Nationalportal", privacyText: "Datenschutz: Keine Datenerhebung.", licenseText: "Alle Rechte vorbehalten.",
+      themeToggle: "Dunkel/Hell", langToggle: "Sprache",
+      accessTitle: "Barrierefreiheit", contrastLabel: "Kontrast", grayscaleLabel: "Graustufen", saturateLabel: "Sättigung",
+      cursorColorLabel: "Cursorfarbe", cursorRed: "Rot", cursorYellow: "Gelb", cursorEnableLabel: "Cursor hervorheben",
+      resetBtn: "Standard wiederherstellen" },
+    "zh-simple": { name: "简体白话", welcome: "你好", code: "zh-simple", useZh: true,
+      mainTitle: "Sixside", mainSubtitle: "山魂永驻",
+      aboutTitle: "关于 Sixside", historyTitle: "历史", historyText: "世代与这片土地和谐共生。",
+      geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
+      populationTitle: "人口", populationText: "人民行走于隐秘小径，守护古老方式。",
+      govTitle: "政府部门", otherTitle: "其他机构",
+      viewAllBtn: "查看全部部门", copyrightLine: "© Sixside 省政府",
+      techSupportLine: "技术支持和维护由 Wareflame 提供",
+      nationalLink: "UPL 国家门户", privacyText: "隐私政策：不收集个人数据。", licenseText: "保留所有权利。",
+      themeToggle: "深色/浅色", langToggle: "语言",
+      accessTitle: "辅助功能", contrastLabel: "对比度", grayscaleLabel: "灰度", saturateLabel: "饱和度",
+      cursorColorLabel: "鼠标高亮颜色", cursorRed: "红色", cursorYellow: "黄色", cursorEnableLabel: "开启鼠标高亮",
+      resetBtn: "恢复默认" },
+    "zh-classical": { name: "简体文言", welcome: "汝安", code: "zh-classical", useZh: true,
+      mainTitle: "Sixside", mainSubtitle: "山魂永驻",
+      aboutTitle: "六面志", historyTitle: "史", historyText: "世代与此土相谐。",
+      geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
+      populationTitle: "民", populationText: "民行隐径，守古法。",
+      govTitle: "官府", otherTitle: "他署",
+      viewAllBtn: "悉览诸部", copyrightLine: "© 六面省政府",
+      techSupportLine: "技护由 Wareflame 供之",
+      nationalLink: "UPL 国门", privacyText: "隐策：不敛民息。", licenseText: "悉权保留。",
+      themeToggle: "深浅", langToggle: "语",
+      accessTitle: "辅功", contrastLabel: "对比", grayscaleLabel: "灰阶", saturateLabel: "饱和",
+      cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黄", cursorEnableLabel: "启鼠标",
+      resetBtn: "复原" },
+    "zh-traditional": { name: "正體官話", welcome: "你好", code: "zh-traditional", useZh: true,
+      mainTitle: "Sixside", mainSubtitle: "山魂永駐",
+      aboutTitle: "關於 Sixside", historyTitle: "歷史", historyText: "世代與這片土地和諧共生。",
+      geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
+      populationTitle: "人口", populationText: "人民行走於隱秘小徑，守護古老方式。",
+      govTitle: "政府部門", otherTitle: "其他機構",
+      viewAllBtn: "查看全部部門", copyrightLine: "© Sixside 省政府",
+      techSupportLine: "技術支持和維護由 Wareflame 提供",
+      nationalLink: "UPL 國家門戶", privacyText: "隱私政策：不收集個人數據。", licenseText: "保留所有權利。",
+      themeToggle: "深色/淺色", langToggle: "語言",
+      accessTitle: "輔助功能", contrastLabel: "對比度", grayscaleLabel: "灰度", saturateLabel: "飽和度",
+      cursorColorLabel: "鼠標高亮顏色", cursorRed: "紅色", cursorYellow: "黃色", cursorEnableLabel: "開啟鼠標高亮",
+      resetBtn: "恢復默認" },
+    "zh-huaxia": { name: "華夏文言", welcome: "汝安", code: "zh-huaxia", useZh: true,
+      mainTitle: "Sixside", mainSubtitle: "山魂永駐",
+      aboutTitle: "六面志", historyTitle: "史", historyText: "世代與此土相諧。",
+      geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
+      populationTitle: "民", populationText: "民行隱徑，守古法。",
+      govTitle: "官府", otherTitle: "他署",
+      viewAllBtn: "悉覽諸部", copyrightLine: "© 六面省政府",
+      techSupportLine: "技護由 Wareflame 供之",
+      nationalLink: "UPL 國門", privacyText: "隱策：不斂民息。", licenseText: "悉權保留。",
+      themeToggle: "深淺", langToggle: "語",
+      accessTitle: "輔功", contrastLabel: "對比", grayscaleLabel: "灰階", saturateLabel: "飽和",
+      cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黃", cursorEnableLabel: "啟鼠標",
+      resetBtn: "復原" },
+    fr: { name: "Français", welcome: "Bonjour", code: "fr",
+      mainTitle: "Sixside", mainSubtitle: "L'esprit éternel des montagnes",
+      aboutTitle: "À propos de Sixside", historyTitle: "Histoire", historyText: "Des générations ont vécu en harmonie avec cette terre.",
+      geographyTitle: "Géographie", geographyText: "Montagnes, bambou, vignes, ruisseaux.",
+      populationTitle: "Population", populationText: "Les gens marchent sur des sentiers cachés.",
+      govTitle: "Gouvernement et Agences", otherTitle: "Autres Bureaux",
+      viewAllBtn: "Voir tous les départements", copyrightLine: "© Gouvernement provincial de Sixside",
+      techSupportLine: "Soutien technique et maintenance fournis par Wareflame",
+      nationalLink: "Portail national UPL", privacyText: "Confidentialité : aucune donnée collectée.", licenseText: "Tous droits réservés.",
+      themeToggle: "Sombre/Clair", langToggle: "Langue",
+      accessTitle: "Accessibilité", contrastLabel: "Contraste", grayscaleLabel: "Niveaux de gris", saturateLabel: "Saturation",
+      cursorColorLabel: "Couleur du curseur", cursorRed: "Rouge", cursorYellow: "Jaune", cursorEnableLabel: "Activer la surbrillance du curseur",
+      resetBtn: "Rétablir les paramètres par défaut" },
+    ru: { name: "Русский", welcome: "Здравствуйте", code: "ru",
+      mainTitle: "Sixside", mainSubtitle: "Вечный дух гор",
+      aboutTitle: "О Sixside", historyTitle: "История", historyText: "Поколения жили в гармонии с этой землёй.",
+      geographyTitle: "География", geographyText: "Горы, бамбук, ручьи.",
+      populationTitle: "Население", populationText: "Люди ходят скрытыми тропами.",
+      govTitle: "Правительство", otherTitle: "Другие офисы",
+      viewAllBtn: "Показать все отделы", copyrightLine: "© Правительство Sixside",
+      techSupportLine: "Техническая поддержка и обслуживание предоставлены Wareflame",
+      nationalLink: "Национальный портал UPL", privacyText: "Конфиденциальность: данные не собираются.", licenseText: "Все права защищены.",
+      themeToggle: "Тёмный/Светлый", langToggle: "Язык",
+      accessTitle: "Специальные возможности", contrastLabel: "Контраст", grayscaleLabel: "Ч/б", saturateLabel: "Насыщенность",
+      cursorColorLabel: "Цвет курсора", cursorRed: "Красный", cursorYellow: "Жёлтый", cursorEnableLabel: "Включить подсветку курсора",
+      resetBtn: "Сбросить" },
+    mn: { name: "Монгол", welcome: "Сайн уу", code: "mn",
+      mainTitle: "Sixside", mainSubtitle: "Уулын мөнхийн сүнс",
+      aboutTitle: "Sixside-ийн тухай", historyTitle: "Түүх", historyText: "Үе үе энэ газартай зохицон амьдарч байсан.",
+      geographyTitle: "Газар зүй", geographyText: "Уулс, хулс, ус, горхи.",
+      populationTitle: "Хүн ам", populationText: "Хүмүүс далд замаар явдаг.",
+      govTitle: "Засгийн газар ба Агентлагууд", otherTitle: "Бусад Албан газар",
+      viewAllBtn: "Бүх хэлтсийг харах", copyrightLine: "© Sixside мужийн засгийн газар",
+      techSupportLine: "Техникийн дэмжлэг, засвар үйлчилгээг Wareflame хангана",
+      nationalLink: "UPL Үндэсний Портал", privacyText: "Нууцлал: Мэдээлэл цуглуулахгүй.", licenseText: "Бүх эрх хуулиар хамгаалагдсан.",
+      themeToggle: "Хар/Цагаан", langToggle: "Хэл",
+      accessTitle: "Хүртээмж", contrastLabel: "Тодосгол", grayscaleLabel: "Саарал", saturateLabel: "Ханасан байдал",
+      cursorColorLabel: "Хулганы өнгө", cursorRed: "Улаан", cursorYellow: "Шар", cursorEnableLabel: "Хулганы тодруулгыг идэвхжүүлэх",
+      resetBtn: "Анхны төлөв" }
+  };
 
-    // 顶部导航
-    document.getElementById('homeBtn').onclick = goHome;
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const page = link.getAttribute('data-page');
-            if (page === 'home') goHome();
-            else if (page === 'pd') showDetail('pd');
-            else if (page === 'hes') showDetail('hes');
-            else if (page === 'maffa') showDetail('maffa');
-        });
-    });
+  let currentLang = "en";
 
+  function getDeptName(dept, langCode) {
+    if (langCode === "en") return dept.nameEn;
+    const map = {
+      es: dept.nameEs, pt: dept.namePt, de: dept.nameDe, fr: dept.nameFr, ru: dept.nameRu, mn: dept.nameMn,
+      "zh-simple": dept.nameZhSimple, "zh-classical": dept.nameZhClassical,
+      "zh-traditional": dept.nameZhTraditional, "zh-huaxia": dept.nameZhHuaxia
+    };
+    const translated = map[langCode];
+    return `${dept.nameEn} (${translated})`;
+  }
+
+  function getOtherName(other, langCode) {
+    if (langCode === "en") return other.nameEn;
+    const map = {
+      es: other.nameEs, pt: other.namePt, de: other.nameDe, fr: other.nameFr, ru: other.nameRu, mn: other.nameMn,
+      "zh-simple": other.nameZhSimple, "zh-classical": other.nameZhClassical,
+      "zh-traditional": other.nameZhTraditional, "zh-huaxia": other.nameZhHuaxia
+    };
+    const translated = map[langCode];
+    return `${other.nameEn} (${translated})`;
+  }
+
+  function getDesc(deptOrOther, langCode) {
+    if (langCode === "en") return deptOrOther.descEn;
+    const map = {
+      es: deptOrOther.descEs, pt: deptOrOther.descPt, de: deptOrOther.descDe,
+      fr: deptOrOther.descFr, ru: deptOrOther.descRu, mn: deptOrOther.descMn,
+      "zh-simple": deptOrOther.descZhSimple, "zh-classical": deptOrOther.descZhClassical,
+      "zh-traditional": deptOrOther.descZhTraditional, "zh-huaxia": deptOrOther.descZhHuaxia
+    };
+    return map[langCode] || deptOrOther.descEn;
+  }
+
+  function applyLanguage(langCode) {
+    const data = langData[langCode];
+    if (!data) return;
+    // 页面主内容
+    document.getElementById("mainTitle").innerText = data.mainTitle;
+    document.getElementById("mainSubtitle").innerText = data.mainSubtitle;
+    document.getElementById("aboutTitle").innerText = data.aboutTitle;
+    document.getElementById("govTitle").innerText = data.govTitle;
+    document.getElementById("otherTitle").innerText = data.otherTitle;
+    document.getElementById("viewAllBtn").innerText = data.viewAllBtn;
+    document.getElementById("copyrightLine").innerHTML = data.copyrightLine;
+    document.getElementById("techSupportLine").innerHTML = data.techSupportLine;
+    document.getElementById("nationalLink").innerText = data.nationalLink;
+    document.getElementById("themeToggleBtn").innerText = data.themeToggle;
+    document.getElementById("langReopenBtn").innerText = data.langToggle;
+    window.privacyMsg = data.privacyText;
+    window.licenseMsg = data.licenseText;
+    // 辅助功能面板文字
+    document.getElementById("accessTitle").innerText = data.accessTitle;
+    document.getElementById("contrastLabel").innerHTML = `${data.contrastLabel} <span id="contrastVal">${contrastSlider.value}</span>`;
+    document.getElementById("grayscaleLabel").innerHTML = `${data.grayscaleLabel} <span id="grayscaleVal">${grayscaleSlider.value}</span>`;
+    document.getElementById("saturateLabel").innerHTML = `${data.saturateLabel} <span id="saturateVal">${saturateSlider.value}</span>`;
+    document.getElementById("cursorColorLabel").innerText = data.cursorColorLabel;
+    document.getElementById("cursorRed").innerText = data.cursorRed;
+    document.getElementById("cursorYellow").innerText = data.cursorYellow;
+    document.getElementById("cursorEnableLabel").innerText = data.cursorEnableLabel;
+    document.getElementById("resetAccessibilityBtn").innerText = data.resetBtn;
+    localStorage.setItem("sixside_lang", langCode);
+    currentLang = langCode;
     renderHome();
+  }
 
-    // 辅助功能滑块
-    const contrastSlider = document.getElementById('contrastSlider');
-    const grayscaleSlider = document.getElementById('grayscaleSlider');
-    const saturateSlider = document.getElementById('saturateSlider');
-    const contrastVal = document.getElementById('contrastVal');
-    const grayscaleVal = document.getElementById('grayscaleVal');
-    const saturateVal = document.getElementById('saturateVal');
-    let filterTimeout;
-    function applyFilters() {
-        const c = contrastSlider.value;
-        const g = grayscaleSlider.value;
-        const s = saturateSlider.value;
-        document.body.style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
-        contrastVal.innerText = c;
-        grayscaleVal.innerText = g;
-        saturateVal.innerText = s;
+  function renderHome() {
+    const data = langData[currentLang];
+    const aboutGrid = document.getElementById("aboutGrid");
+    aboutGrid.innerHTML = `
+      <div class="card"><h3>${data.historyTitle}</h3><p>${data.historyText}</p></div>
+      <div class="card"><h3>${data.geographyTitle}</h3><p>${data.geographyText}</p></div>
+      <div class="card"><h3>${data.populationTitle}</h3><p>${data.populationText}</p></div>
+    `;
+    const featuredDepts = document.getElementById("featuredDepts");
+    featuredDepts.innerHTML = featuredIds.map(id => {
+      const dept = allDepts.find(d => d.id === id);
+      return `<div class="card" data-id="${dept.id}"><h3>${getDeptName(dept, currentLang)}</h3><p>${getDesc(dept, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${dept.head}</p></div>`;
+    }).join("");
+    const otherGrid = document.getElementById("otherOfficesGrid");
+    otherGrid.innerHTML = otherOffices.map(o => `<div class="card"><h3>${getOtherName(o, currentLang)}</h3><p>${getDesc(o, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${o.head}</p></div>`).join("");
+    document.querySelectorAll(".card[data-id]").forEach(card => { card.addEventListener("click", () => showDetail(card.getAttribute("data-id"))); });
+  }
+
+  function showDetail(id) {
+    const dept = allDepts.find(d => d.id === id);
+    if (!dept) return;
+    document.getElementById("homeView").style.display = "none";
+    const detailDiv = document.getElementById("detailView");
+    let extra = "";
+    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><table><thead><tr><th>Item</th><th>Rate</th></tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
+    detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${getDeptName(dept, currentLang)}</h2><p><strong>Head:</strong> ${dept.head}</p><p>${getDesc(dept, currentLang)}</p>${extra}</div>`;
+    detailDiv.style.display = "block";
+    document.getElementById("backHomeBtn").onclick = goHome;
+    document.getElementById("currentLocation").innerText = getDeptName(dept, currentLang);
+  }
+
+  function goHome() {
+    document.getElementById("detailView").style.display = "none";
+    document.getElementById("homeView").style.display = "block";
+    document.getElementById("currentLocation").innerText = "Home";
+  }
+
+  function showAllDepartments() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.innerHTML = `<div class="all-depts-modal"><h3>${langData[currentLang].viewAllBtn}</h3><div id="allDeptsList"></div><button class="btn-square" id="closeModalBtn" style="margin-top:1rem;">Close</button></div>`;
+    document.body.appendChild(modal);
+    const listDiv = modal.querySelector("#allDeptsList");
+    listDiv.innerHTML = allDepts.map(d => `<div class="card" data-id="${d.id}" style="margin-bottom:0.8rem;"><h3>${getDeptName(d, currentLang)}</h3><p>${getDesc(d, currentLang)}</p><p>Head: ${d.head}</p></div>`).join("");
+    modal.querySelectorAll(".card").forEach(card => { card.addEventListener("click", () => { modal.remove(); showDetail(card.getAttribute("data-id")); }); });
+    modal.querySelector("#closeModalBtn").onclick = () => modal.remove();
+  }
+
+  function showLangModal() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    let opts = "";
+    for (const lang of langOrder) { const d = langData[lang]; opts += `<div class="lang-option" data-lang="${lang}">${d.name}<div class="lang-welcome">${d.welcome}</div></div>`; }
+    modal.innerHTML = `<div class="lang-modal"><h3>Select Language</h3>${opts}<button class="btn-square" id="closeLangBtn" style="margin-top:1rem;">Cancel</button></div>`;
+    document.body.appendChild(modal);
+    modal.querySelectorAll(".lang-option").forEach(opt => { opt.addEventListener("click", () => { applyLanguage(opt.getAttribute("data-lang")); modal.remove(); }); });
+    modal.querySelector("#closeLangBtn").onclick = () => modal.remove();
+  }
+
+  // 辅助功能控件
+  const contrastSlider = document.getElementById("contrastSlider");
+  const grayscaleSlider = document.getElementById("grayscaleSlider");
+  const saturateSlider = document.getElementById("saturateSlider");
+  const contrastVal = document.getElementById("contrastVal");
+  const grayscaleVal = document.getElementById("grayscaleVal");
+  const saturateVal = document.getElementById("saturateVal");
+  let filterTimeout;
+  function applyFilters() {
+    const c = contrastSlider.value, g = grayscaleSlider.value, s = saturateSlider.value;
+    document.body.style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
+    contrastVal.innerText = c; grayscaleVal.innerText = g; saturateVal.innerText = s;
+  }
+  function handleSliderInput() { if (filterTimeout) clearTimeout(filterTimeout); filterTimeout = setTimeout(applyFilters, 16); }
+  contrastSlider.addEventListener("input", handleSliderInput);
+  grayscaleSlider.addEventListener("input", handleSliderInput);
+  saturateSlider.addEventListener("input", handleSliderInput);
+  applyFilters();
+
+  const cursorCheckbox = document.getElementById("cursorCheckbox");
+  const cursorColorSelect = document.getElementById("cursorColorSelect");
+  let cursorActive = false;
+  function updateCursor() {
+    if (cursorActive) {
+      document.body.classList.add("highlight-cursor");
+      const color = cursorColorSelect.value;
+      document.body.classList.remove("cursor-red", "cursor-yellow");
+      document.body.classList.add(`cursor-${color}`);
+      document.body.style.cursor = "none";
+    } else {
+      document.body.classList.remove("highlight-cursor", "cursor-red", "cursor-yellow");
+      document.body.style.cursor = "";
     }
-    function handleSliderInput() {
-        if (filterTimeout) clearTimeout(filterTimeout);
-        filterTimeout = setTimeout(applyFilters, 16);
-    }
-    contrastSlider.addEventListener('input', handleSliderInput);
-    grayscaleSlider.addEventListener('input', handleSliderInput);
-    saturateSlider.addEventListener('input', handleSliderInput);
+  }
+  cursorCheckbox.addEventListener("change", (e) => { cursorActive = e.target.checked; updateCursor(); });
+  cursorColorSelect.addEventListener("change", () => { if (cursorActive) updateCursor(); });
+  document.addEventListener("mousemove", (e) => { if (cursorActive) { document.body.style.setProperty("--mouse-x", e.clientX + "px"); document.body.style.setProperty("--mouse-y", e.clientY + "px"); } });
+  document.getElementById("resetAccessibilityBtn").onclick = () => {
+    contrastSlider.value = "1"; grayscaleSlider.value = "0"; saturateSlider.value = "1";
     applyFilters();
+    cursorCheckbox.checked = false; cursorActive = false; updateCursor();
+  };
 
-    const cursorCheckbox = document.getElementById('cursorCheckbox');
-    let cursorActive = false;
-    function updateCursor() {
-        if (cursorActive) {
-            document.body.classList.add('highlight-cursor');
-            document.body.style.cursor = 'none';
-        } else {
-            document.body.classList.remove('highlight-cursor');
-            document.body.style.cursor = '';
-        }
-    }
-    cursorCheckbox.addEventListener('change', (e) => {
-        cursorActive = e.target.checked;
-        updateCursor();
-    });
-    document.addEventListener('mousemove', (e) => {
-        if (cursorActive) {
-            document.body.style.setProperty('--mouse-x', e.clientX + 'px');
-            document.body.style.setProperty('--mouse-y', e.clientY + 'px');
-        }
-    });
+  document.getElementById("homeBtn").onclick = goHome;
+  document.getElementById("viewAllBtn").onclick = showAllDepartments;
+  document.getElementById("langReopenBtn").onclick = showLangModal;
+  const toggleBtn = document.getElementById("accessibilityToggle");
+  const panel = document.getElementById("accessibilityPanel");
+  if (toggleBtn && panel) toggleBtn.onclick = () => panel.classList.toggle("show");
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+  themeToggleBtn.onclick = () => document.body.classList.toggle("light");
+  document.getElementById("privacyLink").onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
+  document.getElementById("licenseLink").onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
 
-    const resetBtn = document.getElementById('resetAccessibilityBtn');
-    if (resetBtn) {
-        resetBtn.onclick = () => {
-            contrastSlider.value = '1';
-            grayscaleSlider.value = '0';
-            saturateSlider.value = '1';
-            applyFilters();
-            cursorCheckbox.checked = false;
-            cursorActive = false;
-            updateCursor();
-        };
-    }
-
-    const toggleBtn = document.getElementById('accessibilityToggle');
-    const panel = document.getElementById('accessibilityPanel');
-    if (toggleBtn && panel) {
-        toggleBtn.onclick = () => {
-            panel.classList.toggle('show');
-        };
-    }
-
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    if (themeToggleBtn) {
-        themeToggleBtn.onclick = () => {
-            const isLight = document.body.classList.contains('light');
-            if (isLight) document.body.classList.remove('light');
-            else document.body.classList.add('light');
-            localStorage.setItem('sixside_theme', isLight ? 'dark' : 'light');
-        };
-    }
-    const savedTheme = localStorage.getItem('sixside_theme');
-    if (savedTheme === 'light') document.body.classList.add('light');
-    else if (savedTheme === 'dark') document.body.classList.remove('light');
-    else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (!prefersDark) document.body.classList.add('light');
-    }
-
-    document.getElementById('privacyLink').onclick = (e) => { e.preventDefault(); alert("Privacy Policy: Sixside Government does not collect personal data without consent."); };
-    document.getElementById('licenseLink').onclick = (e) => { e.preventDefault(); alert("Website License: © Sixside Provincial Government. All rights reserved."); };
+  renderHome();
+  const savedLang = localStorage.getItem("sixside_lang");
+  if (savedLang && langData[savedLang]) applyLanguage(savedLang);
+  else applyLanguage("en");
 </script>
 </body>
 </html>

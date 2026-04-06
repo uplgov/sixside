@@ -17,6 +17,7 @@
       --btn-bg: #1e2a3a;
       --accent-red: #cc3333;
       --accent-green: #2ecc71;
+      --accent-amber: #f39c12;
     }
     body.light {
       --bg-primary: #f4f6f9;
@@ -34,254 +35,220 @@
       color: var(--text-primary);
       line-height: 1.6;
       transition: background 0.3s;
-      overflow-x: hidden;
     }
-    .filter-layer { transition: filter 0.2s; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-    /* 顶部导航 */
+    /* 顶部紧急报警栏 */
+    .emergency-top-bar {
+      background: #000;
+      color: #fff;
+      border-bottom: 2px solid var(--accent-red);
+      padding: 8px 20px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .emergency-main {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 4px;
+      align-items: center;
+    }
+    .emergency-num { color: var(--accent-red); font-size: 1.2rem; font-weight: bold; }
+    .emergency-notice { font-size: 0.75rem; color: #888; letter-spacing: 0.5px; }
+
+    /* 闪烁高亮标签 */
+    .alert-blink {
+      background: var(--accent-red);
+      color: white;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-left: 8px;
+      animation: alert-flash 1s infinite;
+      border-radius: 2px;
+    }
+    @keyframes alert-flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* 导航栏 */
     .top-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.2rem 2rem;
+      padding: 1rem 2rem;
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border-color);
       position: sticky; top: 0; z-index: 1000;
     }
-    .nav-brand { font-weight: bold; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+    .nav-brand { font-weight: bold; letter-spacing: 1px; }
     .nav-brand span { color: var(--text-secondary); font-weight: normal; }
-    
     .nav-tools { display: flex; gap: 15px; align-items: center; }
-    .tool-btn {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 5px 15px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-
-    /* 紧急联络区 */
-    .emergency-bar {
-      background: #000;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      padding: 10px;
-      font-family: monospace;
-      border-bottom: 2px solid var(--accent-red);
-    }
-    .emergency-item { display: flex; align-items: center; gap: 10px; }
-    .emergency-num { color: var(--accent-red); font-size: 1.2rem; font-weight: bold; }
-
-    /* 巡逻状态指示 */
+    
     .patrol-status {
-      display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--accent-green);
-      font-family: monospace; padding: 5px 10px; border: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--accent-green);
+      font-family: monospace; padding: 4px 10px; border: 1px solid var(--border-color);
     }
     .blink-dot {
       width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%;
-      box-shadow: 0 0 5px var(--accent-green); animation: blink 2s infinite;
+      box-shadow: 0 0 5px var(--accent-green); animation: dot-blink 2s infinite;
     }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes dot-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    /* 辅助面板 */
-    .acc-panel {
-      position: absolute; top: 60px; right: 2rem; width: 300px;
-      background: var(--bg-secondary); border: 1px solid var(--border-color);
-      padding: 20px; z-index: 2000; display: none;
+    .tool-btn {
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      color: var(--text-primary); padding: 5px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
     }
-    .acc-panel.show { display: block; }
-    .acc-group { margin-bottom: 15px; }
-    .acc-group label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: var(--text-secondary); }
-    input[type="range"] { width: 100%; }
 
     /* 英雄区 */
-    .hero { text-align: center; padding: 80px 0; border-bottom: 1px solid var(--border-color); }
-    .hero h1 { font-size: 3rem; margin-bottom: 15px; font-weight: normal; }
-    .hero p { color: var(--text-secondary); font-style: italic; max-width: 700px; margin: 0 auto 30px; }
+    .hero { text-align: center; padding: 60px 0; border-bottom: 1px solid var(--border-color); }
+    .hero h1 { font-size: 2.8rem; margin-bottom: 15px; font-weight: normal; letter-spacing: 1px; }
+    .hero p { color: var(--text-secondary); font-style: italic; max-width: 800px; margin: 0 auto 40px; }
 
-    /* 数据展示 */
-    .stats-grid {
-      display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center;
-      max-width: 600px; margin: -30px auto 50px;
-      background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 20px;
+    /* 数据显示 */
+    .stats-container {
+      display: grid; grid-template-columns: 1fr 1px 1fr; 
+      max-width: 700px; margin: -30px auto 50px;
+      background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .stat-box { text-align: center; }
-    .stat-val { font-size: 1.8rem; font-family: monospace; display: block; }
-    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
-
-    /* 主要内容布局 */
-    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 50px; }
-    .section-head { font-size: 1.4rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-
-    /* 悬赏名单 */
-    .wanted-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      padding: 20px; margin-bottom: 20px; transition: 0.3s;
-    }
-    .wanted-card:hover { border-color: #8c734a; }
-    .wanted-flex { display: flex; gap: 20px; align-items: center; }
-    .photo-placeholder { width: 80px; height: 100px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #555; }
+    .stat-val { font-size: 2rem; font-family: monospace; font-weight: bold; }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-top: 5px; display: block; }
     
-    /* 失物招领 */
-    .lost-search { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; margin-bottom: 15px; }
+    /* 下降箭头 */
+    .trend-down {
+      display: inline-block;
+      width: 0; height: 0; 
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 12px solid var(--accent-green);
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    .trend-text { font-size: 0.8rem; color: var(--accent-green); font-family: monospace; }
+
+    /* 内容布局 */
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 50px; }
+    .section-title { font-size: 1.4rem; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+
+    /* 卡片样式 */
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 25px; margin-bottom: 20px; }
+    .wanted-item { display: flex; gap: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; }
+    .photo-box { width: 70px; height: 90px; background: #000; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #444; border: 1px solid #333; }
+
+    .lost-input { width: 100%; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; margin-bottom: 20px; font-family: inherit; }
     .lost-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .lost-table td { padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-    .lost-date { text-align: right; color: var(--text-secondary); }
+    .lost-table td { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+    .date-col { text-align: right; color: var(--text-secondary); font-family: monospace; }
 
-    /* 语言模态框 */
-    .modal-overlay {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.8); z-index: 3000; display: none;
-      align-items: center; justify-content: center;
-    }
-    .lang-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); width: 500px; padding: 30px; }
-    .lang-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-    .lang-btn { padding: 10px; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer; text-align: left; }
-    .lang-btn:hover { background: var(--text-primary); color: var(--bg-primary); }
-
-    /* 鼠标辅助 */
-    .cursor-highlight {
-      position: fixed; pointer-events: none; width: 30px; height: 30px; border-radius: 50%;
-      transform: translate(-50%, -50%); z-index: 9999; display: none;
-    }
-
-    footer { text-align: center; padding: 60px 0; color: var(--text-secondary); font-size: 0.8rem; border-top: 1px solid var(--border-color); margin-top: 100px; }
+    footer { text-align: center; padding: 60px 0; color: var(--text-secondary); font-size: 0.8rem; border-top: 1px solid var(--border-color); margin-top: 80px; }
   </style>
 </head>
 <body>
 
-<div id="cursor" class="cursor-highlight"></div>
-
-<div class="emergency-bar">
-  <div class="emergency-item">EMERGENCY: <span class="emergency-num">110</span></div>
-  <div class="emergency-item">NON-EMERGENCY: <span class="emergency-num" style="color: #f39c12;">009</span></div>
+<div class="emergency-top-bar">
+  <div class="emergency-main">
+    <div>
+      EMERGENCY: <span class="emergency-num">110</span>
+      <span class="alert-blink">REPORT EMERGENCY</span>
+    </div>
+    <div style="width:1px; height:15px; background:#444;"></div>
+    <div>
+      NON-EMERGENCY: <span class="emergency-num" style="color:var(--accent-amber)">009</span>
+      <span class="alert-blink" style="background:var(--accent-amber)">REPORT INCIDENT</span>
+    </div>
+  </div>
+  <div class="emergency-notice">
+    CALLS TO 110/009 ARE TOLL-FREE AND REQUIRE NO SIM CARD (CELLULAR COVERAGE REQUIRED) | SMS REPORTING AVAILABLE TO 110 & 009
+  </div>
 </div>
 
 <nav class="top-nav">
   <div class="nav-brand">
     SIXSIDE <span>| POLICE DEPARTMENT</span>
   </div>
-  
   <div class="nav-tools">
     <div class="patrol-status">
       <div class="blink-dot"></div> ACTIVE PATROL 24/7/365
     </div>
-    <button class="tool-btn" id="accToggle">ACCESSIBILITY</button>
-    <button class="tool-btn" id="themeToggle">DARK/LIGHT</button>
-    <button class="tool-btn" id="langToggle">LANGUAGE</button>
-  </div>
-
-  <div class="acc-panel" id="accPanel">
-    <div class="acc-group">
-      <label>CONTRAST <span id="val-contrast">1.0</span></label>
-      <input type="range" id="range-contrast" min="0.5" max="2" step="0.1" value="1">
-    </div>
-    <div class="acc-group">
-      <label>GRAYSCALE <span id="val-gray">0</span></label>
-      <input type="range" id="range-gray" min="0" max="1" step="0.1" value="0">
-    </div>
-    <div class="acc-group">
-      <label>CURSOR HIGHLIGHT</label>
-      <select id="cursorColor" class="lost-search" style="margin-bottom:10px">
-        <option value="rgba(204,51,51,0.4)">RED</option>
-        <option value="rgba(243,156,18,0.4)">YELLOW</option>
-      </select>
-      <button class="tool-btn" style="width:100%" id="toggleCursor">TOGGLE CURSOR</button>
-    </div>
+    <button class="tool-btn" onclick="document.body.classList.toggle('light')">DARK/LIGHT</button>
+    <button class="tool-btn">LANGUAGE</button>
   </div>
 </nav>
 
-<div class="filter-layer" id="mainContent">
-  <div class="container">
-    <header class="hero">
-      <h1 id="t-title">JUSTICE, PROFESSIONALISM, PROTECTION.</h1>
-      <p id="t-subtitle">Serving the citizens of Sixside with unwavering dedication and integrity since 1922.</p>
-      
-      <div class="stats-grid">
-        <div class="stat-box">
-          <span class="stat-val">17m 04s</span>
-          <span class="stat-label">Avg Response (2025)</span>
+<div class="container">
+  <header class="hero">
+    <h1>JUSTICE, PROFESSIONALISM, PROTECTION.</h1>
+    <p>Serving the citizens of Sixside with unwavering dedication and integrity since 1989.</p>
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <span class="stat-val">17m 04s</span>
+        <div style="margin-top: 5px;">
+          <span class="trend-down"></span>
+          <span class="trend-text">6s VS 2024</span>
         </div>
-        <div style="background: var(--border-color);"></div>
-        <div class="stat-box">
-          <span class="stat-val">98.2%</span>
-          <span class="stat-label">Clearance Rate</span>
+        <span class="stat-label">Avg Response Time</span>
+      </div>
+      <div style="background: var(--border-color);"></div>
+      <div class="stat-box">
+        <span class="stat-val">98.2%</span>
+        <span class="stat-label">Clearance Rate</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <section>
+      <h2 class="section-title">WANTED LIST</h2>
+      <div class="card">
+        <div class="wanted-item">
+          <div class="photo-box">PHOTO</div>
+          <div>
+            <h3 style="color:var(--accent-red); font-size:1rem;">ID #8829: UNKNOWN SUSPECT</h3>
+            <p style="font-size:0.85rem; margin:5px 0;">Case: Armed Robbery at North Peak District.</p>
+            <p style="font-size:0.8rem; color:var(--accent-amber);">BOUNTY: $50,000</p>
+          </div>
+        </div>
+        <div class="wanted-item">
+          <div class="photo-box">PHOTO</div>
+          <div>
+            <h3 style="color:var(--accent-red); font-size:1rem;">ID #7104: JOHN DOE</h3>
+            <p style="font-size:0.85rem; margin:5px 0;">Case: Felony Evasion and Public Endangerment.</p>
+            <p style="font-size:0.8rem; color:var(--accent-amber);">BOUNTY: $25,000</p>
+          </div>
         </div>
       </div>
-    </header>
+    </section>
 
-    <div class="main-grid">
-      <section>
-        <h2 class="section-head" id="t-wanted-head">WANTED LIST</h2>
-        
-        <div class="wanted-card">
-          <div class="wanted-flex">
-            <div class="photo-placeholder">IMAGE</div>
-            <div>
-              <h3 style="color: var(--accent-red);">ID #8829: UNKNOWN SUSPECT</h3>
-              <p style="font-size: 0.9rem;">Case: Armed Robbery at North Peak District.</p>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top:5px;">REWARD: $50,000</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="wanted-card">
-          <div class="wanted-flex">
-            <div class="photo-placeholder">IMAGE</div>
-            <div>
-              <h3 style="color: var(--accent-red);">ID #7104: JOHN DOE</h3>
-              <p style="font-size: 0.9rem;">Case: Felony Evasion and Public Endangerment.</p>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top:5px;">REWARD: $25,000</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <aside>
-        <h2 class="section-head" id="t-lost-head">LOST & FOUND</h2>
-        <input type="text" class="lost-search" placeholder="Search by item name...">
+    <aside>
+      <h2 class="section-title">LOST & FOUND</h2>
+      <div class="card">
+        <input type="text" class="lost-input" placeholder="Search items...">
         <table class="lost-table">
           <tr>
-            <td>Leather Wallet (ID Included)</td>
-            <td class="lost-date">OCT 12</td>
+            <td>Leather Wallet</td>
+            <td class="date-col">OCT 12</td>
           </tr>
           <tr>
             <td>DJI Drone (Damaged)</td>
-            <td class="lost-date">OCT 11</td>
+            <td class="date-col">OCT 11</td>
           </tr>
           <tr>
             <td>Toyota Car Keys</td>
-            <td class="lost-date">OCT 09</td>
+            <td class="date-col">OCT 09</td>
           </tr>
           <tr>
-            <td>Hiking Backpack (Blue)</td>
-            <td class="lost-date">OCT 05</td>
+            <td>Hiking Backpack</td>
+            <td class="date-col">OCT 05</td>
           </tr>
         </table>
-      </aside>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="langModal">
-  <div class="lang-modal">
-    <h3 id="t-select-lang">SELECT LANGUAGE</h3>
-    <div class="lang-grid">
-      <button class="lang-btn" onclick="setLang('en')">English</button>
-      <button class="lang-btn" onclick="setLang('zh')">简体中文</button>
-      <button class="lang-btn" onclick="setLang('wyw')">文言文</button>
-      <button class="lang-btn" onclick="setLang('jp')">日本語</button>
-      <button class="lang-btn" onclick="setLang('kr')">한국어</button>
-      <button class="lang-btn" onclick="setLang('fr')">Français</button>
-      <button class="lang-btn" onclick="setLang('de')">Deutsch</button>
-      <button class="lang-btn" onclick="setLang('ru')">Русский</button>
-    </div>
-    <button class="tool-btn" style="margin-top:20px; width:100%" id="closeLang">CLOSE</button>
+      </div>
+    </aside>
   </div>
 </div>
 
@@ -289,83 +256,6 @@
   <p>© 2025-2026 SIXSIDE POLICE DEPARTMENT</p>
   <p>Technical support and maintenance provided by Wareflame</p>
 </footer>
-
-<script>
-  // 语言数据引擎 (同步主站)
-  const langData = {
-    en: {
-      title: "JUSTICE, PROFESSIONALISM, PROTECTION.",
-      subtitle: "Serving the citizens of Sixside with unwavering dedication and integrity since 1922.",
-      wanted: "WANTED LIST",
-      lost: "LOST & FOUND",
-      select: "SELECT LANGUAGE"
-    },
-    zh: {
-      title: "公正、专业、守护。",
-      subtitle: "自1922年以来，我们以坚定不移的奉献精神和正直品质服务六面省公民。",
-      wanted: "悬赏名单",
-      lost: "失物招领",
-      select: "选择语言"
-    },
-    wyw: {
-      title: "秉公执律，专业卫民。",
-      subtitle: "自岁次壬戌，吾辈始终不渝，竭诚守正，以报六面之民。",
-      wanted: "缉捕名录",
-      lost: "遗物认领",
-      select: "择言"
-    }
-    // 其他语言可在此扩展...
-  };
-
-  // 基础逻辑
-  const accPanel = document.getElementById('accPanel');
-  const langModal = document.getElementById('langModal');
-  const mainLayer = document.getElementById('mainContent');
-  const cursor = document.getElementById('cursor');
-  let cursorEnabled = false;
-
-  // 辅助功能开关
-  document.getElementById('accToggle').onclick = () => accPanel.classList.toggle('show');
-  document.getElementById('langToggle').onclick = () => langModal.style.display = 'flex';
-  document.getElementById('closeLang').onclick = () => langModal.style.display = 'none';
-  document.getElementById('themeToggle').onclick = () => document.body.classList.toggle('light');
-
-  // 滤镜控制
-  function applyFilters() {
-    const c = document.getElementById('range-contrast').value;
-    const g = document.getElementById('range-gray').value;
-    mainLayer.style.filter = `contrast(${c}) grayscale(${g})`;
-    document.getElementById('val-contrast').innerText = c;
-    document.getElementById('val-gray').innerText = g;
-  }
-  document.getElementById('range-contrast').oninput = applyFilters;
-  document.getElementById('range-gray').oninput = applyFilters;
-
-  // 语言切换
-  function setLang(code) {
-    const data = langData[code] || langData['en'];
-    document.getElementById('t-title').innerText = data.title;
-    document.getElementById('t-subtitle').innerText = data.subtitle;
-    document.getElementById('t-wanted-head').innerText = data.wanted;
-    document.getElementById('t-lost-head').innerText = data.lost;
-    document.getElementById('t-select-lang').innerText = data.select;
-    langModal.style.display = 'none';
-  }
-
-  // 鼠标高亮
-  document.getElementById('toggleCursor').onclick = () => {
-    cursorEnabled = !cursorEnabled;
-    cursor.style.display = cursorEnabled ? 'block' : 'none';
-    document.body.style.cursor = cursorEnabled ? 'none' : 'default';
-  };
-
-  document.addEventListener('mousemove', (e) => {
-    if(!cursorEnabled) return;
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-    cursor.style.background = document.getElementById('cursorColor').value;
-  });
-</script>
 
 </body>
 </html>

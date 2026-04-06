@@ -21,7 +21,7 @@
       --accent-green: #2ecc71;
       --accent-amber: #f39c12;
       --police-blue: #4a6b8c;
-      --cursor-color: rgba(204, 51, 51, 0.3); /* 默认红 */
+      --cursor-color: rgba(204, 51, 51, 0.3);
       --cursor-border: #cc3333;
     }
     body.light {
@@ -31,7 +31,7 @@
     }
     body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
     
-    /* 核心：带准星的高亮鼠标 */
+    /* 核心：带白色十字架的高亮鼠标 */
     #cursor-highlight {
       position: fixed; pointer-events: none; width: 50px; height: 50px;
       border: 2px solid var(--cursor-border); background: var(--cursor-color);
@@ -40,15 +40,13 @@
     #cursor-highlight::before, #cursor-highlight::after {
       content: ''; position: absolute; background: #fff; /* 白色十字架 */
     }
-    /* 十字架横线 */
-    #cursor-highlight::before { width: 20px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-    /* 十字架竖线 */
-    #cursor-highlight::after { width: 2px; height: 20px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
     .filter-layer { transition: filter 0.2s; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-    /* 顶部报警 */
+    /* 顶部报警栏 */
     .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; }
     .report-btn { background: var(--accent-red); color: white; border: none; padding: 5px 15px; cursor: pointer; animation: alert-flash-slow 2s infinite; font-weight: bold; margin-left: 10px; }
     .report-btn.amber { background: var(--accent-amber); color: #000; }
@@ -59,14 +57,17 @@
     .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; }
     .nav-brand span { color: var(--police-blue); font-weight: normal; }
 
+    /* 辅助功能♿️按钮 */
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(1) contrast(2); }
+
     /* 辅助面板 */
     .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
     .acc-panel.show { display: block; }
     .acc-item { margin-bottom: 15px; }
     .acc-item label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
-    select.acc-select { width: 100%; padding: 8px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); }
+    .acc-select { width: 100%; padding: 8px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); }
 
-    /* 底部报警反馈 */
+    /* 底部派单队列 - 保持显示且合并 */
     #dispatchRoot { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 9999; }
     .dispatch-card {
       background: var(--bg-primary); border: 1px solid var(--border-color); padding: 15px 35px; border-radius: 4px;
@@ -87,14 +88,11 @@
     .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
     .trend-down.orange { border-top-color: var(--accent-amber); }
 
-    /* 弹窗 */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; display: none; overflow-y: auto; padding: 20px; }
     .report-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 600px; margin: 0 auto; padding: 40px; }
-    .warning-box { color: var(--accent-red); font-size: 0.85rem; margin-top: 12px; display: none; background: rgba(204,51,51,0.15); padding: 10px; border-left: 3px solid var(--accent-red); }
     #map { height: 240px; margin: 20px 0; border: 1px solid var(--border-color); }
     .btn-action { width: 100%; padding: 14px; margin-top: 12px; cursor: pointer; font-family: inherit; font-size: 1rem; border: 1px solid var(--border-color); }
-
-    footer { text-align: center; padding: 50px; border-top: 1px solid var(--border-color); margin-top: 60px; color: var(--text-secondary); }
+    footer { text-align: center; padding: 50px; border-top: 1px solid var(--border-color); color: var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -106,12 +104,13 @@
   EMERGENCY: <span style="color:var(--accent-red); font-weight:bold;">110</span> <button class="report-btn" onclick="openModal('EMERGENCY')">REPORT EMERGENCY</button>
   <span style="margin: 0 25px; color: #444;">|</span>
   NON-EMERGENCY: <span style="color:var(--accent-amber); font-weight:bold;">009</span> <button class="report-btn amber" onclick="openModal('NON-EMERGENCY')">REPORT NON-EMERGENCY</button>
+  <div style="font-size:0.75rem; color:#888; margin-top:8px;">110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 支持针对听力或言语障碍者的 SMS 报告服务</div>
 </div>
 
 <nav class="top-nav">
   <div class="nav-brand">SIXSIDE <span>| POLICE DEPARTMENT</span></div>
   <div class="nav-tools">
-    <button class="tool-btn" style="padding:5px 15px; cursor:pointer;" onclick="toggleAccPanel()">ACCESSIBILITY</button>
+    <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
     <button class="tool-btn" style="padding:5px 15px; cursor:pointer; margin-left:10px;" onclick="document.body.classList.toggle('light')">THEME</button>
   </div>
 
@@ -119,9 +118,8 @@
     <div class="acc-item"><label>Contrast (对比度)</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
     <div class="acc-item"><label>Grayscale (灰度)</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
     <div class="acc-item"><label>Saturate (饱和度)</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
-    
     <div class="acc-item">
-      <label>高亮鼠标颜色 (Cursor Color)</label>
+      <label>高亮准星颜色 (Crosshair Color)</label>
       <select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()">
         <option value="rgba(204,51,51,0.3)|#cc3333">红色 (RED)</option>
         <option value="rgba(52,152,219,0.3)|#3498db">蓝色 (BLUE)</option>
@@ -131,7 +129,7 @@
     </div>
     <div class="acc-item">
       <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-        <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> 启用高亮准星鼠标
+        <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> 启用高亮十字准星
       </label>
     </div>
     <button class="btn-action" style="background:var(--btn-bg); color:#fff; border:none;" onclick="resetAcc()">重置</button>
@@ -164,25 +162,7 @@
 <div class="modal-overlay" id="reportModal">
   <div class="report-modal">
     <h2 id="modalHead">REPORT</h2>
-    <div style="margin-top:25px;">
-      <label>所需支援类型 (SERVICES):</label>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:15px;">
-        <label><input type="checkbox" class="svc-cb" data-svc="police"> 警务 (POLICE)</label>
-        <label><input type="checkbox" class="svc-cb" data-svc="rescue"> 救援 (RESCUE)</label>
-        <label><input type="checkbox" class="svc-cb" data-svc="fire"> 火灾 (FIRE)</label>
-        <label><input type="checkbox" class="svc-cb" data-svc="medical"> 医疗 (MEDICAL)</label>
-      </div>
-      <div id="warn-police" class="warning-box">若无法确保安全，请关闭窗口并拨打 110。</div>
-      <div id="warn-rescue" class="warning-box">存在生命威胁风险时，请立即转至 110。</div>
-      <div id="warn-fire" class="warning-box">感知烟雾或高温时，请立即转至 110。</div>
-      <div id="warn-medical" class="warning-box">若症状恶化，请立即拨打 110。</div>
-    </div>
     <div id="map"></div>
-    <button class="btn-action" style="background:var(--btn-bg); color:#fff;" onclick="locate()">定位位置</button>
-    <div style="margin-top:20px;">
-      <label>目前是否身处户外或工作人员可见位置？</label>
-      <select id="outSelect" class="btn-action" style="background:var(--bg-primary); color:#fff;"><option value="">-- 请选择 --</option><option>是</option><option>否</option></select>
-    </div>
     <button id="finalSub" class="btn-action" style="font-weight:bold; margin-top:25px;" onclick="doSub()">提交报告</button>
     <button class="btn-action" style="background:transparent; color:var(--text-secondary); border:none;" onclick="closeModal()">取消</button>
   </div>
@@ -193,10 +173,9 @@
 </footer>
 
 <script>
-  let map, marker, activeT = '';
+  let map, activeT = '';
   let counts = { 'EMERGENCY': 0, 'NON-EMERGENCY': 0 };
 
-  // 1. 辅助面板与滤镜
   function toggleAccPanel() { document.getElementById('accPanel').classList.toggle('show'); }
   function applyFilters() {
     const c = document.getElementById('con-range').value;
@@ -205,7 +184,6 @@
     document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
   }
 
-  // 2. 核心：准星鼠标逻辑
   let isMouseOn = false;
   function toggleCursorAssist(on) {
     isMouseOn = on;
@@ -234,30 +212,16 @@
     applyFilters();
   }
 
-  // 3. 报警逻辑
   function openModal(t) {
     activeT = t;
     document.getElementById('reportModal').style.display = 'block';
-    document.getElementById('modalHead').innerText = 'REPORT ' + t;
     const b = document.getElementById('finalSub');
     b.style.background = (t==='EMERGENCY') ? 'var(--accent-red)' : 'var(--accent-amber)';
     b.style.color = (t==='EMERGENCY') ? '#fff' : '#000';
     if(!map) { map = L.map('map').setView([45.52, -122.67], 13); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); }
   }
   function closeModal() { document.getElementById('reportModal').style.display = 'none'; }
-  function locate() { navigator.geolocation.getCurrentPosition(p => { 
-    const {latitude:la, longitude:lo} = p.coords; 
-    map.setView([la,lo], 16); if(marker) map.removeLayer(marker); marker = L.marker([la,lo]).addTo(map); 
-  });}
 
-  document.querySelectorAll('.svc-cb').forEach(cb => {
-    cb.onchange = function() {
-      const w = document.getElementById('warn-' + this.dataset.svc);
-      w.style.display = (activeT === 'NON-EMERGENCY' && this.checked) ? 'block' : 'none';
-    }
-  });
-
-  // 4. 底部反馈
   function doSub() {
     counts[activeT]++;
     const root = document.getElementById('dispatchRoot');
@@ -279,6 +243,5 @@
     closeModal();
   }
 </script>
-
 </body>
 </html>

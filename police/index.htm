@@ -144,6 +144,30 @@
     .lang-option:hover { background: var(--police-blue); transform: translateY(-2px); }
     .direct-call-hint { background: rgba(204,51,51,0.15); border: 1px solid var(--accent-red); border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--accent-red); }
     .error-msg { color: var(--accent-red); font-size: 0.8rem; margin-top: 5px; }
+    
+    /* 发送提示 */
+    .toast-notify {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent-green);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 20000;
+      animation: fadeOut 3s ease-in-out forwards;
+    }
+    .toast-notify.error {
+      background: var(--accent-red);
+      color: white;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      70% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
+    }
   </style>
 </head>
 <body>
@@ -153,7 +177,7 @@
   <span id="emergencyLabel">EMERGENCY:</span> <span class="emergency-number">110</span> <button class="report-btn" id="emergencyBtn">REPORT EMERGENCY</button>
   <span style="margin:0 20px;">|</span>
   <span id="nonEmergencyLabel">NON-EMERGENCY:</span> <span class="nonemergency-number">009</span>
-  <div style="font-size:0.75rem; color:#aaa; margin-top:6px;" id="callNote">110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 支持针对听力或言语障碍者的 SMS 报告服务</div>
+  <div style="font-size:0.75rem; color:#aaa; margin-top:6px;" id="callNote"></div>
 </div>
 <nav class="top-nav">
   <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
@@ -214,31 +238,183 @@
   };
 
   const translations = {
-    en: { emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', reportEmerg:'REPORT EMERGENCY', callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | SMS reporting available for hearing/speech impaired', justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE', respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', modalHead:'Emergency Report', directCallHint:'⚠️ For emergencies, please dial 110 directly ⚠️', serviceLabel:'Select Services (multiple)', chkPolice:'Police', chkRescue:'Rescue', chkFire:'Fire', chkMedical:'Medical', locationLabel:'Location / Geo-coordinates', visibleLabel:'Are you in an open/visible area?', optYes:'Yes', optNo:'No', contactLabel:'Contact (optional)', sosBtn:'IMMEDIATE SOS', cancel:'Cancel', locateBtn:'Get My Location and Pin on Map', contrast:'Contrast', grayscale:'Grayscale', saturate:'Saturate', crosshair:'Crosshair Color', enableCursor:'Enable Crosshair Assist', reset:'Reset', langTitle:'Select Language', emergQueueMsg:'Support en route', selectServiceError:'Please select at least one service', locationRequiredError:'Please get your location first', dbNotice:'UPL National Database | Nationwide synchronized data', lostTitle:'Lost and Found', btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', btn5:'Request', btn6:'Complaint, Thanks & Suggestion', folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.' },
-    'zh-Hans': { emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', reportEmerg:'报告紧急事件', callNote:'110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 支持针对听力或言语障碍者的 SMS 报告服务', justice:'正义', professionalism:'专业精神', protection:'保护', respTime:'2025年平均响应时间', clearRate:'2025年平均办结率', respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%', footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', modalHead:'紧急报告', directCallHint:'⚠️ 紧急情况请直接拨打 110 ⚠️', serviceLabel:'选择支援类型 (可多选)', chkPolice:'警察', chkRescue:'救援', chkFire:'火灾', chkMedical:'医疗', locationLabel:'位置 / 经纬度', visibleLabel:'您在户外或警员可见区域吗？', optYes:'是', optNo:'否', contactLabel:'联系方式 (选填)', sosBtn:'立即求救', cancel:'取消', locateBtn:'获取我的位置并定位', contrast:'对比度', grayscale:'灰度', saturate:'饱和度', crosshair:'准星颜色', enableCursor:'启用高亮十字准星', reset:'重置', langTitle:'选择语言', emergQueueMsg:'支援正在抵达现场', selectServiceError:'请至少选择一种支援类型', locationRequiredError:'请先获取您的位置', dbNotice:'UPL 国家数据库 | 全国数据同步', lostTitle:'失物招领', btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', btn5:'请求', btn6:'投诉、感谢和建议', folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。' }
+    en: { 
+      emergencyLabel:'EMERGENCY:', 
+      nonEmergencyLabel:'NON-EMERGENCY:', 
+      reportEmerg:'REPORT EMERGENCY', 
+      callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
+      justice:'JUSTICE', 
+      professionalism:'PROFESSIONALISM', 
+      protection:'PROTECTION', 
+      respTime:'2025 AVG RESPONSE TIME', 
+      clearRate:'2025 AVG CLEARANCE RATE', 
+      respVal:'17m 04s', 
+      clearVal:'98.2%', 
+      respTrend:'6s VS 2024', 
+      clearTrend:'0.6% lower VS 2024', 
+      footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', 
+      modalHead:'Emergency Report', 
+      directCallHint:'⚠️ For emergencies, please dial 110 directly ⚠️', 
+      serviceLabel:'Select Services (multiple)', 
+      chkPolice:'Police', 
+      chkRescue:'Rescue', 
+      chkFire:'Fire', 
+      chkMedical:'Medical', 
+      locationLabel:'Location / Geo-coordinates', 
+      visibleLabel:'Are you in an open/visible area?', 
+      optYes:'Yes', 
+      optNo:'No', 
+      contactLabel:'Contact (optional)', 
+      sosBtn:'IMMEDIATE SOS', 
+      cancel:'Cancel', 
+      locateBtn:'Get My Location and Pin on Map', 
+      contrast:'Contrast', 
+      grayscale:'Grayscale', 
+      saturate:'Saturate', 
+      crosshair:'Crosshair Color', 
+      enableCursor:'Enable Crosshair Assist', 
+      reset:'Reset', 
+      langTitle:'Select Language', 
+      emergQueueMsg:'Support en route', 
+      selectServiceError:'Please select at least one service', 
+      locationRequiredError:'Please get your location first', 
+      dbNotice:'UPL National Database | Nationwide synchronized data', 
+      lostTitle:'Lost and Found', 
+      btn1:'Report a Crime', 
+      btn2:'Tell Us', 
+      btn3:'Lost and Found', 
+      btn4:'Apply or Register', 
+      btn5:'Request', 
+      btn6:'Complaint, Thanks & Suggestion', 
+      folderName:'Transparent Folder', 
+      chargerName:'HP Laptop 45W Charger', 
+      drinkName:'Lucozade Drink', 
+      folderDate:'April 2026', 
+      chargerDate:'Jan - Feb 2026', 
+      drinkDate:'Apr 2025 - Nov 2025', 
+      folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
+      chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', 
+      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.' 
+    },
+    'zh-Hans': { 
+      emergencyLabel:'紧急情况:', 
+      nonEmergencyLabel:'非紧急:', 
+      reportEmerg:'报告紧急事件', 
+      callNote:'110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 110/009 短信报警可用',
+      justice:'正义', 
+      professionalism:'专业精神', 
+      protection:'保护', 
+      respTime:'2025年平均响应时间', 
+      clearRate:'2025年平均办结率', 
+      respVal:'17分04秒', 
+      clearVal:'98.2%', 
+      respTrend:'比2024年快6秒', 
+      clearTrend:'比2024年低0.6%', 
+      footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', 
+      modalHead:'紧急报告', 
+      directCallHint:'⚠️ 紧急情况请直接拨打 110 ⚠️', 
+      serviceLabel:'选择支援类型 (可多选)', 
+      chkPolice:'警察', 
+      chkRescue:'救援', 
+      chkFire:'火灾', 
+      chkMedical:'医疗', 
+      locationLabel:'位置 / 经纬度', 
+      visibleLabel:'您在户外或警员可见区域吗？', 
+      optYes:'是', 
+      optNo:'否', 
+      contactLabel:'联系方式 (选填)', 
+      sosBtn:'立即求救', 
+      cancel:'取消', 
+      locateBtn:'获取我的位置并定位', 
+      contrast:'对比度', 
+      grayscale:'灰度', 
+      saturate:'饱和度', 
+      crosshair:'准星颜色', 
+      enableCursor:'启用高亮十字准星', 
+      reset:'重置', 
+      langTitle:'选择语言', 
+      emergQueueMsg:'支援正在抵达现场', 
+      selectServiceError:'请至少选择一种支援类型', 
+      locationRequiredError:'请先获取您的位置', 
+      dbNotice:'UPL 国家数据库 | 全国数据同步', 
+      lostTitle:'失物招领', 
+      btn1:'报告犯罪', 
+      btn2:'告诉我们', 
+      btn3:'失物招领', 
+      btn4:'申请或注册', 
+      btn5:'请求', 
+      btn6:'投诉、感谢和建议', 
+      folderName:'透明文件夹', 
+      chargerName:'惠普电脑45瓦充电器', 
+      drinkName:'Lucozade饮料', 
+      folderDate:'2026年4月', 
+      chargerDate:'2026年1月至2月', 
+      drinkDate:'2025年4月至11月', 
+      folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
+      chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', 
+      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。' 
+    }
   };
+  
   // 补充其他12种语言
   const otherLangs = ['es','de','pt','zh-Hant','fr','lzh','ru','mn','ja','ko','hi','zh-Classical'];
   otherLangs.forEach(code => { translations[code] = JSON.parse(JSON.stringify(translations.en)); });
-  translations.es = { ...translations.en, emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA', sosBtn:'SOS INMEDIATO', cancel:'Cancelar', locateBtn:'Obtener mi ubicación', btn1:'Reportar un Crimen', btn2:'Díganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar', btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia' };
-  translations.de = { ...translations.en, emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', reportEmerg:'NOTFALL MELDEN', sosBtn:'SOFORT SOS', btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundbüro', btn4:'Beantragen oder Registrieren', btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag' };
-  translations.pt = { ...translations.en, emergencyLabel:'EMERGÊNCIA:', nonEmergencyLabel:'NÃO EMERGÊNCIA:', sosBtn:'SOS IMEDIATO', btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar', btn5:'Solicitação', btn6:'Reclamação, Agradecimento e Sugestão' };
-  translations['zh-Hant'] = JSON.parse(JSON.stringify(translations['zh-Hans']));
-  translations['zh-Hant'].emergencyLabel = '緊急情況:';
-  translations['zh-Hant'].nonEmergencyLabel = '非緊急:';
-  translations.fr = { ...translations.en, emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', sosBtn:'SOS IMMÉDIAT', btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer', btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion' };
-  translations.lzh = { ...translations['zh-Hans'], emergencyLabel:'警急:', nonEmergencyLabel:'常事:', sosBtn:'急求', cancel:'止', btn1:'報警', btn2:'告吾', btn3:'失物', btn4:'請或註', btn5:'求', btn6:'訴、謝、議' };
-  translations.ru = { ...translations.en, emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', sosBtn:'НЕМЕДЛЕННО SOS', btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку', btn5:'Запрос', btn6:'Жалоба, благодарность' };
-  translations.mn = { ...translations.en, emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', sosBtn:'ЯАРАЛТАЙ SOS', btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах', btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал' };
-  translations.ja = { ...translations.en, emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', sosBtn:'緊急SOS', btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録', btn5:'リクエスト', btn6:'苦情・感謝・提案' };
-  translations.ko = { ...translations.en, emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', sosBtn:'긴급 SOS', btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록', btn5:'요청', btn6:'불만, 감사, 제안' };
-  translations.hi = { ...translations.en, emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपातकाल:', sosBtn:'तत्काल SOS', btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें', btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव' };
-  translations['zh-Classical'] = JSON.parse(JSON.stringify(translations.lzh));
+  
+  translations.es = { ...translations.es, emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA', callNote:'110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible', sosBtn:'SOS INMEDIATO', cancel:'Cancelar', locateBtn:'Obtener mi ubicación', btn1:'Reportar un Crimen', btn2:'Díganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar', btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia' };
+  translations.de = { ...translations.de, emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', reportEmerg:'NOTFALL MELDEN', callNote:'110/009 Kostenloser Anruf, keine SIM-Karte erforderlich (Mobilfunkabdeckung erforderlich) | 110/009 SMS-Meldung verfügbar', sosBtn:'SOFORT SOS', btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundbüro', btn4:'Beantragen oder Registrieren', btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag' };
+  translations.pt = { ...translations.pt, emergencyLabel:'EMERGÊNCIA:', nonEmergencyLabel:'NÃO EMERGÊNCIA:', callNote:'110/009 chamada gratuita, não precisa de SIM (cobertura celular necessária) | 110/009 relatório por SMS disponível', sosBtn:'SOS IMEDIATO', btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar', btn5:'Solicitação', btn6:'Reclamação, Agradecimento e Sugestão' };
+  translations['zh-Hant'] = { ...translations['zh-Hant'], emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', callNote:'110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用', btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊', btn5:'請求', btn6:'投訴、感謝和建議' };
+  translations.fr = { ...translations.fr, emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible', sosBtn:'SOS IMMÉDIAT', btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer', btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion' };
+  translations.lzh = { ...translations.lzh, emergencyLabel:'警急:', nonEmergencyLabel:'常事:', callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用', sosBtn:'急求', cancel:'止', btn1:'報警', btn2:'告吾', btn3:'失物', btn4:'請或註', btn5:'求', btn6:'訴、謝、議' };
+  translations.ru = { ...translations.ru, emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', callNote:'110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен', sosBtn:'НЕМЕДЛЕННО SOS', btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку', btn5:'Запрос', btn6:'Жалоба, благодарность' };
+  translations.mn = { ...translations.mn, emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', callNote:'110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой', sosBtn:'ЯАРАЛТАЙ SOS', btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах', btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал' };
+  translations.ja = { ...translations.ja, emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', callNote:'110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能', sosBtn:'緊急SOS', btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録', btn5:'リクエスト', btn6:'苦情・感謝・提案' };
+  translations.ko = { ...translations.ko, emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', callNote:'110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능', sosBtn:'긴급 SOS', btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록', btn5:'요청', btn6:'불만, 감사, 제안' };
+  translations.hi = { ...translations.hi, emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपातकाल:', callNote:'110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध', sosBtn:'तत्काल SOS', btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें', btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव' };
+  translations['zh-Classical'] = { ...translations['zh-Classical'], emergencyLabel:'警急:', nonEmergencyLabel:'常事:', callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用', sosBtn:'急求', cancel:'止', btn1:'報警', btn2:'告吾', btn3:'失物', btn4:'請或註', btn5:'求', btn6:'訴、謝、議' };
 
   let currentLang = 'zh-Hans';
   let currentLatLng = null;
   let counts = { EMERGENCY: 0 };
   let mottoIndex = 0, mottoInterval = null;
+
+  // Formspree 表单地址
+  const FORMSPREE_URL = 'https://formspree.io/f/mjgplavv';
+
+  // 显示提示消息
+  function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notify' + (isError ? ' error' : '');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // 发送报警邮件到 Formspree
+  async function sendEmailAlert(data) {
+    try {
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        showToast('✅ 报警已发送！警方正在赶往现场');
+        return true;
+      } else {
+        showToast('❌ 发送失败，请直接拨打110', true);
+        return false;
+      }
+    } catch (error) {
+      console.error('发送失败:', error);
+      showToast('❌ 网络错误，请直接拨打110', true);
+      return false;
+    }
+  }
 
   function updateMotto() {
     let mottoDiv = document.getElementById('currentMotto');
@@ -293,6 +469,7 @@
   function applyLanguage(lang) {
     let t = translations[lang];
     if(!t) return;
+    
     const ids = ['emergencyLabel','nonEmergencyLabel','callNote','wordJustice','wordProfessionalism','wordProtection','respTimeVal','clearRateVal','respTrend','clearTrend','respLabel','clearLabel','footerText','modalHead','directCallHint','serviceLabel','chkPolice','chkRescue','chkFire','chkMedical','locationLabel','visibleLabel','optYes','optNo','contactLabel','sosBtn','cancelModalBtn','locateBtn','contrastLabel','grayscaleLabel','saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle'];
     ids.forEach(id => { let el = document.getElementById(id); if(el && t[id]) el.innerText = t[id]; });
     document.getElementById('emergencyBtn').innerText = t.reportEmerg;
@@ -344,12 +521,62 @@
   document.getElementById('cancelModalBtn').onclick=closeModal;
   document.getElementById('closeLostDetail').onclick=()=>document.getElementById('lostDetailModal').style.display='none';
   document.getElementById('closeLangModal').onclick=()=>document.getElementById('langModal').style.display='none';
-  document.getElementById('submitSosBtn').onclick=()=>{
+  
+  // SOS 按钮点击处理 - 发送邮件 + 显示调度卡片
+  document.getElementById('submitSosBtn').onclick=async () => {
     let t = translations[currentLang];
-    let services=[]; document.querySelectorAll('#serviceCheck input:checked').forEach(cb=>services.push(cb.value));
-    if(services.length===0){ document.getElementById('serviceWarning').innerText = t.selectServiceError; return; }
-    if(!currentLatLng){ document.getElementById('locationError').innerText = t.locationRequiredError; return; }
-    addDispatchCard(); closeModal();
+    let services=[]; 
+    document.querySelectorAll('#serviceCheck input:checked').forEach(cb=>services.push(cb.value));
+    if(services.length===0){ 
+      document.getElementById('serviceWarning').innerText = t.selectServiceError; 
+      return; 
+    }
+    if(!currentLatLng){ 
+      document.getElementById('locationError').innerText = t.locationRequiredError; 
+      return; 
+    }
+    
+    // 获取可见性选项
+    let visibilityRadio = document.querySelector('input[name="visibility"]:checked');
+    let visibility = visibilityRadio ? visibilityRadio.value : 'Not specified';
+    
+    // 获取联系方式
+    let contact = document.getElementById('contactInput').value || 'Not provided';
+    
+    // 获取当前时间
+    let now = new Date();
+    let timeStr = now.toLocaleString(currentLang === 'zh-Hans' ? 'zh-CN' : 'en-US', { timeZone: 'Asia/Shanghai' });
+    
+    // 服务类型翻译（用于邮件显示）
+    let serviceMap = {
+      'police': t.chkPolice || 'Police',
+      'rescue': t.chkRescue || 'Rescue', 
+      'fire': t.chkFire || 'Fire',
+      'medical': t.chkMedical || 'Medical'
+    };
+    let serviceNames = services.map(s => serviceMap[s] || s).join(', ');
+    
+    // 准备发送到 Formspree 的数据
+    const emailData = {
+      _subject: '🚨 SSPD EMERGENCY ALERT - 紧急报警 🚨',
+      time: timeStr,
+      location: currentLatLng,
+      latlng: currentLatLng,
+      services: serviceNames,
+      visibility: visibility === 'yes' ? 'Yes (Open/Visible Area)' : (visibility === 'no' ? 'No (Hidden Area)' : 'Not specified'),
+      contact: contact,
+      message: `🚨 报警详情 🚨\n\n时间: ${timeStr}\n经纬度: ${currentLatLng}\n服务类型: ${serviceNames}\n可见区域: ${visibility === 'yes' ? '是' : (visibility === 'no' ? '否' : '未说明')}\n联系方式: ${contact}\n\n请立即处理！`
+    };
+    
+    // 发送邮件到你的邮箱
+    const success = await sendEmailAlert(emailData);
+    
+    if (success) {
+      // 显示调度卡片
+      addDispatchCard();
+      // 关闭弹窗
+      closeModal();
+    }
   };
 
   function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }

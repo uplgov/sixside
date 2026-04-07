@@ -7,20 +7,11 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg-primary: #0a0f1a;
-      --bg-secondary: #10161f;
-      --text-primary: #e8edf5;
-      --text-secondary: #9aaebf;
-      --border-color: #1a2538;
-      --card-bg: #10161f;
-      --card-border: #222c38;
-      --btn-bg: #1e2a3a;
-      --accent-red: #cc3333;
-      --accent-green: #2ecc71;
-      --accent-amber: #f39c12;
-      --police-blue: #4a6b8c;
-      --cursor-color: rgba(204, 51, 51, 0.3);
-      --cursor-border: #cc3333;
+      --bg-primary: #0a0f1a; --bg-secondary: #10161f; --text-primary: #e8edf5;
+      --text-secondary: #9aaebf; --border-color: #1a2538; --card-bg: #10161f;
+      --card-border: #222c38; --btn-bg: #1e2a3a; --accent-red: #cc3333;
+      --accent-green: #2ecc71; --accent-amber: #f39c12; --police-blue: #4a6b8c;
+      --cursor-color: rgba(204, 51, 51, 0.3); --cursor-border: #cc3333;
     }
     body.light {
       --bg-primary: #f4f6f9; --bg-secondary: #ffffff; --text-primary: #1a2634;
@@ -44,7 +35,13 @@
 
     /* 导航栏 */
     .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
-    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; cursor: pointer; }
+    
+    /* 左上角按钮：禁止选中复制 */
+    .nav-brand {
+      background: none; border: none; font-weight: bold; letter-spacing: 1px; color: #ffffff;
+      cursor: pointer; font-family: inherit; font-size: 1.1rem; padding: 0; outline: none;
+      -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    }
     .nav-brand span { color: var(--police-blue); font-weight: normal; }
 
     .nav-tools { display: flex; gap: 15px; align-items: center; }
@@ -61,15 +58,15 @@
     /* 语言模态框 */
     .lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; display: none; align-items: center; justify-content: center; }
     .lang-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 500px; background: var(--bg-secondary); padding: 30px; border: 1px solid var(--border-color); }
-    .lang-btn { background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; cursor: pointer; text-align: center; }
+    .lang-btn { background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; cursor: pointer; text-align: center; font-family: inherit; }
 
-    /* 快速离开按钮 (Right side quick exit) */
+    /* 快速离开按钮 */
     .quick-exit {
       position: fixed; top: 50%; right: 0; transform: translateY(-50%);
       background: var(--accent-red); color: #fff; padding: 20px 8px;
       writing-mode: vertical-rl; text-orientation: mixed; font-weight: bold;
       cursor: pointer; z-index: 9999; border: 2px solid #fff; border-right: none;
-      border-radius: 8px 0 0 8px; letter-spacing: 2px; transition: 0.2s;
+      border-radius: 8px 0 0 8px; letter-spacing: 2px; transition: 0.2s; font-family: sans-serif;
     }
     .quick-exit:hover { background: #a00; padding-right: 15px; }
 
@@ -109,31 +106,31 @@
 
 <div id="cursor-highlight"></div>
 
-<button class="quick-exit" onclick="quickExit()" title="Leave this page immediately">LEAVE THIS PAGE</button>
+<button class="quick-exit" onclick="quickExit()" data-i18n="leave">LEAVE THIS PAGE</button>
 
 <nav class="top-nav">
-  <div class="nav-brand" onclick="location.reload()">SIXSIDE <span>| POLICE DEPARTMENT</span></div>
+  <button class="nav-brand" onclick="window.location.href='https://uplgov.github.io/sixside/police/index.htm'">SIXSIDE <span>| POLICE DEPARTMENT</span></button>
   <div class="nav-tools">
     <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
-    <button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button>
-    <button class="tool-btn" onclick="document.getElementById('langModal').style.display='flex'">LANGUAGE</button>
+    <button class="tool-btn" onclick="document.body.classList.toggle('light')" data-i18n="theme">THEME</button>
+    <button class="tool-btn" onclick="document.getElementById('langModal').style.display='flex'" data-i18n="lang">LANGUAGE</button>
   </div>
 
   <div class="acc-panel" id="accPanel">
-    <div class="acc-item"><label>Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
-    <div class="acc-item"><label>Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label data-i18n="acc_contrast">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label data-i18n="acc_grayscale">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
     <div class="acc-item">
-      <label>Crosshair Color</label>
+      <label data-i18n="acc_cursor_color">Crosshair Color</label>
       <select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()">
         <option value="rgba(204,51,51,0.3)|#cc3333">Red</option>
         <option value="rgba(52,152,219,0.3)|#3498db">Blue</option>
         <option value="rgba(50,205,50,0.3)|#32cd32">Lime</option>
-        <option value="rgba(255,255,0,0.3)|#ffff00">Bright Yellow</option>
+        <option value="rgba(255,255,0,0.3)|#ffff00">Yellow</option>
       </select>
     </div>
     <div class="acc-item">
       <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-        <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> Enable Crosshair Cursor
+        <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> <span data-i18n="acc_enable_cursor">Enable Crosshair Cursor</span>
       </label>
     </div>
   </div>
@@ -141,22 +138,22 @@
 
 <div class="lang-modal" id="langModal">
   <div class="lang-grid">
-    <h3 style="grid-column: 1 / -1; color: #fff; margin-bottom: 15px;">Select Language</h3>
+    <h3 style="grid-column: 1 / -1; color: #fff; margin-bottom: 15px;" data-i18n="select_lang">Select Language</h3>
     <button class="lang-btn" onclick="setLang('en')">English (UK)</button>
-    <button class="lang-btn">Español</button>
+    <button class="lang-btn" onclick="setLang('es')">Español</button>
     <button class="lang-btn" onclick="setLang('zh-Hans')">简体白话</button>
-    <button class="lang-btn">Deutsch</button>
-    <button class="lang-btn">Português</button>
-    <button class="lang-btn">正體官話</button>
-    <button class="lang-btn">Français</button>
-    <button class="lang-btn">简体文言</button>
-    <button class="lang-btn">Русский</button>
-    <button class="lang-btn">華夏文言</button>
-    <button class="lang-btn">Монгол</button>
-    <button class="lang-btn">日本語</button>
-    <button class="lang-btn">한국어</button>
-    <button class="lang-btn">हिन्दी</button>
-    <button class="tool-btn" style="grid-column: 1 / -1; margin-top: 15px;" onclick="document.getElementById('langModal').style.display='none'">Close</button>
+    <button class="lang-btn" onclick="setLang('de')">Deutsch</button>
+    <button class="lang-btn" onclick="setLang('pt')">Português</button>
+    <button class="lang-btn" onclick="setLang('zh-Hant')">正體官話</button>
+    <button class="lang-btn" onclick="setLang('fr')">Français</button>
+    <button class="lang-btn" onclick="setLang('zh-Classical')">简体文言</button>
+    <button class="lang-btn" onclick="setLang('ru')">Русский</button>
+    <button class="lang-btn" onclick="setLang('zh-Huaxia')">華夏文言</button>
+    <button class="lang-btn" onclick="setLang('mn')">Монгол</button>
+    <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+    <button class="lang-btn" onclick="setLang('hi')">हिन्दी</button>
+    <button class="tool-btn" style="grid-column: 1 / -1; margin-top: 15px;" onclick="document.getElementById('langModal').style.display='none'" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -165,9 +162,9 @@
     
     <div id="selectionView">
       <div class="header-section">
-        <h1 id="t-title">Report a Crime</h1>
-        <p id="t-subtitle">In an emergency, always call 110. For non-emergencies, use 009 or report online below.</p>
-        <div class="header-notice" id="t-notice">For anything not listed below, please call 110 or 009.</div>
+        <h1 data-i18n="title">Report a Crime</h1>
+        <p data-i18n="sub">In an emergency, always call 110. For non-emergencies, use 009 or report online below.</p>
+        <div class="header-notice" data-i18n="notice">For anything not listed below, please call 110 or 009.</div>
       </div>
 
       <div class="category-grid" id="categoryGrid">
@@ -175,98 +172,160 @@
     </div>
 
     <div id="reportFormContainer">
-      <button class="back-btn" onclick="goBack()">← Back to categories</button>
+      <button class="back-btn" onclick="goBack()" data-i18n="back">← Back to categories</button>
       <h2 id="formTitle" style="margin-bottom: 20px; font-size: 1.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></h2>
-      
       <div id="formContent"></div>
     </div>
 
   </div>
 </div>
 
-<footer>
-  <p>© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p>
+<footer data-i18n="footer">
+  © 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame
 </footer>
 
 <script>
-  // 核心逻辑与数据
+  // 多语言数据字典
+  const dict = {
+    "en": {
+      leave: "LEAVE THIS PAGE", theme: "THEME", lang: "LANGUAGE", close: "Close", select_lang: "Select Language",
+      acc_contrast: "Contrast", acc_grayscale: "Grayscale", acc_cursor_color: "Crosshair Color", acc_enable_cursor: "Enable Crosshair Cursor",
+      title: "Report a Crime", sub: "In an emergency, always call 110. For non-emergencies, use 009 or report online below.", notice: "For anything not listed below, please call 110 or 009.",
+      back: "← Back to categories", footer: "© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame",
+      c1: "Report a Crime", c2: "Domestic Abuse", c3: "Traffic Collision", c4: "Missing Person", c5: "Anti-social Behaviour", c6: "Fraud", c7: "Stolen Vehicle", c8: "Harassment", c9: "Unregistered/Unlicensed Vehicles & Boats", c10: "Hate Crime or Racism", c11: "Spiking",
+      fwTitle: "Please call 110 immediately or go to the nearest police station.", fwSub: "This type of incident requires immediate police dispatch and cannot be reported online.",
+      emTitle: "Call 110 in these emergencies:", em1: "Someone is injured or dead", em2: "Someone is using or threatening violence", em3: "A crime is happening right now (e.g., burglary in progress)", nonEm: "For non-emergencies, calling 009 is a more efficient way to handle the situation.",
+      f_date: "Date and Time of Incident", f_loc: "Exact Location (or Postcode)", f_desc: "Detailed Description", p_desc: "What happened? Who was involved?", f_sub: "Submit Report", alert: "Report Submitted."
+    },
+    "zh-Hans": {
+      leave: "离开此网页", theme: "主题", lang: "语言", close: "关闭", select_lang: "选择语言",
+      acc_contrast: "对比度", acc_grayscale: "灰度", acc_cursor_color: "准星颜色", acc_enable_cursor: "启用高亮鼠标准星",
+      title: "报告犯罪", sub: "紧急情况请始终拨打 110。非紧急情况请拨打 009 或在下方在线报告。", notice: "其他没有标注出来的请拨打 110 或 009。",
+      back: "← 返回分类", footer: "© 2025-2026 六面省警察局 | 技术支持：Wareflame",
+      c1: "举报犯罪", c2: "家庭虐待", c3: "交通事故", c4: "失踪人员", c5: "反社会行为", c6: "诈骗", c7: "交通工具失窃", c8: "骚扰", c9: "没有车牌或者未通过年检的车和船", c10: "仇恨或种族歧视", c11: "尖刺",
+      fwTitle: "请立即拨打 110 或前往附近的警局。", fwSub: "此类事件需要警方立即出警，无法在线报告。",
+      emTitle: "在这样的紧急情况下拨打 110：", em1: "有人受伤或死亡", em2: "有人正使用暴力或威胁使用", em3: "犯罪正在发生（例如正在盗窃）", nonEm: "对于非紧急情况，拨打 009 是更有效的处理方式。",
+      f_date: "事件发生日期和时间", f_loc: "准确位置（或邮编）", f_desc: "详细描述", p_desc: "发生了什么？涉及到谁？", f_sub: "提交报告", alert: "报告已提交。"
+    },
+    "zh-Hant": {
+      leave: "離開此網頁", theme: "主題", lang: "語言", close: "關閉", select_lang: "選擇語言",
+      acc_contrast: "對比度", acc_grayscale: "灰度", acc_cursor_color: "準星顏色", acc_enable_cursor: "啟用高亮滑鼠準星",
+      title: "報告犯罪", sub: "緊急情況請始終撥打 110。非緊急情況請撥打 009 或在下方在線報告。", notice: "其他沒有標註出來的請撥打 110 或 009。",
+      back: "← 返回分類", footer: "© 2025-2026 六面省警察局 | 技術支持：Wareflame",
+      c1: "舉報犯罪", c2: "家庭虐待", c3: "交通事故", c4: "失蹤人員", c5: "反社會行為", c6: "詐騙", c7: "交通工具失竊", c8: "騷擾", c9: "沒有車牌或者未通過年檢的車和船", c10: "仇恨或種族歧視", c11: "尖刺",
+      fwTitle: "請立即撥打 110 或前往附近的警局。", fwSub: "此類事件需要警方立即出警，無法在線報告。",
+      emTitle: "在這樣的緊急情況下撥打 110：", em1: "有人受傷或死亡", em2: "有人正使用暴力或威脅使用", em3: "犯罪正在發生（例如正在盜竊）", nonEm: "對於非緊急情況，撥打 009 是更有效的處理方式。",
+      f_date: "事件發生日期和時間", f_loc: "準確位置（或郵編）", f_desc: "詳細描述", p_desc: "發生了什麼？涉及到誰？", f_sub: "提交報告", alert: "報告已提交。"
+    },
+    "zh-Classical": {
+      leave: "急离此卷", theme: "昼夜", lang: "言", close: "闭", select_lang: "择言",
+      acc_contrast: "明暗", acc_grayscale: "黑白", acc_cursor_color: "准星之色", acc_enable_cursor: "启准星",
+      title: "首告罪案", sub: "十万火急即呼110。缓则呼009或录于下。", notice: "未列之事，请呼110或009。",
+      back: "← 返上录", footer: "© 2025-2026 六面省巡捕房 | 技护：Wareflame",
+      c1: "告发罪案", c2: "骨肉相残", c3: "车马相撞", c4: "生人走失", c5: "祸乱乡里", c6: "欺诈", c7: "车马被盗", c8: "寻衅滋事", c9: "无牌黑车船", c10: "仇族生事", c11: "暗器尖刺",
+      fwTitle: "十万火急！速呼110或至近处巡捕房。", fwSub: "此等危急，捕快须即刻出动，不可凭网报之。",
+      emTitle: "遇此急事必呼110：", em1: "见伤亡者", em2: "见持凶逞暴者", em3: "见贼正行窃中", nonEm: "缓事呼009更为妥当。",
+      f_date: "案发时辰", f_loc: "案发实处（或邮驿号）", f_desc: "细状", p_desc: "何事？何人？", f_sub: "上呈文书", alert: "呈报完毕。"
+    },
+    "zh-Huaxia": {
+      leave: "急離此卷", theme: "晝夜", lang: "言", close: "閉", select_lang: "擇言",
+      acc_contrast: "明暗", acc_grayscale: "黑白", acc_cursor_color: "準星之色", acc_enable_cursor: "啟準星",
+      title: "首告罪案", sub: "十萬火急即呼110。緩則呼009或錄於下。", notice: "未列之事，請呼110或009。",
+      back: "← 返上錄", footer: "© 2025-2026 六面省巡捕房 | 技護：Wareflame",
+      c1: "告發罪案", c2: "骨肉相殘", c3: "車馬相撞", c4: "生人走失", c5: "禍亂鄉里", c6: "欺詐", c7: "車馬被盜", c8: "尋釁滋事", c9: "無牌黑車船", c10: "仇族生事", c11: "暗器尖刺",
+      fwTitle: "十萬火急！速呼110或至近處巡捕房。", fwSub: "此等危急，捕快須即刻出動，不可憑網報之。",
+      emTitle: "遇此急事必呼110：", em1: "見傷亡者", em2: "見持凶逞暴者", em3: "見賊正行竊中", nonEm: "緩事呼009更為妥當。",
+      f_date: "案發時辰", f_loc: "案發實處（或郵驛號）", f_desc: "細狀", p_desc: "何事？何人？", f_sub: "上呈文書", alert: "呈報完畢。"
+    },
+    "es": { leave: "SALIR RÁPIDO", theme: "TEMA", lang: "IDIOMA", close: "Cerrar", select_lang: "Seleccionar Idioma", acc_contrast: "Contraste", acc_grayscale: "Escala de grises", acc_cursor_color: "Color de mira", acc_enable_cursor: "Activar mira", title: "Reportar un Crimen", sub: "En emergencia llame al 110. Si no, use 009 o reporte abajo.", notice: "Para otros casos, llame al 110 o 009.", back: "← Volver", footer: "© 2025-2026 SIXSIDE PD | Soporte: Wareflame", c1: "Reportar Crimen", c2: "Abuso Doméstico", c3: "Accidente de Tráfico", c4: "Persona Desaparecida", c5: "Comportamiento Antisocial", c6: "Fraude", c7: "Vehículo Robado", c8: "Acoso", c9: "Vehículos sin licencia", c10: "Crimen de Odio", c11: "Pinchazos", fwTitle: "Llame al 110 inmediatamente.", fwSub: "Esto requiere acción policial inmediata.", emTitle: "Llame al 110 si:", em1: "Alguien está herido o muerto", em2: "Hay violencia", em3: "Un crimen está ocurriendo", nonEm: "Para no emergencias, el 009 es más eficiente.", f_date: "Fecha y hora", f_loc: "Ubicación exacta", f_desc: "Descripción", p_desc: "¿Qué pasó?", f_sub: "Enviar", alert: "Reporte Enviado." },
+    "fr": { leave: "QUITTER VITE", theme: "THÈME", lang: "LANGUE", close: "Fermer", select_lang: "Choisir la Langue", acc_contrast: "Contraste", acc_grayscale: "Nuances de gris", acc_cursor_color: "Couleur", acc_enable_cursor: "Activer le curseur", title: "Signaler un Crime", sub: "En cas d'urgence, 110. Sinon 009.", notice: "Autre : appelez le 110 ou 009.", back: "← Retour", footer: "© 2025-2026 SIXSIDE PD | Support: Wareflame", c1: "Signaler un Crime", c2: "Violence Domestique", c3: "Accident", c4: "Personne Disparue", c5: "Comportement Antisocial", c6: "Fraude", c7: "Véhicule Volé", c8: "Harcèlement", c9: "Véhicules non immatriculés", c10: "Crime de Haine", c11: "Piqûre", fwTitle: "Appelez le 110 immédiatement.", fwSub: "Nécessite une police immédiate.", emTitle: "Appelez le 110 si :", em1: "Blessé ou mort", em2: "Violence", em3: "Crime en cours", nonEm: "Appelez le 009 pour les non-urgences.", f_date: "Date/Heure", f_loc: "Lieu exact", f_desc: "Description", p_desc: "Que s'est-il passé ?", f_sub: "Soumettre", alert: "Soumis." },
+    "de": { leave: "SEITE VERLASSEN", theme: "DESIGN", lang: "SPRACHE", close: "Schließen", select_lang: "Sprache wählen", acc_contrast: "Kontrast", acc_grayscale: "Graustufen", acc_cursor_color: "Farbe", acc_enable_cursor: "Fadenkreuz aktivieren", title: "Verbrechen Melden", sub: "Notfall: 110. Sonst 009.", notice: "Anderes: 110 oder 009 anrufen.", back: "← Zurück", footer: "© 2025-2026 SIXSIDE PD", c1: "Verbrechen Melden", c2: "Häusliche Gewalt", c3: "Verkehrsunfall", c4: "Vermisste Person", c5: "Asoziales Verhalten", c6: "Betrug", c7: "Gestohlenes Fahrzeug", c8: "Belästigung", c9: "Nicht zugelassene Fahrzeuge", c10: "Hassverbrechen", c11: "Spiking", fwTitle: "Sofort 110 anrufen.", fwSub: "Erfordert sofortigen Polizeieinsatz.", emTitle: "110 anrufen wenn:", em1: "Jemand verletzt ist", em2: "Gewalt droht", em3: "Verbrechen im Gange", nonEm: "Sonst 009 anrufen.", f_date: "Datum & Zeit", f_loc: "Ort", f_desc: "Beschreibung", p_desc: "Was passierte?", f_sub: "Senden", alert: "Gesendet." },
+    "pt": { leave: "SAIR RÁPIDO", theme: "TEMA", lang: "IDIOMA", close: "Fechar", select_lang: "Selecionar Idioma", acc_contrast: "Contraste", acc_grayscale: "Escala de Cinza", acc_cursor_color: "Cor da Mira", acc_enable_cursor: "Ativar Mira", title: "Relatar um Crime", sub: "Emergência: 110. Não-emergência: 009.", notice: "Para outros casos, ligue 110 ou 009.", back: "← Voltar", footer: "© 2025-2026 SIXSIDE PD", c1: "Relatar Crime", c2: "Abuso Doméstico", c3: "Acidente de Trânsito", c4: "Pessoa Desaparecida", c5: "Comportamento Antissocial", c6: "Fraude", c7: "Veículo Roubado", c8: "Assédio", c9: "Veículos sem licença", c10: "Crime de Ódio", c11: "Spiking", fwTitle: "Ligue 110 imediatamente.", fwSub: "Requer presença policial imediata.", emTitle: "Ligue 110 se:", em1: "Alguém estiver ferido", em2: "Houver violência", em3: "Crime em andamento", nonEm: "Para não-emergências, use 009.", f_date: "Data/Hora", f_loc: "Localização", f_desc: "Descrição", p_desc: "O que aconteceu?", f_sub: "Enviar", alert: "Enviado." },
+    "ru": { leave: "ВЫЙТИ", theme: "ТЕМА", lang: "ЯЗЫК", close: "Закрыть", select_lang: "Выбор Языка", acc_contrast: "Контраст", acc_grayscale: "Ч/Б", acc_cursor_color: "Цвет курсора", acc_enable_cursor: "Вкл. прицел", title: "Сообщить о Преступлении", sub: "Экстренно: 110. Не экстренно: 009.", notice: "Для прочего звоните 110 или 009.", back: "← Назад", footer: "© 2025-2026 SIXSIDE PD", c1: "Сообщить о преступлении", c2: "Домашнее насилие", c3: "ДТП", c4: "Пропавший без вести", c5: "Антисоциальное поведение", c6: "Мошенничество", c7: "Угнанный транспорт", c8: "Домогательства", c9: "ТС без номеров", c10: "Преступление на почве ненависти", c11: "Спайкинг", fwTitle: "Немедленно звоните 110.", fwSub: "Требует немедленного выезда полиции.", emTitle: "Звоните 110, если:", em1: "Кто-то ранен", em2: "Насилие", em3: "Преступление происходит сейчас", nonEm: "Для неэкстренных ситуаций - 009.", f_date: "Дата и время", f_loc: "Место", f_desc: "Описание", p_desc: "Что произошло?", f_sub: "Отправить", alert: "Отправлено." },
+    "mn": { leave: "ГАРАХ", theme: "Сэдэв", lang: "ХЭЛ", close: "Хаах", select_lang: "Хэл сонгох", acc_contrast: "Тодосгогч", acc_grayscale: "Саарал", acc_cursor_color: "Өнгө", acc_enable_cursor: "Курсор идэвхжүүлэх", title: "Гэмт хэрэг мэдээлэх", sub: "Яаралтай: 110. Яаралтай бус: 009.", notice: "Бусад зүйлд 110, 009 рүү залгана уу.", back: "← Буцах", footer: "© 2025-2026 SIXSIDE PD", c1: "Гэмт хэрэг", c2: "Гэр бүлийн хүчирхийлэл", c3: "Осол", c4: "Алга болсон хүн", c5: "Нийгмийн эсрэг үйлдэл", c6: "Луйвар", c7: "Хулгайлагдсан тээврийн хэрэгсэл", c8: "Дарамт", c9: "Бүртгэлгүй тээвэр", c10: "Үзэн ядалт", c11: "Хордуулах", fwTitle: "110 руу шууд залгана уу.", fwSub: "Цагдаа шууд очих шаардлагатай.", emTitle: "110 руу залгах:", em1: "Хүн гэмтсэн", em2: "Хүчирхийлэл", em3: "Гэмт хэрэг гарч байна", nonEm: "Яаралтай бус үед 009 рүү залгах.", f_date: "Огноо цаг", f_loc: "Байршил", f_desc: "Тодорхойлолт", p_desc: "Юу болсон бэ?", f_sub: "Илгээх", alert: "Илгээгдсэн." },
+    "ja": { leave: "退出する", theme: "テーマ", lang: "言語", close: "閉じる", select_lang: "言語の選択", acc_contrast: "コントラスト", acc_grayscale: "グレースケール", acc_cursor_color: "カーソル色", acc_enable_cursor: "カーソルを有効化", title: "犯罪を報告", sub: "緊急時は110番。非緊急時は009番をご利用ください。", notice: "その他は110番または009番へ。", back: "← 戻る", footer: "© 2025-2026 SIXSIDE PD", c1: "犯罪の報告", c2: "ドメスティック・バイオレンス", c3: "交通事故", c4: "行方不明者", c5: "反社会的行動", c6: "詐欺", c7: "車両盗難", c8: "嫌がらせ", c9: "未登録車両", c10: "ヘイトクライム", c11: "スパイキング", fwTitle: "直ちに110番に通報してください。", fwSub: "警察の緊急出動が必要です。", emTitle: "次のような緊急事態には110番：", em1: "負傷者や死者がいる", em2: "暴力の脅威がある", em3: "犯罪が現在進行中である", nonEm: "非緊急の場合は009番が効果的です。", f_date: "発生日時", f_loc: "正確な場所", f_desc: "詳細な説明", p_desc: "何が起きましたか？", f_sub: "送信", alert: "報告を送信しました。" },
+    "ko": { leave: "나가기", theme: "테마", lang: "언어", close: "닫기", select_lang: "언어 선택", acc_contrast: "대비", acc_grayscale: "흑백", acc_cursor_color: "커서 색상", acc_enable_cursor: "커서 활성화", title: "범죄 신고", sub: "긴급 상황 시 110번, 비긴급 상황 시 009번을 이용하세요.", notice: "목록에 없으면 110 또는 009로 전화하세요.", back: "← 뒤로", footer: "© 2025-2026 SIXSIDE PD", c1: "범죄 신고", c2: "가정 폭력", c3: "교통사고", c4: "실종자", c5: "반사회적 행동", c6: "사기", c7: "차량 도난", c8: "괴롭힘", c9: "미등록 차량", c10: "증오 범죄", c11: "스파이킹(약물)", fwTitle: "즉시 110번에 전화하세요.", fwSub: "경찰의 긴급 출동이 필요합니다.", emTitle: "이런 상황에는 110번에 전화하세요:", em1: "부상자나 사망자가 발생함", em2: "폭력이 사용되거나 위협이 있음", em3: "범죄가 진행 중임", nonEm: "비긴급 상황은 009번이 더 효율적입니다.", f_date: "발생 일시", f_loc: "정확한 위치", f_desc: "상세 설명", p_desc: "무슨 일이 있었나요?", f_sub: "제출", alert: "제출되었습니다." },
+    "hi": { leave: "तुरंत बाहर जाएं", theme: "थीम", lang: "भाषा", close: "बंद करें", select_lang: "भाषा चुनें", acc_contrast: "कंट्रास्ट", acc_grayscale: "ग्रेस्केल", acc_cursor_color: "कर्सर रंग", acc_enable_cursor: "कर्सर सक्षम करें", title: "अपराध की रिपोर्ट करें", sub: "आपात स्थिति में 110 डायल करें। गैर-आपात स्थिति के लिए 009 का उपयोग करें।", notice: "अन्य मामलों के लिए 110 या 009 पर कॉल करें।", back: "← वापस", footer: "© 2025-2026 SIXSIDE PD", c1: "अपराध", c2: "घरेलू हिंसा", c3: "सड़क दुर्घटना", c4: "लापता व्यक्ति", c5: "असामाजिक व्यवहार", c6: "धोखाधड़ी", c7: "चोरी हुआ वाहन", c8: "उत्पीड़न", c9: "पंजीकरण के बिना वाहन", c10: "हेट क्राइम", c11: "स्पाइकिंग", fwTitle: "कृपया तुरंत 110 पर कॉल करें।", fwSub: "पुलिस की तुरंत आवश्यकता है।", emTitle: "इन आपात स्थितियों में 110 पर कॉल करें:", em1: "कोई घायल है या मर गया है", em2: "हिंसा हो रही है", em3: "अपराध हो रहा है", nonEm: "गैर-आपात स्थिति के लिए 009 का उपयोग करें।", f_date: "दिनांक और समय", f_loc: "स्थान", f_desc: "विवरण", p_desc: "क्या हुआ?", f_sub: "जमा करें", alert: "जमा कर दिया गया।" }
+  };
+
   const categories = [
-    { id: 'crime', en: 'Report a Crime', zh: '举报犯罪', isFatal: false },
-    { id: 'abuse', en: 'Domestic Abuse', zh: '家庭虐待', isFatal: false },
-    { id: 'traffic', en: 'Traffic Collision', zh: '交通事故', isFatal: false },
-    { id: 'missing', en: 'Missing Person', zh: '失踪人员', isFatal: true },
-    { id: 'asb', en: 'Anti-social Behaviour', zh: '反社会行为', isFatal: false },
-    { id: 'fraud', en: 'Fraud', zh: '诈骗', isFatal: false },
-    { id: 'stolen_veh', en: 'Stolen Vehicle', zh: '交通工具失窃', isFatal: true },
-    { id: 'harass', en: 'Harassment', zh: '骚扰', isFatal: false },
-    { id: 'unreg', en: 'Unregistered/Unlicensed Vehicles & Boats', zh: '没有车牌或者未通过年检的车和船', isFatal: true },
-    { id: 'hate', en: 'Hate Crime or Racism', zh: '仇恨或种族歧视', isFatal: false },
-    { id: 'spiking', en: 'Spiking', zh: '尖刺', isFatal: true }
+    { id: 'crime', c1: true, isFatal: false },
+    { id: 'abuse', c2: true, isFatal: false },
+    { id: 'traffic', c3: true, isFatal: false },
+    { id: 'missing', c4: true, isFatal: true },
+    { id: 'asb', c5: true, isFatal: false },
+    { id: 'fraud', c6: true, isFatal: false },
+    { id: 'stolen_veh', c7: true, isFatal: true },
+    { id: 'harass', c8: true, isFatal: false },
+    { id: 'unreg', c9: true, isFatal: true },
+    { id: 'hate', c10: true, isFatal: false },
+    { id: 'spiking', c11: true, isFatal: true }
   ];
 
   let currentLang = 'en';
 
-  // 渲染主菜单
+  function applyTranslation() {
+    const d = dict[currentLang];
+    // HTML tags with data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if(d[key]) {
+        if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = d[key];
+        else el.innerText = d[key];
+      }
+    });
+    // Re-render components
+    renderCategories();
+  }
+
+  function setLang(langCode) {
+    currentLang = langCode;
+    document.getElementById('langModal').style.display = 'none';
+    applyTranslation();
+  }
+
   function renderCategories() {
     const grid = document.getElementById('categoryGrid');
     grid.innerHTML = '';
+    const d = dict[currentLang];
     categories.forEach(cat => {
       const btn = document.createElement('button');
       btn.className = 'cat-btn';
-      btn.innerText = cat[currentLang] || cat.en;
-      btn.onclick = () => openForm(cat);
+      // Find the language key (c1, c2, etc)
+      const key = Object.keys(cat).find(k => k.startsWith('c') && k.length <= 3);
+      btn.innerText = d[key] || "Category";
+      btn.onclick = () => openForm(cat, key);
       grid.appendChild(btn);
     });
   }
 
-  // 打开对应的表单或拦截页
-  function openForm(cat) {
+  function openForm(cat, nameKey) {
     document.getElementById('selectionView').style.display = 'none';
     const formContainer = document.getElementById('reportFormContainer');
     formContainer.style.display = 'block';
-    document.getElementById('formTitle').innerText = cat[currentLang] || cat.en;
+    
+    const d = dict[currentLang];
+    document.getElementById('formTitle').innerText = d[nameKey];
 
     const content = document.getElementById('formContent');
-    content.innerHTML = '';
-
     if (cat.isFatal) {
-      // 拦截致命/紧急选项
-      const msg = currentLang === 'en' 
-        ? "Please call 110 immediately or go to the nearest police station."
-        : "请立即拨打110或前往附近的警局。";
       content.innerHTML = `
         <div class="fatal-warning">
-          <h2>⚠️ ${msg}</h2>
-          <p style="color:var(--text-secondary);">This type of incident requires immediate police dispatch and cannot be reported online.</p>
+          <h2>⚠️ ${d.fwTitle}</h2>
+          <p style="color:var(--text-secondary);">${d.fwSub}</p>
         </div>
       `;
     } else {
-      // 显示警告与通用表单
-      const wTitle = currentLang === 'en' ? "Call 110 in these emergencies:" : "在这样的紧急情况下拨打 110：";
-      const w1 = currentLang === 'en' ? "Someone is injured or dead" : "有人受伤或死亡";
-      const w2 = currentLang === 'en' ? "Someone is using or threatening violence" : "有人正使用暴力或威胁使用";
-      const w3 = currentLang === 'en' ? "A crime is happening right now (e.g., burglary in progress)" : "犯罪正在发生（例如正在盗窃）";
-      const nonEm = currentLang === 'en' ? "For non-emergencies, calling 009 is a more efficient way to handle the situation." : "对于非紧急情况，拨打 009 是更有效的处理方式。";
-      
       content.innerHTML = `
         <div class="emergency-warning">
-          <h3>${wTitle}</h3>
-          <ul><li>${w1}</li><li>${w2}</li><li>${w3}</li></ul>
-          <p><i>${nonEm}</i></p>
+          <h3>${d.emTitle}</h3>
+          <ul><li>${d.em1}</li><li>${d.em2}</li><li>${d.em3}</li></ul>
+          <p><i>${d.nonEm}</i></p>
         </div>
-        <div class="form-group">
-          <label>${currentLang === 'en' ? 'Date and Time of Incident' : '事件发生日期和时间'}</label>
-          <input type="datetime-local" class="form-input">
-        </div>
-        <div class="form-group">
-          <label>${currentLang === 'en' ? 'Exact Location (or Postcode)' : '准确位置（或邮编）'}</label>
-          <input type="text" class="form-input" placeholder="...">
-        </div>
-        <div class="form-group">
-          <label>${currentLang === 'en' ? 'Detailed Description' : '详细描述'}</label>
-          <textarea class="form-input" placeholder="${currentLang === 'en' ? 'What happened? Who was involved?' : '发生了什么？涉及到谁？'}"></textarea>
-        </div>
-        <button class="submit-btn" onclick="alert('${currentLang === 'en' ? 'Report Submitted.' : '报告已提交。'}'); goBack();">${currentLang === 'en' ? 'Submit Report' : '提交报告'}</button>
+        <div class="form-group"><label>${d.f_date}</label><input type="datetime-local" class="form-input"></div>
+        <div class="form-group"><label>${d.f_loc}</label><input type="text" class="form-input" placeholder="..."></div>
+        <div class="form-group"><label>${d.f_desc}</label><textarea class="form-input" placeholder="${d.p_desc}"></textarea></div>
+        <button class="submit-btn" onclick="alert('${d.alert}'); goBack();">${d.f_sub}</button>
       `;
     }
   }
@@ -277,30 +336,13 @@
     window.scrollTo(0,0);
   }
 
-  // 快速离开功能 (Quick Exit)
+  // 快速离开 (逃生键)
   function quickExit() {
     window.open('https://www.google.com/search?q=singapore', '_blank');
     window.location.replace('https://www.google.com/search?q=Shetland');
   }
 
-  // 语言系统
-  function setLang(lang) {
-    currentLang = lang;
-    document.getElementById('langModal').style.display = 'none';
-    
-    if (lang === 'en') {
-      document.getElementById('t-title').innerText = "Report a Crime";
-      document.getElementById('t-subtitle').innerText = "In an emergency, always call 110. For non-emergencies, use 009 or report online below.";
-      document.getElementById('t-notice').innerText = "For anything not listed below, please call 110 or 009.";
-    } else if (lang === 'zh-Hans') {
-      document.getElementById('t-title').innerText = "报告犯罪";
-      document.getElementById('t-subtitle').innerText = "紧急情况请始终拨打 110。非紧急情况请拨打 009 或在下方在线报告。";
-      document.getElementById('t-notice').innerText = "其他没有标注出来的请拨打 110 或 009。";
-    }
-    renderCategories();
-  }
-
-  // 辅助面板与滤镜
+  // 辅助功能系统
   function toggleAccPanel() { document.getElementById('accPanel').classList.toggle('show'); }
   function applyFilters() {
     const c = document.getElementById('con-range').value;
@@ -308,7 +350,6 @@
     document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g})`;
   }
 
-  // 准星鼠标
   let isMouseOn = false;
   function toggleCursorAssist(on) {
     isMouseOn = on;
@@ -328,9 +369,8 @@
     h.style.left = e.clientX + 'px'; h.style.top = e.clientY + 'px';
   });
 
-  // 初始化
-  renderCategories();
-
+  // Init
+  applyTranslation();
 </script>
 
 </body>

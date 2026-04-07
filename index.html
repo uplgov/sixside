@@ -99,6 +99,74 @@
     th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; }
     .highlight-cursor { cursor: none; }
     .highlight-cursor:before { content: ''; position: fixed; top: var(--mouse-y, 0); left: var(--mouse-x, 0); width: 28px; height: 28px; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); }
+    /* 画廊详情页样式 */
+    .gallery-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .gallery-detail-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .gallery-detail-item:hover { transform: translateY(-4px); border-color: var(--text-secondary); }
+    .gallery-detail-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .gallery-detail-caption { padding: 0.8rem; font-size: 0.85rem; text-align: center; color: var(--text-secondary); }
+    .gallery-license {
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      background: var(--btn-bg);
+      border-radius: 8px;
+      color: var(--text-secondary);
+    }
+    .gallery-license a { color: var(--text-secondary); }
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s;
+    }
+    .lightbox.show { visibility: visible; opacity: 1; }
+    .lightbox img { max-width: 90%; max-height: 80%; object-fit: contain; }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .lightbox-download {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -142,11 +210,14 @@
       </div>
       <img src="SixsideLogo.png" alt="Sixside Logo" class="logo-large" id="logoImg">
     </div>
+
     <div class="section-title" id="aboutTitle">About Sixside</div>
     <div class="card-grid" id="aboutGrid"></div>
+
     <div class="section-title" id="govTitle">Government & Agencies</div>
     <div class="card-grid" id="featuredDepts"></div>
     <div class="view-all-btn" id="viewAllBtn">View All Departments</div>
+
     <div class="section-title" id="otherTitle">Other Offices</div>
     <div class="card-grid" id="otherOfficesGrid"></div>
   </div>
@@ -159,7 +230,21 @@
   <p><a href="#" id="privacyLink">Privacy</a> | <a href="#" id="licenseLink">Licence</a> | <a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLink">UPL National Portal</a></p>
 </div>
 
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+  <button class="lightbox-close" id="lightboxClose">×</button>
+  <img id="lightboxImg" src="" alt="">
+  <a id="lightboxDownload" class="lightbox-download" download>Download</a>
+</div>
+
 <script>
+  // 画廊图片数据
+  const galleryImages = [
+    { file: "Landscape1.png", nameEn: "Cherry Blossoms Looking Far", nameZhSimple: "樱花树下向远望", nameZhClassical: "櫻花樹下向遠望", nameZhTraditional: "櫻花樹下向遠望", nameZhHuaxia: "櫻花遠眺", nameEs: "Cerezos mirando a lo lejos", namePt: "Cerejeiras olhando ao longe", nameDe: "Kirschblüten in die Ferne blickend", nameFr: "Cerisiers regardant au loin", nameRu: "Цветущая сакура вдалеке", nameMn: "Алс харсан интоорын цэцэг" },
+    { file: "Landscape2.png", nameEn: "Inland Bay Rapid Underground Waterway", nameZhSimple: "内水湾快捷地下水道", nameZhClassical: "內水灣快捷地下水道", nameZhTraditional: "內水灣快捷地下水道", nameZhHuaxia: "內灣快水道", nameEs: "Canal subterráneo rápido de la bahía interior", namePt: "Canal subterrâneo rápido da baía interior", nameDe: "Schneller unterirdischer Wasserweg der Innenbucht", nameFr: "Voie navigable souterraine rapide de la baie intérieure", nameRu: "Быстрый подземный водный путь внутренней бухты", nameMn: "Дотоод булангийн хурдан газар доорх усан зам" },
+    { file: "Landscape3.png", nameEn: "Last Hero Point Overlook", nameZhSimple: "英雄角俯瞰", nameZhClassical: "英雄角俯瞰", nameZhTraditional: "英雄角俯瞰", nameZhHuaxia: "英傑角俯瞰", nameEs: "Mirador del Último Héroe", namePt: "Mirante do Último Herói", nameDe: "Blick vom Letzten Heldenpunkt", nameFr: "Point de vue du Dernier Héros", nameRu: "Обзор Последней точки героя", nameMn: "Сүүлчийн баатрын цэгийн харагдац" }
+  ];
+
   // ======================= 部门数据 =======================
   const allDepts = [
     { id: "governor", nameEn: "Governor's Office", head: "Amina Okonkwo", descEn: "Executive leadership.",
@@ -254,6 +339,8 @@
       aboutTitle: "About Sixside", historyTitle: "History", historyText: "Generations have lived in harmony with this land.",
       geographyTitle: "Geography", geographyText: "Mountains, bamboo, vines, streams.",
       populationTitle: "Population", populationText: "People walk hidden paths, preserve ancient ways.",
+      galleryCardTitle: "Gallery", galleryDetailTitle: "Gallery",
+      galleryLicenseText: "© Sixside Provincial Government · These images are licensed under CC BY 4.0. You may use them for commercial purposes, provided you give appropriate credit to 'Sixside Provincial Government'.",
       govTitle: "Government & Agencies", otherTitle: "Other Offices",
       viewAllBtn: "View All Departments", copyrightLine: "© Sixside Provincial Government",
       techSupportLine: "Technical support and maintenance provided by Wareflame",
@@ -267,6 +354,8 @@
       aboutTitle: "Sobre Sixside", historyTitle: "Historia", historyText: "Generaciones han vivido en armonía con esta tierra.",
       geographyTitle: "Geografía", geographyText: "Montañas, bambú, vides, arroyos.",
       populationTitle: "Población", populationText: "La gente camina por senderos ocultos.",
+      galleryCardTitle: "Galería", galleryDetailTitle: "Galería",
+      galleryLicenseText: "© Gobierno Provincial de Sixside · Estas imágenes están bajo licencia CC BY 4.0. Puede usarlas con fines comerciales, siempre que dé el crédito apropiado a 'Gobierno Provincial de Sixside'.",
       govTitle: "Gobierno y Agencias", otherTitle: "Otras Oficinas",
       viewAllBtn: "Ver todos los departamentos", copyrightLine: "© Gobierno Provincial de Sixside",
       techSupportLine: "Soporte técnico y mantenimiento proporcionados por Wareflame",
@@ -280,6 +369,8 @@
       aboutTitle: "Sobre Sixside", historyTitle: "História", historyText: "Gerações viveram em harmonia com esta terra.",
       geographyTitle: "Geografia", geographyText: "Montanhas, bambu, vinhas, riachos.",
       populationTitle: "População", populationText: "As pessoas andam por caminhos escondidos.",
+      galleryCardTitle: "Galeria", galleryDetailTitle: "Galeria",
+      galleryLicenseText: "© Governo Provincial de Sixside · Estas imagens estão licenciadas sob CC BY 4.0. Pode usá-las para fins comerciais, desde que dê o crédito apropriado a 'Governo Provincial de Sixside'.",
       govTitle: "Governo e Agências", otherTitle: "Outros Escritórios",
       viewAllBtn: "Ver todos os departamentos", copyrightLine: "© Governo Provincial de Sixside",
       techSupportLine: "Suporte técnico e manutenção fornecidos por Wareflame",
@@ -293,6 +384,8 @@
       aboutTitle: "Über Sixside", historyTitle: "Geschichte", historyText: "Generationen lebten im Einklang mit diesem Land.",
       geographyTitle: "Geografie", geographyText: "Berge, Bambus, Reben, Bäche.",
       populationTitle: "Bevölkerung", populationText: "Menschen gehen verborgene Pfade.",
+      galleryCardTitle: "Galerie", galleryDetailTitle: "Galerie",
+      galleryLicenseText: "© Sixside Provinzregierung · Diese Bilder sind unter CC BY 4.0 lizenziert. Sie dürfen sie für kommerzielle Zwecke verwenden, sofern Sie die Sixside Provinzregierung angemessen nennen.",
       govTitle: "Regierung & Behörden", otherTitle: "Andere Ämter",
       viewAllBtn: "Alle Abteilungen anzeigen", copyrightLine: "© Sixside Provinzregierung",
       techSupportLine: "Technische Unterstützung und Wartung durch Wareflame",
@@ -306,6 +399,8 @@
       aboutTitle: "关于 Sixside", historyTitle: "历史", historyText: "世代与这片土地和谐共生。",
       geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
       populationTitle: "人口", populationText: "人民行走于隐秘小径，守护古老方式。",
+      galleryCardTitle: "画廊", galleryDetailTitle: "画廊",
+      galleryLicenseText: "© Sixside 省政府 · 这些图片采用 CC BY 4.0 许可。您可以将其用于商业目的，但须注明“Sixside 省政府”。",
       govTitle: "政府部门", otherTitle: "其他机构",
       viewAllBtn: "查看全部部门", copyrightLine: "© Sixside 省政府",
       techSupportLine: "技术支持和维护由 Wareflame 提供",
@@ -319,6 +414,8 @@
       aboutTitle: "六面志", historyTitle: "史", historyText: "世代与此土相谐。",
       geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
       populationTitle: "民", populationText: "民行隐径，守古法。",
+      galleryCardTitle: "畫苑", galleryDetailTitle: "畫苑",
+      galleryLicenseText: "© 六面省政府 · 此圖依 CC BY 4.0 許可。可商用，惟須註明「六面省政府」。",
       govTitle: "官府", otherTitle: "他署",
       viewAllBtn: "悉览诸部", copyrightLine: "© 六面省政府",
       techSupportLine: "技护由 Wareflame 供之",
@@ -332,6 +429,8 @@
       aboutTitle: "關於 Sixside", historyTitle: "歷史", historyText: "世代與這片土地和諧共生。",
       geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
       populationTitle: "人口", populationText: "人民行走於隱秘小徑，守護古老方式。",
+      galleryCardTitle: "畫廊", galleryDetailTitle: "畫廊",
+      galleryLicenseText: "© Sixside 省政府 · 這些圖片採用 CC BY 4.0 許可。您可以將其用於商業目的，但須註明「Sixside 省政府」。",
       govTitle: "政府部門", otherTitle: "其他機構",
       viewAllBtn: "查看全部部門", copyrightLine: "© Sixside 省政府",
       techSupportLine: "技術支持和維護由 Wareflame 提供",
@@ -345,6 +444,8 @@
       aboutTitle: "六面志", historyTitle: "史", historyText: "世代與此土相諧。",
       geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
       populationTitle: "民", populationText: "民行隱徑，守古法。",
+      galleryCardTitle: "畫苑", galleryDetailTitle: "畫苑",
+      galleryLicenseText: "© 六面省政府 · 此圖依 CC BY 4.0 許可。可商用，惟須註明「六面省政府」。",
       govTitle: "官府", otherTitle: "他署",
       viewAllBtn: "悉覽諸部", copyrightLine: "© 六面省政府",
       techSupportLine: "技護由 Wareflame 供之",
@@ -358,6 +459,8 @@
       aboutTitle: "À propos de Sixside", historyTitle: "Histoire", historyText: "Des générations ont vécu en harmonie avec cette terre.",
       geographyTitle: "Géographie", geographyText: "Montagnes, bambou, vignes, ruisseaux.",
       populationTitle: "Population", populationText: "Les gens marchent sur des sentiers cachés.",
+      galleryCardTitle: "Galerie", galleryDetailTitle: "Galerie",
+      galleryLicenseText: "© Gouvernement provincial de Sixside · Ces images sont sous licence CC BY 4.0. Vous pouvez les utiliser à des fins commerciales, à condition de mentionner 'Gouvernement provincial de Sixside'.",
       govTitle: "Gouvernement et Agences", otherTitle: "Autres Bureaux",
       viewAllBtn: "Voir tous les départements", copyrightLine: "© Gouvernement provincial de Sixside",
       techSupportLine: "Soutien technique et maintenance fournis par Wareflame",
@@ -371,6 +474,8 @@
       aboutTitle: "О Sixside", historyTitle: "История", historyText: "Поколения жили в гармонии с этой землёй.",
       geographyTitle: "География", geographyText: "Горы, бамбук, ручьи.",
       populationTitle: "Население", populationText: "Люди ходят скрытыми тропами.",
+      galleryCardTitle: "Галерея", galleryDetailTitle: "Галерея",
+      galleryLicenseText: "© Правительство Sixside · Эти изображения лицензированы по CC BY 4.0. Вы можете использовать их в коммерческих целях при условии указания 'Правительство Sixside'.",
       govTitle: "Правительство", otherTitle: "Другие офисы",
       viewAllBtn: "Показать все отделы", copyrightLine: "© Правительство Sixside",
       techSupportLine: "Техническая поддержка и обслуживание предоставлены Wareflame",
@@ -384,6 +489,8 @@
       aboutTitle: "Sixside-ийн тухай", historyTitle: "Түүх", historyText: "Үе үе энэ газартай зохицон амьдарч байсан.",
       geographyTitle: "Газар зүй", geographyText: "Уулс, хулс, ус, горхи.",
       populationTitle: "Хүн ам", populationText: "Хүмүүс далд замаар явдаг.",
+      galleryCardTitle: "Галлерей", galleryDetailTitle: "Галлерей",
+      galleryLicenseText: "© Sixside мужийн засгийн газар · Эдгээр зургийг CC BY 4.0 лицензээр ашиглаж болно. Та тэдгээрийг арилжааны зориулалтаар ашиглахдаа 'Sixside мужийн засгийн газар' гэж дурдах ёстой.",
       govTitle: "Засгийн газар ба Агентлагууд", otherTitle: "Бусад Албан газар",
       viewAllBtn: "Бүх хэлтсийг харах", copyrightLine: "© Sixside мужийн засгийн газар",
       techSupportLine: "Техникийн дэмжлэг, засвар үйлчилгээг Wareflame хангана",
@@ -395,6 +502,50 @@
   };
 
   let currentLang = "en";
+
+  // Gallery 相关函数
+  function getGalleryCaption(img, langCode) {
+    const nameMap = {
+      en: img.nameEn, es: img.nameEs, pt: img.namePt, de: img.nameDe, fr: img.nameFr, ru: img.nameRu, mn: img.nameMn,
+      "zh-simple": img.nameZhSimple, "zh-classical": img.nameZhClassical,
+      "zh-traditional": img.nameZhTraditional, "zh-huaxia": img.nameZhHuaxia
+    };
+    return nameMap[langCode] || img.nameEn;
+  }
+
+  function showGalleryDetail() {
+    document.getElementById("homeView").style.display = "none";
+    const detailDiv = document.getElementById("detailView");
+    const data = langData[currentLang];
+    const galleryHtml = galleryImages.map(img => `
+      <div class="gallery-detail-item" data-file="${img.file}">
+        <img src="${img.file}" alt="${getGalleryCaption(img, currentLang)}" loading="lazy">
+        <div class="gallery-detail-caption">${getGalleryCaption(img, currentLang)}</div>
+      </div>
+    `).join("");
+    detailDiv.innerHTML = `
+      <div class="detail-section">
+        <div class="back-home" id="backHomeBtn">← Back</div>
+        <h2>${data.galleryDetailTitle}</h2>
+        <div class="gallery-detail-grid">${galleryHtml}</div>
+        <div class="gallery-license">${data.galleryLicenseText}</div>
+      </div>
+    `;
+    detailDiv.style.display = "block";
+    document.getElementById("currentLocation").innerText = data.galleryDetailTitle;
+    document.getElementById("backHomeBtn").onclick = goHome;
+    // 绑定画廊图片点击事件
+    document.querySelectorAll(".gallery-detail-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const file = item.getAttribute("data-file");
+        const caption = item.querySelector(".gallery-detail-caption").innerText;
+        document.getElementById("lightboxImg").src = file;
+        document.getElementById("lightboxImg").alt = caption;
+        document.getElementById("lightboxDownload").href = file;
+        document.getElementById("lightbox").classList.add("show");
+      });
+    });
+  }
 
   function getDeptName(dept, langCode) {
     if (langCode === "en") return dept.nameEn;
@@ -432,7 +583,6 @@
   function applyLanguage(langCode) {
     const data = langData[langCode];
     if (!data) return;
-    // 页面主内容
     document.getElementById("mainTitle").innerText = data.mainTitle;
     document.getElementById("mainSubtitle").innerText = data.mainSubtitle;
     document.getElementById("aboutTitle").innerText = data.aboutTitle;
@@ -446,7 +596,6 @@
     document.getElementById("langReopenBtn").innerText = data.langToggle;
     window.privacyMsg = data.privacyText;
     window.licenseMsg = data.licenseText;
-    // 辅助功能面板文字
     document.getElementById("accessTitle").innerText = data.accessTitle;
     document.getElementById("contrastLabel").innerHTML = `${data.contrastLabel} <span id="contrastVal">${contrastSlider.value}</span>`;
     document.getElementById("grayscaleLabel").innerHTML = `${data.grayscaleLabel} <span id="grayscaleVal">${grayscaleSlider.value}</span>`;
@@ -468,7 +617,9 @@
       <div class="card"><h3>${data.historyTitle}</h3><p>${data.historyText}</p></div>
       <div class="card"><h3>${data.geographyTitle}</h3><p>${data.geographyText}</p></div>
       <div class="card"><h3>${data.populationTitle}</h3><p>${data.populationText}</p></div>
+      <div class="card" id="galleryCard"><h3>${data.galleryCardTitle}</h3><p>Click to view landscapes</p></div>
     `;
+    document.getElementById("galleryCard").onclick = showGalleryDetail;
     const featuredDepts = document.getElementById("featuredDepts");
     featuredDepts.innerHTML = featuredIds.map(id => {
       const dept = allDepts.find(d => d.id === id);
@@ -485,7 +636,7 @@
     document.getElementById("homeView").style.display = "none";
     const detailDiv = document.getElementById("detailView");
     let extra = "";
-    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><table><thead><tr><th>Item</th><th>Rate</th></tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
+    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><tr><thead><tr><th>Item</th><th>Rate</th><tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
     detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${getDeptName(dept, currentLang)}</h2><p><strong>Head:</strong> ${dept.head}</p><p>${getDesc(dept, currentLang)}</p>${extra}</div>`;
     detailDiv.style.display = "block";
     document.getElementById("backHomeBtn").onclick = goHome;
@@ -509,7 +660,7 @@
     modal.querySelector("#closeModalBtn").onclick = () => modal.remove();
   }
 
-  function showLangModal() {
+  function showLangModal(force = false) {
     const modal = document.createElement("div");
     modal.className = "modal-overlay";
     let opts = "";
@@ -565,7 +716,7 @@
 
   document.getElementById("homeBtn").onclick = goHome;
   document.getElementById("viewAllBtn").onclick = showAllDepartments;
-  document.getElementById("langReopenBtn").onclick = showLangModal;
+  document.getElementById("langReopenBtn").onclick = () => showLangModal(false);
   const toggleBtn = document.getElementById("accessibilityToggle");
   const panel = document.getElementById("accessibilityPanel");
   if (toggleBtn && panel) toggleBtn.onclick = () => panel.classList.toggle("show");
@@ -573,11 +724,12 @@
   themeToggleBtn.onclick = () => document.body.classList.toggle("light");
   document.getElementById("privacyLink").onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
   document.getElementById("licenseLink").onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
+  document.getElementById("lightboxClose").onclick = () => document.getElementById("lightbox").classList.remove("show");
+  document.getElementById("lightbox").onclick = (e) => { if (e.target === document.getElementById("lightbox")) document.getElementById("lightbox").classList.remove("show"); };
 
   renderHome();
-  const savedLang = localStorage.getItem("sixside_lang");
-  if (savedLang && langData[savedLang]) applyLanguage(savedLang);
-  else applyLanguage("en");
+  // 每次访问都弹出语言选择窗口
+  showLangModal(true);
 </script>
 </body>
 </html>

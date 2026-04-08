@@ -6,6 +6,8 @@
   <title>Sixside Police| SSPD</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- hCaptcha -->
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -113,7 +115,7 @@
     .service-card h3 { font-size: 1.3rem; color: var(--accent-amber); }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
-    .report-modal, .lost-modal, .lang-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    .report-modal, .lost-modal, .lang-modal, .captcha-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
     #map { height: 240px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; }
     .btn-action { width: 100%; padding: 12px; margin-top: 12px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
     .btn-danger { background: var(--accent-red); color: white; border: none; }
@@ -167,6 +169,12 @@
       background: var(--accent-red);
       border-color: var(--accent-red);
       color: white;
+    }
+    
+    .h-captcha {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
     }
     
     .toast-notify {
@@ -246,12 +254,27 @@
   <div class="form-group"><label id="visibleLabel"></label><div class="checkbox-group" id="visibilityGroup"><label><input type="radio" name="visibility" value="yes"> <span id="optYes"></span></label><label><input type="radio" name="visibility" value="no"> <span id="optNo"></span></label></div></div>
   <div class="form-group"><label id="contactLabel"></label><input type="text" id="contactInput" placeholder="Phone / Email"></div>
   <div class="form-group"><label id="commentLabel"></label><textarea id="commentInput" rows="3" placeholder=""></textarea></div>
+  
+  <!-- hCaptcha 人机验证 -->
+  <div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54" id="reportCaptcha"></div>
+  <div id="captchaError" class="error-msg" style="text-align:center; margin-top:5px;"></div>
+  
   <button class="btn-action btn-danger" id="submitSosBtn"></button><button class="btn-action" id="cancelModalBtn"></button>
 </div></div>
 
 <div class="modal-overlay" id="lostDetailModal"><div class="lost-modal"><h2 id="lostDetailTitle"></h2><div id="lostDetailContent" class="detail-content"></div><button class="btn-action" id="closeLostDetail">Close</button></div></div>
 
 <div class="modal-overlay" id="langModal"><div class="lang-modal"><h2 id="langModalTitle">Select Language</h2><div id="langGrid" class="lang-grid"></div><button class="btn-action" id="closeLangModal">Close</button></div></div>
+
+<!-- hCaptcha 验证弹窗（用于 Lost and Found） -->
+<div class="modal-overlay" id="captchaModal"><div class="captcha-modal">
+  <h2 id="captchaModalTitle">Verification Required</h2>
+  <p id="captchaModalText" style="text-align:center; margin-bottom:20px;">Please complete the verification below to continue.</p>
+  <div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54" id="lostCaptcha"></div>
+  <div id="lostCaptchaError" class="error-msg" style="text-align:center; margin-top:10px;"></div>
+  <button class="btn-action" id="confirmCaptchaBtn">Confirm</button>
+  <button class="btn-action" id="cancelCaptchaBtn">Cancel</button>
+</div></div>
 
 <script>
   // ======================= 格言库 =======================
@@ -294,6 +317,11 @@
       enableCursor:'Enable Crosshair Assist', reset:'Reset', langTitle:'Select Language', 
       emergQueueMsg:'Support en route', selectServiceError:'Please select at least one service', 
       locationRequiredError:'Please get your location first', 
+      captchaRequiredError:'Please complete the verification',
+      captchaModalTitle:'Verification Required',
+      captchaModalText:'Please complete the verification below to continue.',
+      captchaConfirm:'Confirm',
+      captchaCancel:'Cancel',
       dbNotice:'UPL National Database | Nationwide synchronized data', lostTitle:'Lost and Found', 
       btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', 
       btn5:'Request', btn6:'Complaint, Thanks & Suggestion', 
@@ -323,6 +351,11 @@
       enableCursor:'启用高亮十字准星', reset:'重置', langTitle:'选择语言', 
       emergQueueMsg:'支援正在抵达现场', selectServiceError:'请至少选择一种支援类型', 
       locationRequiredError:'请先获取您的位置', 
+      captchaRequiredError:'请完成人机验证',
+      captchaModalTitle:'验证 required',
+      captchaModalText:'请完成下方验证后继续。',
+      captchaConfirm:'确认',
+      captchaCancel:'取消',
       dbNotice:'UPL 国家数据库 | 全国数据同步', lostTitle:'失物招领', 
       btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', 
       btn5:'请求', btn6:'投诉、感谢和建议', 
@@ -352,6 +385,11 @@
       enableCursor:'Activar asistencia de mira', reset:'Reiniciar', langTitle:'Seleccionar Idioma',
       emergQueueMsg:'Apoyo en camino', selectServiceError:'Por favor seleccione al menos un servicio',
       locationRequiredError:'Por favor obtenga su ubicacion primero',
+      captchaRequiredError:'Por favor complete la verificacion',
+      captchaModalTitle:'Verificacion requerida',
+      captchaModalText:'Por favor complete la verificacion a continuacion para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
       dbNotice:'Base de datos nacional UPL | Datos sincronizados a nivel nacional', lostTitle:'Objetos Perdidos',
       btn1:'Reportar un Crimen', btn2:'Diganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar',
       btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
@@ -381,6 +419,11 @@
       enableCursor:'Fadenkreuz-Assistent aktivieren', reset:'Zurucksetzen', langTitle:'Sprache auswahlen',
       emergQueueMsg:'Unterstutzung unterwegs', selectServiceError:'Bitte wahlen Sie mindestens einen Dienst aus',
       locationRequiredError:'Bitte rufen Sie zuerst Ihren Standort ab',
+      captchaRequiredError:'Bitte schlieSSen Sie die Verifizierung ab',
+      captchaModalTitle:'Verifizierung erforderlich',
+      captchaModalText:'Bitte schlieSSen Sie die untenstehende Verifizierung ab, um fortzufahren.',
+      captchaConfirm:'Bestatigen',
+      captchaCancel:'Abbrechen',
       dbNotice:'UPL Nationale Datenbank | Bundesweit synchronisierte Daten', lostTitle:'Fundburo',
       btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundburo', btn4:'Beantragen oder Registrieren',
       btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
@@ -410,6 +453,11 @@
       enableCursor:'Ativar assistencia de mira', reset:'Redefinir', langTitle:'Selecionar Idioma',
       emergQueueMsg:'Suporte a caminho', selectServiceError:'Por favor, selecione pelo menos um servico',
       locationRequiredError:'Por favor, obtenha sua localizacao primeiro',
+      captchaRequiredError:'Por favor, complete a verificacao',
+      captchaModalTitle:'Verificacao necessaria',
+      captchaModalText:'Por favor, complete a verificacao abaixo para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
       dbNotice:'Banco de dados nacional UPL | Dados sincronizados em todo o pais', lostTitle:'Achados e Perdidos',
       btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar',
       btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
@@ -439,6 +487,11 @@
       enableCursor:'啟用高亮十字準星', reset:'重置', langTitle:'選擇語言',
       emergQueueMsg:'支援正在抵達現場', selectServiceError:'請至少選擇一種支援類型',
       locationRequiredError:'請先獲取您的位置',
+      captchaRequiredError:'請完成人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
       dbNotice:'UPL 國家數據庫 | 全國數據同步', lostTitle:'失物招領',
       btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊',
       btn5:'請求', btn6:'投訴、感謝和建議',
@@ -468,6 +521,11 @@
       enableCursor:'Activer l\'assistance viseur', reset:'Reinitialiser', langTitle:'Choisir la langue',
       emergQueueMsg:'Soutien en route', selectServiceError:'Veuillez selectionner au moins un service',
       locationRequiredError:'Veuillez d\'abord obtenir votre position',
+      captchaRequiredError:'Veuillez completer la verification',
+      captchaModalTitle:'Verification requise',
+      captchaModalText:'Veuillez completer la verification ci-dessous pour continuer.',
+      captchaConfirm:'Confirmer',
+      captchaCancel:'Annuler',
       dbNotice:'Base de donnees nationale UPL | Donnees synchronisees a l\'echelle nationale', lostTitle:'Objets Perdus',
       btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer',
       btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
@@ -497,6 +555,11 @@
       enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
       emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
       locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
       dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
@@ -526,6 +589,11 @@
       enableCursor:'Включить помощь прицела', reset:'Сброс', langTitle:'Выберите язык',
       emergQueueMsg:'Поддержка в пути', selectServiceError:'Пожалуйста, выберите хотя бы одну услугу',
       locationRequiredError:'Пожалуйста, сначала определите ваше местоположение',
+      captchaRequiredError:'Пожалуйста, завершите верификацию',
+      captchaModalTitle:'Требуется верификация',
+      captchaModalText:'Пожалуйста, завершите верификацию ниже, чтобы продолжить.',
+      captchaConfirm:'Подтвердить',
+      captchaCancel:'Отмена',
       dbNotice:'Национальная база данных UPL | Общенациональные синхронизированные данные', lostTitle:'Бюро находок',
       btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку',
       btn5:'Запрос', btn6:'Жалоба, благодарность',
@@ -555,6 +623,11 @@
       enableCursor:'Харааны цэгийн туслах идэвхжYYлэх', reset:'Дахин тохируулах', langTitle:'Хэл сонгох',
       emergQueueMsg:'Тусламж замдаа', selectServiceError:'Дор хаяж нэг Yййлчилгээ сонгоно уу',
       locationRequiredError:'Эхлээд байршлаа аваарай',
+      captchaRequiredError:'Баталгаажуулалтыг гYйцэтгэнэ YY',
+      captchaModalTitle:'Баталгаажуулалт шаардлагатай',
+      captchaModalText:'YYргэлжлYYлэхийн тулд доорх баталгаажуулалтыг гYйцэтгэнэ YY.',
+      captchaConfirm:'Баталгаажуулах',
+      captchaCancel:'Цуцлах',
       dbNotice:'UPL Yндэсний мэдээллийн сан | Yндэсний хэмжээний синхрончлогдсон єгєгдєл', lostTitle:'Алдагдсан эд зYйлс',
       btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зYйлс', btn4:'Єргєдєл гаргах',
       btn5:'ХYсэлт', btn6:'Гомдол, талархал, санал',
@@ -584,6 +657,11 @@
       enableCursor:'クロスヘアアシストを有効にする', reset:'リセット', langTitle:'言語を選択',
       emergQueueMsg:'支援が向かっています', selectServiceError:'少なくとも1つのサービスを選択してください',
       locationRequiredError:'最初に現在地を取得してください',
+      captchaRequiredError:'認証を完了してください',
+      captchaModalTitle:'認証が必要です',
+      captchaModalText:'続行するには下の認証を完了してください。',
+      captchaConfirm:'確認',
+      captchaCancel:'キャンセル',
       dbNotice:'UPL全国データベース | 全国同期データ', lostTitle:'忘れ物',
       btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録',
       btn5:'リクエスト', btn6:'苦情・感謝・提案',
@@ -613,6 +691,11 @@
       enableCursor:'조준선 지원 활성화', reset:'초기화', langTitle:'언어 선택',
       emergQueueMsg:'지원 출동 중', selectServiceError:'최소 하나의 서비스를 선택하세요',
       locationRequiredError:'먼저 내 위치를 가져오세요',
+      captchaRequiredError:'인증을 완료해주세요',
+      captchaModalTitle:'인증 필요',
+      captchaModalText:'계속하려면 아래 인증을 완료해주세요.',
+      captchaConfirm:'확인',
+      captchaCancel:'취소',
       dbNotice:'UPL 국가 데이터베이스 | 전국 동기화 데이터', lostTitle:'분실물',
       btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록',
       btn5:'요청', btn6:'불만, 감사, 제안',
@@ -642,6 +725,11 @@
       enableCursor:'क्रॉसहेयर सहायता सक्षम करें', reset:'रीसेट', langTitle:'भाषा चुनें',
       emergQueueMsg:'सहायता मार्ग पर', selectServiceError:'कृपया कम से कम एक सेवा चुनें',
       locationRequiredError:'कृपया पहले अपना स्थान प्राप्त करें',
+      captchaRequiredError:'कृपया सत्यापन पूरा करें',
+      captchaModalTitle:'सत्यापन आवश्यक है',
+      captchaModalText:'जारी रखने के लिए कृपया नीचे दिया गया सत्यापन पूरा करें।',
+      captchaConfirm:'पुष्टि करें',
+      captchaCancel:'रद्द करें',
       dbNotice:'UPL राष्ट्रीय डेटाबेस | राष्ट्रव्यापी सिंक्रनाइज़ डेटा', lostTitle:'खोई हुई वस्तुएं',
       btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें',
       btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
@@ -671,6 +759,11 @@
       enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
       emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
       locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
       dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
@@ -687,6 +780,9 @@
   let selectedServices = [];
   let counts = { EMERGENCY: 0 };
   let mottoIndex = 0, mottoInterval = null;
+  let pendingLostCallback = null;
+  let reportCaptchaWidgetId = null;
+  let lostCaptchaWidgetId = null;
 
   const FORMSPREE_URL = 'https://formspree.io/f/mjgplavv';
 
@@ -788,13 +884,45 @@
       const card = document.createElement('div');
       card.className = 'service-card';
       card.innerHTML = `<h3>${btn.text}</h3>`;
-      if(btn.isLost) card.onclick = () => showLostAndFound();
-      else card.onclick = () => window.open(btn.url, '_blank');
+      if(btn.isLost) {
+        card.onclick = () => {
+          showCaptchaForLost();
+        };
+      } else {
+        card.onclick = () => window.open(btn.url, '_blank');
+      }
       container.appendChild(card);
     });
   }
-
-  function showLostAndFound() {
+  
+  function showCaptchaForLost() {
+    const t = translations[currentLang];
+    // 重置验证码
+    const captchaContainer = document.getElementById('lostCaptcha');
+    if (captchaContainer) {
+      // 清除旧内容
+      captchaContainer.innerHTML = '<div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54"></div>';
+      // 重新渲染
+      if (typeof hcaptcha !== 'undefined') {
+        const newCaptchaDiv = captchaContainer.querySelector('.h-captcha');
+        if (newCaptchaDiv) {
+          lostCaptchaWidgetId = hcaptcha.render(newCaptchaDiv);
+        }
+      }
+    }
+    document.getElementById('captchaModalTitle').innerText = t.captchaModalTitle;
+    document.getElementById('captchaModalText').innerText = t.captchaModalText;
+    document.getElementById('confirmCaptchaBtn').innerText = t.captchaConfirm;
+    document.getElementById('cancelCaptchaBtn').innerText = t.captchaCancel;
+    document.getElementById('lostCaptchaError').innerText = '';
+    document.getElementById('captchaModal').style.display = 'block';
+    
+    pendingLostCallback = () => {
+      showLostAndFoundContent();
+    };
+  }
+  
+  function showLostAndFoundContent() {
     let t = translations[currentLang];
     let items = [
       { name: t.folderName, date: t.folderDate, detail: t.folderDetail },
@@ -929,15 +1057,83 @@
     document.getElementById('contactInput').value=''; 
     document.getElementById('commentInput').value='';
     document.getElementById('serviceWarning').innerText=''; 
-    document.getElementById('locationError').innerText=''; 
+    document.getElementById('locationError').innerText='';
+    document.getElementById('captchaError').innerText = '';
+    // 重置 hCaptcha
+    if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) {
+      try {
+        hcaptcha.reset(reportCaptchaWidgetId);
+      } catch(e) {}
+    }
   }
   function closeModal(){ document.getElementById('reportModal').style.display='none'; }
   document.getElementById('cancelModalBtn').onclick=closeModal;
   document.getElementById('closeLostDetail').onclick=()=>document.getElementById('lostDetailModal').style.display='none';
   document.getElementById('closeLangModal').onclick=()=>document.getElementById('langModal').style.display='none';
   
+  document.getElementById('confirmCaptchaBtn').onclick = async () => {
+    const t = translations[currentLang];
+    let captchaToken = null;
+    
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try {
+        captchaToken = hcaptcha.getResponse(lostCaptchaWidgetId);
+      } catch(e) {
+        captchaToken = null;
+      }
+    }
+    
+    if (!captchaToken || captchaToken.length === 0) {
+      document.getElementById('lostCaptchaError').innerText = t.captchaRequiredError;
+      return;
+    }
+    
+    document.getElementById('captchaModal').style.display = 'none';
+    if (pendingLostCallback) {
+      pendingLostCallback();
+      pendingLostCallback = null;
+    }
+    // 重置验证码
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try {
+        hcaptcha.reset(lostCaptchaWidgetId);
+      } catch(e) {}
+    }
+  };
+  
+  document.getElementById('cancelCaptchaBtn').onclick = () => {
+    document.getElementById('captchaModal').style.display = 'none';
+    pendingLostCallback = null;
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try {
+        hcaptcha.reset(lostCaptchaWidgetId);
+      } catch(e) {}
+    }
+  };
+  
   document.getElementById('submitSosBtn').onclick=async () => {
     let t = translations[currentLang];
+    
+    let captchaToken = null;
+    if (typeof hcaptcha !== 'undefined') {
+      try {
+        if (reportCaptchaWidgetId !== null) {
+          captchaToken = hcaptcha.getResponse(reportCaptchaWidgetId);
+        } else {
+          const captchaElem = document.querySelector('#reportModal .h-captcha');
+          if (captchaElem) {
+            captchaToken = hcaptcha.getResponse(captchaElem);
+          }
+        }
+      } catch(e) {
+        captchaToken = null;
+      }
+    }
+    
+    if (!captchaToken || captchaToken.length === 0) {
+      document.getElementById('captchaError').innerText = t.captchaRequiredError;
+      return;
+    }
     
     if(selectedServices.length === 0){ 
       document.getElementById('serviceWarning').innerText = t.selectServiceError; 
@@ -980,6 +1176,7 @@
       timezone: deviceInfo.timezone,
       ip: deviceInfo.ip,
       userAgent: deviceInfo.userAgent,
+      'h-captcha-response': captchaToken,
       message: `ALERT DETAILS\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTime: ${timeStr}\nLocation: ${currentLatLng}\nServices: ${serviceNames}\nVisible Area: ${visibility === 'yes' ? 'Yes' : (visibility === 'no' ? 'No' : 'Not specified')}\nContact: ${contact}\nComment: ${comment}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDEVICE INFORMATION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDevice: ${deviceInfo.device}\nOS: ${deviceInfo.os}\nIP Address: ${deviceInfo.ip}\nTimezone: ${deviceInfo.timezone}\nUser Agent: ${deviceInfo.userAgent}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPlease handle this alert immediately.`
     };
     
@@ -987,6 +1184,12 @@
     if (success) {
       addDispatchCard();
       closeModal();
+      // 重置验证码
+      if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) {
+        try {
+          hcaptcha.reset(reportCaptchaWidgetId);
+        } catch(e) {}
+      }
     }
   };
 
@@ -1022,11 +1225,27 @@
   }
   document.getElementById('langSwitchBtn').onclick=()=>showLangModal();
 
+  // 初始化 hCaptcha widgets
+  window.onload = function() {
+    initMap();
+    showLangModal();
+    // 渲染报警弹窗中的 hCaptcha
+    if (typeof hcaptcha !== 'undefined') {
+      const reportCaptchaElem = document.querySelector('#reportModal .h-captcha');
+      if (reportCaptchaElem) {
+        reportCaptchaWidgetId = hcaptcha.render(reportCaptchaElem);
+      }
+      const lostCaptchaElem = document.querySelector('#lostCaptcha .h-captcha');
+      if (lostCaptchaElem) {
+        lostCaptchaWidgetId = hcaptcha.render(lostCaptchaElem);
+      }
+    }
+  };
+  
   let savedLang = localStorage.getItem('sspd_lang');
   if(savedLang && translations[savedLang]) currentLang = savedLang;
   applyLanguage(currentLang);
   initServiceButtons();
-  window.addEventListener('load',()=>{ initMap(); showLangModal(); });
 </script>
 </body>
 </html>

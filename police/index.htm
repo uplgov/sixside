@@ -6,6 +6,7 @@
   <title>Sixside Police| SSPD</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- hCaptcha -->
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -76,7 +77,6 @@
     .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
     .trend-down.orange { border-top-color: var(--accent-amber); }
     
-    /* tooltip 样式 */
     .stat-label-container {
       position: relative;
       display: inline-block;
@@ -219,6 +219,111 @@
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
     .report-modal, .lost-modal, .lang-modal, .captcha-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    
+    /* ===== [CHANGED] 时间校验弹窗样式 ===== */
+    .time-check-modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 12px;
+    }
+    .time-check-content h2 {
+      color: var(--accent-amber);
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+    .time-check-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+      margin-bottom: 25px;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .time-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .time-value {
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .user-time-section {
+      background: rgba(74, 107, 140, 0.15);
+      border: 1px solid var(--police-blue);
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .user-time-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .user-time-label {
+      color: var(--police-blue);
+      font-weight: bold;
+    }
+    .user-time-value {
+      font-family: monospace;
+      font-size: 1.2rem;
+      color: var(--accent-amber);
+      font-weight: bold;
+    }
+    .warning-text {
+      color: var(--accent-red);
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+      padding: 10px;
+      background: rgba(204, 51, 51, 0.1);
+      border-radius: 6px;
+    }
+    .time-check-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--police-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .time-check-btn:hover {
+      background: var(--accent-amber);
+      transform: translateY(-2px);
+    }
+    .time-check-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .loading-text {
+      text-align: center;
+      color: var(--accent-amber);
+      margin-top: 15px;
+      font-style: italic;
+    }
+    /* ===== [/CHANGED] ===== */
+    
     #map { height: 240px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; }
     .btn-action { width: 100%; padding: 12px; margin-top: 12px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
     .btn-danger { background: var(--accent-red); color: white; border: none; }
@@ -302,28 +407,6 @@
       70% { opacity: 1; }
       100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
     }
-
-    /* === [NEW] 时钟警告弹窗样式 === */
-    .time-warning-overlay { 
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(10, 15, 26, 0.98); z-index: 30000; 
-      display: flex; justify-content: center; align-items: center; padding: 20px;
-    }
-    .time-card {
-      background: var(--bg-secondary); border: 2px solid var(--accent-red);
-      max-width: 600px; width: 100%; padding: 40px; border-radius: 12px;
-      box-shadow: 0 0 30px rgba(204, 51, 51, 0.3); text-align: center;
-    }
-    .time-card h2 { color: var(--accent-red); margin-bottom: 15px; }
-    .time-card p { margin-bottom: 25px; line-height: 1.6; }
-    .clock-display { 
-      background: #000; padding: 20px; border-radius: 8px; margin-bottom: 20px;
-      border: 1px solid var(--police-blue); font-family: monospace;
-    }
-    .clock-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-    .clock-val { color: var(--accent-amber); font-weight: bold; }
-    .user-time-row { border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px; color: var(--text-secondary); }
-    /* === [/NEW] === */
   </style>
 </head>
 <body>
@@ -377,22 +460,39 @@
 </div>
 <footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
 
-<div id="timeWarningOverlay" class="time-warning-overlay" style="display: none;">
-  <div class="time-card">
-    <h2 id="timeWarnTitle">Clock Inaccurate</h2>
-    <p id="timeWarnMsg">Your clock is inaccurate. This may cause certain features to be unavailable. Current time is:</p>
-    <div class="clock-display">
-      <div class="clock-row"><span>UTC (+993y):</span> <span class="clock-val" id="clockUtc">--:--:--</span></div>
-      <div class="clock-row"><span>Local (+993y):</span> <span class="clock-val" id="clockLocal">--:--:--</span></div>
-      <div class="clock-row"><span>Buddhist:</span> <span class="clock-val" id="clockBuddhist">--</span></div>
-      <div class="clock-row"><span>Lunar:</span> <span class="clock-val" id="clockLunar">--</span></div>
-      <div class="user-time-row">
-        <span id="userTimeLabel">Your Time:</span> <span id="clockUser">--:--:--</span>
+<!-- ===== [CHANGED] 时间校验弹窗 ===== -->
+<div class="modal-overlay" id="timeCheckModal">
+  <div class="time-check-modal">
+    <div class="time-check-content">
+      <h2 id="timeCheckTitle">你的时间不准</h2>
+      <div class="time-check-subtitle" id="timeCheckSubtitle">您的时钟不准。现在时间是：</div>
+      
+      <div class="time-grid" id="timeGrid">
+        <div class="time-row"><span class="time-label" id="utcTimeLabel">UTC 时间</span><span class="time-value" id="utcTimeValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="localTimeLabel">本地时间</span><span class="time-value" id="localTimeValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="buddhistYearLabel">佛历</span><span class="time-value" id="buddhistYearValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="lunarYearLabel">农历</span><span class="time-value" id="lunarYearValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="futureYearLabel">未来时间 (+993)</span><span class="time-value" id="futureYearValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="unixTimestampLabel">Unix 时间戳</span><span class="time-value" id="unixTimestampValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="julianDayLabel">儒略日 (JD)</span><span class="time-value" id="julianDayValue">--</span></div>
       </div>
+      
+      <div class="user-time-section">
+        <div class="user-time-row">
+          <span class="user-time-label" id="yourTimeLabel">这是你的时间：</span>
+          <span class="user-time-value" id="userTimeValue">--</span>
+        </div>
+      </div>
+      
+      <div class="warning-text" id="timeWarning">您的时间不准可能导致某些功能不可用。</div>
+      
+      <button class="time-check-btn" id="continueBtn">继续访问网站</button>
+      <div class="loading-text" id="loadingText" style="display: none;">重新加载连接...</div>
     </div>
-    <button class="btn-action btn-danger" id="continueBtn">Continue to Website</button>
   </div>
 </div>
+<!-- ===== [/CHANGED] ===== -->
+
 <div class="modal-overlay" id="reportModal"><div class="report-modal">
   <div class="direct-call-hint" id="directCallHint"></div>
   <h2 id="modalHead">Emergency Report</h2>
@@ -439,8 +539,8 @@
     en: ["Serving the citizens of Sixside since 1989.","Courage, Integrity, Service — Our core values.","Protecting with honour, serving with pride.","Your safety is our sacred duty.","Twenty-four seven, three hundred sixty-five — We stand guard.","Where justice meets compassion.","Every call matters, every life counts."],
     'zh-Hans': ["自1989年以来为Sixside市民服务。","勇气、正直、服务 — 我们的核心价值观。","以荣誉守护，以自豪服务。","您的安全是我们的神圣职责。","一年365天，一周7天，全天候守护。","正义与同情在此交汇。","每一次求助都重要，每一条生命都珍贵。"],
     es: ["Sirviendo a los ciudadanos de Sixside desde 1989.","Coraje, Integridad, Servicio — Nuestros valores fundamentales.","Protegiendo con honor, sirviendo con orgullo.","Su seguridad es nuestro sagrado deber.","Veinticuatro siete, trescientos sesenta y cinco — Vigilamos.","Donde la justicia se encuentra con la compasión.","Cada llamada importa, cada vida cuenta."],
-    de: ["Den Bürgern von Sixside seit 1989 dienen.","Mut, Integrität, Dienst — Unsere Kernwerte.","Mit Ehre schützen, mit Stolz dienen.","Ihre Sicherheit ist unsere heilige Pflicht.","Vierundzwanzig sieben, dreihundertfünfundsechzig — Wir halten Wache.","Wo Gerechtigkeit auf Mitgefühl trifft.","Jeder Anruf zählt, jeder Leben zählt."],
-    pt: ["Servindo os cidadãos de Sixside since 1989.","Coragem, Integridade, Serviço — Nossos valores fundamentais.","Protegendo com honra, servindo com orgulho.","Sua segurança é nosso dever sagrado.","Vinte e quatro sete, trezentos e sessenta e cinco — Vigiamos.","Onde a justiça encontra a compaixão.","Cada chamada importa, cada vida conta."],
+    de: ["Den Bürgern von Sixside seit 1989 dienen.","Mut, Integrität, Dienst — Unsere Kernwerte.","Mit Ehre schützen, mit Stolz dienen.","Ihre Sicherheit ist unsere heilige Pflicht.","Vierundzwanzig sieben, dreihundertfünfundsechzig — Wir halten Wache.","Wo Gerechtigkeit auf Mitgefühl trifft.","Jeder Anruf zählt, jedes Leben zählt."],
+    pt: ["Servindo os cidadãos de Sixside desde 1989.","Coragem, Integridade, Serviço — Nossos valores fundamentais.","Protegendo com honra, servindo com orgulho.","Sua segurança é nosso dever sagrado.","Vinte e quatro sete, trezentos e sessenta e cinco — Vigiamos.","Onde a justiça encontra a compaixão.","Cada chamada importa, cada vida conta."],
     'zh-Hant': ["自1989年以來為Sixside市民服務。","勇氣、正直、服務 — 我們的核心價值觀。","以榮譽守護，以自豪服務。","您的安全是我們的神聖職責。","一年365天，一週7天，全天候守護。","正義與同情在此交匯。","每一次求助都重要，每一條生命都珍貴。"],
     fr: ["Au service des citoyens de Sixside depuis 1989.","Courage, Intégrité, Service — Nos valeurs fondamentales.","Protéger avec honneur, servir avec fierté.","Votre sécurité est notre devoir sacré.","Vingt-quatre sept, trois cent soixante-cinq — Nous veillons.","Là où la justice rencontre la compassion.","Chaque appel compte, chaque vie compte."],
     lzh: ["自一九八九年奉公於六面市民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"],
@@ -459,8 +559,8 @@
       callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
       justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', 
       respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE',
-      respTooltip:'...',
-      clearTooltip:'...',
+      respTooltip:'Specifically refers to the average time interval from when the call taker hangs up the emergency call and the dispatcher completes dispatch, to when the first officer arrives at the scene and confirms the location. Its calculation typically includes call handling time and travel time, but excludes on-scene handling time. This metric is a core KPI measuring police mobility and jurisdictional coverage density; lower values indicate stronger emergency response capability.',
+      clearTooltip:'Within a specific statistical period, the percentage average obtained by dividing the number of cases lawfully closed (solved, referred for prosecution, or otherwise disposed) by the total number of cases filed in the same period. Note that this metric does not directly reflect whether crime occurred; it only measures the processing efficiency of reported cases. In the U.S. Uniform Crime Reporting system, clearance is typically achieved by arrest or exceptional means. It is another core KPI for assessing detective effectiveness and public security management quality.',
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', 
       footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', 
       modalHead:'Emergency Report', 
@@ -485,11 +585,26 @@
       btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', 
       btn5:'Request', btn6:'Complaint, Thanks & Suggestion',
       btn7:'Public Files', btn8:'Join SSPD', btn9:'To the PD',
-      // === [NEW] 时钟翻译 ===
-      timeWarnTitle:'Your Clock Is Inaccurate',
-      timeWarnMsg:'Your clock is inaccurate. This may cause certain features to be unavailable. Current time is:',
-      userTimeLabel:'Your local device time:',
-      continueBtn:'Continue to Website'
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Your Clock is Inaccurate',
+      timeCheckSubtitle:'Your clock is inaccurate. The correct time is:',
+      utcTime:'UTC Time',
+      localTime:'Local Time',
+      buddhistYear:'Buddhist Era (BE)',
+      lunarYear:'Lunar Calendar',
+      futureYear:'Future Time (+993)',
+      unixTimestamp:'Unix Timestamp',
+      julianDay:'Julian Day (JD)',
+      yourTime:'Your device time:',
+      timeWarning:'Your inaccurate clock may cause some features to be unavailable.',
+      continueBtn:'Continue to Website',
+      reconnecting:'Reconnecting...',
+      // ===== [/CHANGED] =====
+      folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', 
+      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', 
+      folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
+      chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', 
+      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.' 
     },
     'zh-Hans': { 
       emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', reportEmerg:'报告紧急事件', 
@@ -514,7 +629,7 @@
       emergQueueMsg:'支援正在抵达现场', selectServiceError:'请至少选择一种支援类型', 
       locationRequiredError:'请先获取您的位置', 
       captchaRequiredError:'请完成人机验证',
-      captchaModalTitle:'验证 Required',
+      captchaModalTitle:'验证 required',
       captchaModalText:'请完成下方验证后继续。',
       captchaConfirm:'确认',
       captchaCancel:'取消',
@@ -522,196 +637,1411 @@
       btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', 
       btn5:'请求', btn6:'投诉、感谢和建议',
       btn7:'公开信息', btn8:'加入SSPD', btn9:'前往警察局',
-      // === [NEW] 时钟翻译 ===
-      timeWarnTitle:'您的时钟不准',
-      timeWarnMsg:'您的时钟不准。这可能导致某些功能不可用。现在时间是：',
-      userTimeLabel:'您的本地时间：',
-      continueBtn:'继续访问网站'
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'你的时间不准',
+      timeCheckSubtitle:'您的时钟不准。现在时间是：',
+      utcTime:'UTC 时间',
+      localTime:'本地时间',
+      buddhistYear:'佛历 (BE)',
+      lunarYear:'农历',
+      futureYear:'未来时间 (+993)',
+      unixTimestamp:'Unix 时间戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'这是你的时间：',
+      timeWarning:'您的时间不准可能导致某些功能不可用。',
+      continueBtn:'继续访问网站',
+      reconnecting:'重新加载连接...',
+      // ===== [/CHANGED] =====
+      folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', 
+      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', 
+      folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
+      chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', 
+      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。' 
+    },
+    es: {
+      emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
+      callNote:'110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible',
+      justice:'JUSTICIA', professionalism:'PROFESIONALISMO', protection:'PROTECCION',
+      respTime:'TIEMPO DE RESPUESTA MEDIO 2025', clearRate:'TASA DE RESOLUCION MEDIA 2025',
+      respTooltip:'Específicamente se refiere al intervalo de tiempo promedio desde que el operador cuelga la llamada de emergencia y el despachador completa la asignación, hasta que el primer agente llega al lugar y confirma la ubicación. Su cálculo normalmente incluye el tiempo de gestión de la llamada y el tiempo de desplazamiento, pero excluye el tiempo de intervención en el lugar. Este indicador es un KPI central que mide la movilidad policial y la densidad de cobertura jurisdiccional; valores más bajos indican una mayor capacidad de respuesta ante emergencias.',
+      clearTooltip:'Dentro de un período estadístico específico, el porcentaje promedio obtenido al dividir el número de casos cerrados legalmente (resueltos, remitidos para enjuiciamiento o archivados de otra forma) por el número total de casos registrados en el mismo período. Tenga en cuenta que este indicador no refleja directamente si ocurrió un delito; solo mide la eficiencia en el procesamiento de los casos denunciados. En el sistema Uniform Crime Reporting de EE. UU., el cierre se logra normalmente mediante arresto o medios excepcionales. Es otro KPI central para evaluar la eficacia investigativa y la calidad de la gestión de la seguridad pública.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menos vs 2024',
+      footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Soporte tecnico por Wareflame',
+      modalHead:'Reporte de Emergencia',
+      directCallHint:'Para emergencias, marque 110 directamente. No se necesita tarjeta SIM.',
+      serviceLabel:'Seleccione Servicios (haga clic para seleccionar, se permiten multiples)',
+      servicePolice:'Policia', serviceRescue:'Rescate', serviceFire:'Bomberos', serviceMedical:'Medico',
+      locationLabel:'Ubicacion / Coordenadas GPS',
+      visibleLabel:'Esta en un area abierta o visible?', optYes:'Si', optNo:'No',
+      contactLabel:'Contacto (opcional)',
+      commentLabel:'Comentarios Adicionales', commentPlaceholder:'Por favor describa su situacion en detalle...',
+      sosBtn:'SOS INMEDIATO', cancel:'Cancelar', locateBtn:'Obtener mi ubicacion',
+      contrast:'Contraste', grayscale:'Escala de grises', saturate:'Saturacion', crosshair:'Color de mira',
+      enableCursor:'Activar asistencia de mira', reset:'Reiniciar', langTitle:'Seleccionar Idioma',
+      emergQueueMsg:'Apoyo en camino', selectServiceError:'Por favor seleccione al menos un servicio',
+      locationRequiredError:'Por favor obtenga su ubicacion primero',
+      captchaRequiredError:'Por favor complete la verificacion',
+      captchaModalTitle:'Verificacion requerida',
+      captchaModalText:'Por favor complete la verificacion a continuacion para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
+      dbNotice:'Base de datos nacional UPL | Datos sincronizados a nivel nacional', lostTitle:'Objetos Perdidos',
+      btn1:'Reportar un Crimen', btn2:'Diganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar',
+      btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
+      btn7:'Archivos Públicos', btn8:'Unirse a SSPD', btn9:'Ir a la Policía',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Tu Reloj es Inexacto',
+      timeCheckSubtitle:'Su reloj es inexacto. La hora correcta es:',
+      utcTime:'Hora UTC',
+      localTime:'Hora Local',
+      buddhistYear:'Era Budista (BE)',
+      lunarYear:'Calendario Lunar',
+      futureYear:'Tiempo Futuro (+993)',
+      unixTimestamp:'Marca de Tiempo Unix',
+      julianDay:'Día Juliano (JD)',
+      yourTime:'Hora de su dispositivo:',
+      timeWarning:'Su reloj inexacto puede causar que algunas funciones no estén disponibles.',
+      continueBtn:'Continuar al Sitio Web',
+      reconnecting:'Reconectando...',
+      // ===== [/CHANGED] =====
+      folderName:'Carpeta Transparente', chargerName:'Cargador HP Laptop 45W', drinkName:'Bebida Lucozade',
+      folderDate:'Abril 2026', chargerDate:'Ene - Feb 2026', drinkDate:'Abr 2025 - Nov 2025',
+      folderDetail:'Cremallera roja. Marcador permanente "2026 Biology" en plastico. Contiene materiales de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Cualquier pista llame al 009.',
+      chargerDetail:'Cargador de portatil. Sospechoso: hombre negro con cabello rizado negro, visto cerca de Ratcliffe on the Wreake, Charnwood, Leicestershire (Ene/Feb 2026). Testigo reporto. Cualquier pista llame al 009.',
+      drinkDetail:'Sospechoso: hombre negro con cabello rizado negro, misma ubicacion que el cargador. Robado entre Abr 2025 - Nov 2025. Cualquier pista llame al 009.'
+    },
+    de: {
+      emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', reportEmerg:'NOTFALL MELDEN',
+      callNote:'110/009 Kostenloser Anruf, keine SIM-Karte erforderlich (Mobilfunkabdeckung erforderlich) | 110/009 SMS-Meldung verfugbar',
+      justice:'GERECHTIGKEIT', professionalism:'PROFESSIONALITAT', protection:'SCHUTZ',
+      respTime:'DURCHSCHNITTLICHE REAKTIONSZEIT 2025', clearRate:'DURCHSCHNITTLICHE AUFKLARUNGSRATE 2025',
+      respTooltip:'Bezeichnet konkret das durchschnittliche Zeitintervall von dem Moment, in dem der Anrufbeantworter den Notruf auflegt und der Disponent den Einsatz zuweist, bis zum Eintreffen der ersten Einsatzkraft vor Ort und der Bestätigung des Standorts. Die Berechnung umfasst in der Regel die Anrufbearbeitungszeit und die Fahrzeit, jedoch nicht die Einsatzzeit vor Ort. Diese Kennzahl ist ein zentraler KPI zur Messung der polizeilichen Mobilität und der Abdeckungsdichte im Zuständigkeitsbereich; niedrigere Werte bedeuten eine höhere Einsatzfähigkeit.',
+      clearTooltip:'Innerhalb eines bestimmten statistischen Zeitraums der prozentuale Durchschnitt, der sich aus der Division der Anzahl der rechtmäßig abgeschlossenen (aufgeklärten, zur Strafverfolgung übergebenen oder anderweitig erledigten) Fälle durch die Gesamtzahl der im gleichen Zeitraum erfassten Fälle ergibt. Beachten Sie, dass diese Kennzahl nicht direkt widerspiegelt, ob eine Straftat stattgefunden hat; sie misst lediglich die Bearbeitungseffizienz gemeldeter Fälle. Im US-amerikanischen Uniform Crime Reporting-System erfolgt die Aufklärung in der Regel durch Festnahme oder Ausnahmefälle. Es ist ein weiterer zentraler KPI zur Bewertung der Ermittlungseffektivität und der Qualität der öffentlichen Sicherheitsverwaltung.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% niedriger vs 2024',
+      footer:'© 2025-2026 POLIZEIBEHORDE SIXSIDE | Technischer Support von Wareflame',
+      modalHead:'Notfallmeldung',
+      directCallHint:'Bei Notfallen wahlen Sie bitte direkt 110. Keine SIM-Karte erforderlich.',
+      serviceLabel:'Dienste auswahlen (zum Auswahlen klicken, mehrere moglich)',
+      servicePolice:'Polizei', serviceRescue:'Rettung', serviceFire:'Feuerwehr', serviceMedical:'Medizinisch',
+      locationLabel:'Standort / Geo-Koordinaten',
+      visibleLabel:'Befinden Sie sich in einem offenen/sichtbaren Bereich?', optYes:'Ja', optNo:'Nein',
+      contactLabel:'Kontakt (optional)',
+      commentLabel:'Zusatzliche Kommentare', commentPlaceholder:'Bitte beschreiben Sie Ihre Situation im Detail...',
+      sosBtn:'SOFORT SOS', cancel:'Abbrechen', locateBtn:'Meinen Standort abrufen',
+      contrast:'Kontrast', grayscale:'Graustufen', saturate:'Sattigung', crosshair:'Fadenkreuzfarbe',
+      enableCursor:'Fadenkreuz-Assistent aktivieren', reset:'Zurucksetzen', langTitle:'Sprache auswahlen',
+      emergQueueMsg:'Unterstutzung unterwegs', selectServiceError:'Bitte wahlen Sie mindestens einen Dienst aus',
+      locationRequiredError:'Bitte rufen Sie zuerst Ihren Standort ab',
+      captchaRequiredError:'Bitte schlieSSen Sie die Verifizierung ab',
+      captchaModalTitle:'Verifizierung erforderlich',
+      captchaModalText:'Bitte schlieSSen Sie die untenstehende Verifizierung ab, um fortzufahren.',
+      captchaConfirm:'Bestatigen',
+      captchaCancel:'Abbrechen',
+      dbNotice:'UPL Nationale Datenbank | Bundesweit synchronisierte Daten', lostTitle:'Fundburo',
+      btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundburo', btn4:'Beantragen oder Registrieren',
+      btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
+      btn7:'Öffentliche Dateien', btn8:'SSPD beitreten', btn9:'Zur Polizei',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Ihre Uhr ist ungenau',
+      timeCheckSubtitle:'Ihre Uhr ist ungenau. Die korrekte Zeit ist:',
+      utcTime:'UTC Zeit',
+      localTime:'Lokale Zeit',
+      buddhistYear:'Buddhistische Zeitrechnung (BE)',
+      lunarYear:'Mondkalender',
+      futureYear:'Zukünftige Zeit (+993)',
+      unixTimestamp:'Unix-Zeitstempel',
+      julianDay:'Julianisches Datum (JD)',
+      yourTime:'Ihre Gerätezeit:',
+      timeWarning:'Ihre ungenaue Uhr kann dazu führen, dass einige Funktionen nicht verfügbar sind.',
+      continueBtn:'Zur Website fortfahren',
+      reconnecting:'Verbindung wird wiederhergestellt...',
+      // ===== [/CHANGED] =====
+      folderName:'Transparente Mappe', chargerName:'HP Laptop 45W Ladegerat', drinkName:'Lucozade-Getrank',
+      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025',
+      folderDetail:'Roter ReiBverschluss. Permanentmarker "2026 Biology" auf Kunststoff. Enthalt GCSE-Biologiematerialien. Belohnung: £10 (≈9.98 UCC). Hinweise bitte unter 009.',
+      chargerDetail:'Laptop-Ladegerat. Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gesehen in der Nahe von Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Zeuge gemeldet. Hinweise bitte unter 009.',
+      drinkDetail:'Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gleicher Ort wie Ladegerat. Gestohlen zwischen Apr 2025 - Nov 2025. Hinweise bitte unter 009.'
+    },
+    pt: {
+      emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NAO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
+      callNote:'110/009 chamada gratuita, nao precisa de SIM (cobertura celular necessaria) | 110/009 relatorio por SMS disponivel',
+      justice:'JUSTICA', professionalism:'PROFISSIONALISMO', protection:'PROTECAO',
+      respTime:'TEMPO MEDIO DE RESPOSTA 2025', clearRate:'TAXA MEDIA DE RESOLUCAO 2025',
+      respTooltip:'Refere-se especificamente ao intervalo de tempo médio desde que o operador desliga a chamada de emergência e o despachante conclui a atribuição, até que o primeiro agente chega ao local e confirma a localização. O seu cálculo normalmente inclui o tempo de atendimento da chamada e o tempo de deslocação, mas exclui o tempo de intervenção no local. Este indicador é um KPI central que mede a mobilidade policial e a densidade de cobertura jurisdicional; valores mais baixos indicam maior capacidade de resposta a emergências.',
+      clearTooltip:'Dentro de um período estatístico específico, a percentagem média obtida dividindo o número de casos legalmente encerrados (resolvidos, remetidos para acusação ou de outra forma arquivados) pelo número total de casos registados no mesmo período. Note que este indicador não reflete diretamente se ocorreu um crime; apenas mede a eficiência de processamento dos casos denunciados. No sistema Uniform Crime Reporting dos EUA, o encerramento é normalmente alcançado por detenção ou meios excecionais. É outro KPI central para avaliar a eficácia da investigação e a qualidade da gestão da segurança pública.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menor vs 2024',
+      footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Suporte tecnico por Wareflame',
+      modalHead:'Relatorio de Emergencia',
+      directCallHint:'Para emergencias, disque 110 diretamente. Nao e necessario cartao SIM.',
+      serviceLabel:'Selecione Servicos (clique para selecionar, multiplos permitidos)',
+      servicePolice:'Policia', serviceRescue:'Resgate', serviceFire:'Bombeiros', serviceMedical:'Medico',
+      locationLabel:'Localizacao / Coordenadas GPS',
+      visibleLabel:'Voce esta em uma area aberta/visivel?', optYes:'Sim', optNo:'Nao',
+      contactLabel:'Contato (opcional)',
+      commentLabel:'Comentarios Adicionais', commentPlaceholder:'Por favor, descreva sua situacao em detalhes...',
+      sosBtn:'SOS IMEDIATO', cancel:'Cancelar', locateBtn:'Obter minha localizacao',
+      contrast:'Contraste', grayscale:'Escala de cinza', saturate:'Saturacao', crosshair:'Cor da mira',
+      enableCursor:'Ativar assistencia de mira', reset:'Redefinir', langTitle:'Selecionar Idioma',
+      emergQueueMsg:'Suporte a caminho', selectServiceError:'Por favor, selecione pelo menos um servico',
+      locationRequiredError:'Por favor, obtenha sua localizacao primeiro',
+      captchaRequiredError:'Por favor, complete a verificacao',
+      captchaModalTitle:'Verificacao necessaria',
+      captchaModalText:'Por favor, complete a verificacao abaixo para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
+      dbNotice:'Banco de dados nacional UPL | Dados sincronizados em todo o pais', lostTitle:'Achados e Perdidos',
+      btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar',
+      btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
+      btn7:'Arquivos Públicos', btn8:'Juntar-se à SSPD', btn9:'Para a Polícia',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Seu Relógio Está Inexato',
+      timeCheckSubtitle:'Seu relógio está inexato. A hora correta é:',
+      utcTime:'Hora UTC',
+      localTime:'Hora Local',
+      buddhistYear:'Era Budista (BE)',
+      lunarYear:'Calendário Lunar',
+      futureYear:'Tempo Futuro (+993)',
+      unixTimestamp:'Timestamp Unix',
+      julianDay:'Dia Juliano (JD)',
+      yourTime:'Hora do seu dispositivo:',
+      timeWarning:'Seu relógio inexato pode fazer com que algumas funções não estejam disponíveis.',
+      continueBtn:'Continuar para o Site',
+      reconnecting:'Reconectando...',
+      // ===== [/CHANGED] =====
+      folderName:'Pasta Transparente', chargerName:'Carregador HP Laptop 45W', drinkName:'Bebida Lucozade',
+      folderDate:'Abril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Abr 2025 - Nov 2025',
+      folderDetail:'Ziper vermelho. Marcador permanente "2026 Biology" no plastico. Contem materiais de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Qualquer pista ligue para 009.',
+      chargerDetail:'Carregador de laptop. Suspeito: homem negro com cabelo cacheado preto, visto perto de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Testemunha reportou. Qualquer pista ligue para 009.',
+      drinkDetail:'Suspeito: homem negro com cabelo cacheado preto, mesmo local do carregador. Roubado entre Abr 2025 - Nov 2025. Qualquer pista ligue para 009.'
+    },
+    'zh-Hant': {
+      emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', reportEmerg:'報告緊急事件',
+      callNote:'110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用',
+      justice:'正義', professionalism:'專業精神', protection:'保護',
+      respTime:'2025年平均響應時間', clearRate:'2025年平均辦結率',
+      respTooltip:'具體指從接警員掛斷報警電話、調度員完成派單起，至第一名警力抵達現場並確認位置止的時間間隔的平均值。其計算口徑通常包含通話處理耗時與路途行駛耗時，但不包含現場處置時間。該指標是衡量警務機動性與轄區管控密度的核心關鍵績效指標，數值越低代表應急處突能力越強。',
+      clearTooltip:'在特定統計週期內，警方依法辦結（破獲、移送起訴或作其他處理）的案件數除以同期立案總數所得的百分比平均值。注意，該指標不直接反映犯罪是否發生，僅衡量已報案件的處理效率。在美國統一犯罪報告體系中，通常以逮捕或例外情形結案作為清除標準。它是評估警局偵查效能與治安管控質量的另一項核心關鍵績效指標。',
+      respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%',
+      footer:'© 2025-2026 六面警察局 | 技術支援 Wareflame',
+      modalHead:'緊急報告',
+      directCallHint:'緊急情況請直接撥打110。無需SIM卡。',
+      serviceLabel:'選擇支援類型 (點擊選擇，可多選)',
+      servicePolice:'警察', serviceRescue:'救援', serviceFire:'火警', serviceMedical:'醫療',
+      locationLabel:'位置 / 經緯度',
+      visibleLabel:'您在戶外或警員可見區域嗎？', optYes:'是', optNo:'否',
+      contactLabel:'聯繫方式 (選填)',
+      commentLabel:'補充說明', commentPlaceholder:'請詳細描述您的情況...',
+      sosBtn:'立即求救', cancel:'取消', locateBtn:'獲取我的位置並定位',
+      contrast:'對比度', grayscale:'灰度', saturate:'飽和度', crosshair:'準星顏色',
+      enableCursor:'啟用高亮十字準星', reset:'重置', langTitle:'選擇語言',
+      emergQueueMsg:'支援正在抵達現場', selectServiceError:'請至少選擇一種支援類型',
+      locationRequiredError:'請先獲取您的位置',
+      captchaRequiredError:'請完成人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL 國家數據庫 | 全國數據同步', lostTitle:'失物招領',
+      btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊',
+      btn5:'請求', btn6:'投訴、感謝和建議',
+      btn7:'公開信息', btn8:'加入SSPD', btn9:'前往警察局',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'你的時間不準',
+      timeCheckSubtitle:'您的時鐘不準。現在時間是：',
+      utcTime:'UTC 時間',
+      localTime:'本地時間',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      futureYear:'未來時間 (+993)',
+      unixTimestamp:'Unix 時間戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'這是你的時間：',
+      timeWarning:'您的時間不準可能導致某些功能不可用。',
+      continueBtn:'繼續訪問網站',
+      reconnecting:'重新加載連接...',
+      // ===== [/CHANGED] =====
+      folderName:'透明文件夾', chargerName:'惠普電腦45瓦充電器', drinkName:'Lucozade飲料',
+      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月',
+      folderDetail:'紅色拉鏈。透明塑料上用永久馬克筆寫著"2026 Biology"。內含GCSE生物資料。酬金：10英鎊(≈9.98 UCC)。有線索請撥打009。',
+      chargerDetail:'筆記本電腦充電器。嫌疑人：有黑色卷發的黑人男性，2026年1/2月出現在萊斯特郡查恩伍德拉特克利夫村附近。有目擊證人。任何線索請撥打009。',
+      drinkDetail:'嫌疑人：有黑色卷發的黑人男性，同充電器地點。2025年4月至11月間失竊。任何線索請撥打009。'
+    },
+    fr: {
+      emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', reportEmerg:'SIGNALER UNE URGENCE',
+      callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
+      justice:'JUSTICE', professionalism:'PROFESSIONNALISME', protection:'PROTECTION',
+      respTime:'TEMPS DE REPONSE MOYEN 2025', clearRate:'TAUX DE RESOLUTION MOYEN 2025',
+      respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartiteur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
+      clearTooltip:'Dans une période statistique donnée, le pourcentage moyen obtenu en divisant le nombre d\'affaires légalement classées (résolues, transmises pour poursuites ou autrement traitées) par le nombre total d\'affaires enregistrées sur la même période. Notez que cet indicateur ne reflète pas directement si un crime a eu lieu ; il mesure uniquement l\'efficacité du traitement des affaires signalées. Dans le système Uniform Crime Reporting américain, le classement est généralement obtenu par arrestation ou moyens exceptionnels. C\'est un autre KPI central pour évaluer l\'efficacité des enquêtes et la qualité de la gestion de la sécurité publique.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% plus bas vs 2024',
+      footer:'© 2025-2026 SERVICE DE POLICE DE SIXSIDE | Support technique par Wareflame',
+      modalHead:'Rapport d\'Urgence',
+      directCallHint:'Pour les urgences, composez le 110 directement. Aucune carte SIM requise.',
+      serviceLabel:'Selectionner les services (cliquer pour selectionner, multiples autorises)',
+      servicePolice:'Police', serviceRescue:'Secours', serviceFire:'Pompiers', serviceMedical:'Medical',
+      locationLabel:'Emplacement / Coordonnees GPS',
+      visibleLabel:'Etes-vous dans une zone ouverte/visible?', optYes:'Oui', optNo:'Non',
+      contactLabel:'Contact (optionnel)',
+      commentLabel:'Commentaires Supplementaires', commentPlaceholder:'Veuillez decrire votre situation en detail...',
+      sosBtn:'SOS IMMEDIAT', cancel:'Annuler', locateBtn:'Obtenir ma position',
+      contrast:'Contraste', grayscale:'Niveaux de gris', saturate:'Saturation', crosshair:'Couleur du viseur',
+      enableCursor:'Activer l\'assistance viseur', reset:'Reinitialiser', langTitle:'Choisir la langue',
+      emergQueueMsg:'Soutien en route', selectServiceError:'Veuillez selectionner au moins un service',
+      locationRequiredError:'Veuillez d\'abord obtenir votre position',
+      captchaRequiredError:'Veuillez completer la verification',
+      captchaModalTitle:'Verification requise',
+      captchaModalText:'Veuillez completer la verification ci-dessous pour continuer.',
+      captchaConfirm:'Confirmer',
+      captchaCancel:'Annuler',
+      dbNotice:'Base de donnees nationale UPL | Donnees synchronisees a l\'echelle nationale', lostTitle:'Objets Perdus',
+      btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer',
+      btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
+      btn7:'Fichiers Publics', btn8:'Rejoindre SSPD', btn9:'Vers la Police',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Votre Horloge est Inexacte',
+      timeCheckSubtitle:'Votre horloge est inexacte. L\'heure correcte est :',
+      utcTime:'Heure UTC',
+      localTime:'Heure Locale',
+      buddhistYear:'Ère Bouddhiste (BE)',
+      lunarYear:'Calendrier Lunaire',
+      futureYear:'Temps Futur (+993)',
+      unixTimestamp:'Horodatage Unix',
+      julianDay:'Jour Julien (JD)',
+      yourTime:'Heure de votre appareil :',
+      timeWarning:'Votre horloge inexacte peut rendre certaines fonctions indisponibles.',
+      continueBtn:'Continuer vers le Site',
+      reconnecting:'Reconnexion...',
+      // ===== [/CHANGED] =====
+      folderName:'Dossier Transparent', chargerName:'Chargeur HP Laptop 45W', drinkName:'Boisson Lucozade',
+      folderDate:'Avril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Avr 2025 - Nov 2025',
+      folderDetail:'Fermeture eclair rouge. Marqueur permanent "2026 Biology" sur plastique. Contient du materiel de biologie GCSE. Recompense: £10 (≈9.98 UCC). Tout indice appelez le 009.',
+      chargerDetail:'Chargeur d\'ordinateur portable. Suspect: homme noir aux cheveux boucles noirs, vu pres de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Temoin signale. Tout indice appelez le 009.',
+      drinkDetail:'Suspect: homme noir aux cheveux boucles noirs, meme endroit que le chargeur. Vole entre Avr 2025 - Nov 2025. Tout indice appelez le 009.'
+    },
+    lzh: {
+      emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
+      callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      justice:'義', professionalism:'專', protection:'護',
+      respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
+      footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      modalHead:'急報',
+      directCallHint:'警急直撥110。毋需SIM卡。',
+      serviceLabel:'擇援類 (點選，可多擇)',
+      servicePolice:'警', serviceRescue:'救', serviceFire:'火', serviceMedical:'醫',
+      locationLabel:'所在 / 經緯',
+      visibleLabel:'君在曠野或可見處否？', optYes:'然', optNo:'否',
+      contactLabel:'繫方 (選填)',
+      commentLabel:'附言', commentPlaceholder:'詳述君之情狀...',
+      sosBtn:'急求', cancel:'止', locateBtn:'取吾所在並定址',
+      contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星色',
+      enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
+      emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
+      locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
+      btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
+      btn5:'求', btn6:'訴、謝、議',
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'君之時不準',
+      timeCheckSubtitle:'君之時鐘不準。今時為：',
+      utcTime:'UTC 時',
+      localTime:'本地時',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      futureYear:'未來時 (+993)',
+      unixTimestamp:'Unix 時戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'此乃君之時：',
+      timeWarning:'君時不準，或致部分功能不可用。',
+      continueBtn:'繼續訪網',
+      reconnecting:'重連中...',
+      // ===== [/CHANGED] =====
+      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
+      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
+      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
+      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
+    },
+    ru: {
+      emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', reportEmerg:'СООБЩИТЬ О ЧП',
+      callNote:'110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен',
+      justice:'СПРАВЕДЛИВОСТЬ', professionalism:'ПРОФЕССИОНАЛИЗМ', protection:'ЗАЩИТА',
+      respTime:'СРЕДНЕЕ ВРЕМЯ ОТВЕТА 2025', clearRate:'СРЕДНИЙ УРОВЕНЬ РАСКРЫВАЕМОСТИ 2025',
+      respTooltip:'Конкретно означает средний временной интервал с момента, когда оператор вешает трубку после экстренного вызова и диспетчер завершает назначение, до прибытия первого сотрудника на место и подтверждения местоположения. В расчет обычно включается время обработки вызова и время в пути, но исключается время работы на месте. Этот показатель является ключевым KPI, измеряющим мобильность полиции и плотность охвата территории; чем ниже значение, тем выше способность к экстренному реагированию.',
+      clearTooltip:'В течение определенного статистического периода средний процент, полученный путем деления числа дел, законно закрытых (раскрытых, переданных в суд или иным образом урегулированных), на общее число зарегистрированных дел за тот же период. Обратите внимание, что этот показатель не отражает напрямую, произошло ли преступление; он лишь измеряет эффективность обработки зарегистрированных дел. В системе Uniform Crime Reporting США закрытие обычно достигается путем ареста или исключительных обстоятельств. Это еще один ключевой KPI для оценки эффективности расследований и качества управления общественной безопасностью.',
+      respVal:'17м 04с', clearVal:'98.2%', respTrend:'6с vs 2024', clearTrend:'0.6% ниже vs 2024',
+      footer:'© 2025-2026 ПОЛИЦЕЙСКИЙ ДЕПАРТАМЕНТ СИКСАЙД | Техподдержка Wareflame',
+      modalHead:'Сообщение о ЧП',
+      directCallHint:'При чрезвычайных ситуациях звоните 110 напрямую. SIM-карта не требуется.',
+      serviceLabel:'Выберите услуги (нажмите для выбора, можно несколько)',
+      servicePolice:'Полиция', serviceRescue:'Спасение', serviceFire:'Пожар', serviceMedical:'Медицина',
+      locationLabel:'Местоположение / Координаты',
+      visibleLabel:'Вы находитесь на открытой/видной местности?', optYes:'Да', optNo:'Нет',
+      contactLabel:'Контакт (опционально)',
+      commentLabel:'Дополнительные комментарии', commentPlaceholder:'Пожалуйста, подробно опишите ситуацию...',
+      sosBtn:'НЕМЕДЛЕННО SOS', cancel:'Отмена', locateBtn:'Определить мое местоположение',
+      contrast:'Контраст', grayscale:'Оттенки серого', saturate:'Насыщенность', crosshair:'Цвет прицела',
+      enableCursor:'Включить помощь прицела', reset:'Сброс', langTitle:'Выберите язык',
+      emergQueueMsg:'Поддержка в пути', selectServiceError:'Пожалуйста, выберите хотя бы одну услугу',
+      locationRequiredError:'Пожалуйста, сначала определите ваше местоположение',
+      captchaRequiredError:'Пожалуйста, завершите верификацию',
+      captchaModalTitle:'Требуется верификация',
+      captchaModalText:'Пожалуйста, завершите верификацию ниже, чтобы продолжить.',
+      captchaConfirm:'Подтвердить',
+      captchaCancel:'Отмена',
+      dbNotice:'Национальная база данных UPL | Общенациональные синхронизированные данные', lostTitle:'Бюро находок',
+      btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку',
+      btn5:'Запрос', btn6:'Жалоба, благодарность',
+      btn7:'Общественные файлы', btn8:'Вступить в SSPD', btn9:'В полицию',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Ваши Часы Неточны',
+      timeCheckSubtitle:'Ваши часы неточны. Правильное время:',
+      utcTime:'Время UTC',
+      localTime:'Местное Время',
+      buddhistYear:'Буддийская Эра (BE)',
+      lunarYear:'Лунный Календарь',
+      futureYear:'Будущее Время (+993)',
+      unixTimestamp:'Unix Время',
+      julianDay:'Юлианский День (JD)',
+      yourTime:'Время вашего устройства:',
+      timeWarning:'Неточные часы могут привести к недоступности некоторых функций.',
+      continueBtn:'Продолжить на Сайт',
+      reconnecting:'Переподключение...',
+      // ===== [/CHANGED] =====
+      folderName:'Прозрачная папка', chargerName:'Зарядное устройство HP Laptop 45W', drinkName:'Напиток Lucozade',
+      folderDate:'Апрель 2026', chargerDate:'Янв - Фев 2026', drinkDate:'Апр 2025 - Ноя 2025',
+      folderDetail:'Красная молния. Перманентный маркер "2026 Biology" на пластике. Содержит материалы по биологии GCSE. Награда: £10 (≈9.98 UCC). Любые подсказки звоните 009.',
+      chargerDetail:'Зарядное устройство для ноутбука. Подозреваемый: чернокожий мужчина с вьющимися черными волосами, замечен недалеко от Рэтклифф-он-те-Рик, Чарнвуд, Лестершир (Янв/Фев 2026). Свидетель сообщил. Любые подсказки звоните 009.',
+      drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.'
+    },
+    mn: {
+      emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', reportEmerg:'ЯАЛТАЙ МЭДЭЭЛЭХ',
+      callNote:'110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (Үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
+      justice:'ШУДАРГА ЁС', professionalism:'МЭРГЭЖИЛ', protection:'ХАМГААЛАЛ',
+      respTime:'2025 ОНЫ ДУНДАЖ ХАРИУ АВСАН ХУГАЦАА', clearRate:'2025 ОНЫ ДУНДАЖ ШИЙДВЭРЛЭЛТИЙН ТҮВШИН',
+      respTooltip:'Яаралтай дуудлагыг оператор тасалж, диспетчер даалгаврыг гүйцэтгэсэн үеэс эхлэн анхны цагдаагийн албан хаагч газар дээр ирж, байршлыг баталгаажуулах хүртэлх дундаж хугацааны завсар. Тооцоололд дуудлага боловсруулах хугацаа, замд явах хугацаа багтах боловч газар дээр ажиллах хугацаа орохгүй. Энэ үзүүлэлт нь цагдаагийн хөдөлгөөнт чадвар, харьяалах нутаг дэвсгэрийн хамрах хүрээний нягтралыг хэмжих гол KPI юм. Бага утга нь илүү өндөр хариу үйлдэл үзүүлэх чадварыг илтгэнэ.',
+      clearTooltip:'Тухайн статистикийн хугацаанд хуулийн дагуу шийдвэрлэсэн (илрүүлсэн, яллах дүгнэлт үйлдсэн эсвэл өөр аргаар шийдвэрлэсэн) хэргийн тоог мөн хугацаанд бүртгэгдсэн нийт хэргийн тоонд хувааж олсон дундаж хувь. Анхаарна уу: энэ үзүүлэлт нь гэмт хэрэг гарсан эсэхийг шууд илтгэдэггүй; зөвхөн бүртгэгдсэн хэргийн боловсруулалтын үр ашгийг хэмждэг. АНУ-ын Нэгдсэн Гэмт Хэргийн Тайлангийн системд хэргийг ихэвчлэн баривчлах эсвэл онцгой тохиолдлоор шийдвэрлэдэг. Энэ нь мөрдөн байцаалтын үр нөлөө, нийтийн аюулгүй байдлын удирдлагын чанарыг үнэлэх өөр нэг гол KPI юм.',
+      respVal:'17м 04с', clearVal:'98.2%', respTrend:'2024-ээс 6с хурдан', clearTrend:'2024-ээс 0.6% бага',
+      footer:'© 2025-2026 СИКСАЙД ЦАГДААГЫН ГАЗАР | Техникийн дэмжлэг Wareflame',
+      modalHead:'Яаралтай мэдээлэх',
+      directCallHint:'Яаралтай тохиолдолд 110 руу шууд залгана уу. SIM карт шаардлагагүй.',
+      serviceLabel:'Үйлчилгээ сонгох (дарах замаар сонгох, олон сонголттой)',
+      servicePolice:'Цагдаа', serviceRescue:'Аврах', serviceFire:'Гал', serviceMedical:'Эмнэлэг',
+      locationLabel:'Байршил / Координат',
+      visibleLabel:'Та нээлттэй үзэгдэх хэсэгт байна уу?', optYes:'Тийм', optNo:'Үгүй',
+      contactLabel:'Холбоо барих (заавал биш)',
+      commentLabel:'Нэмэлт сэтгэгдэл', commentPlaceholder:'Та нөхцөл байдлыг дэлгэрэнгүй тайлбарлана уу...',
+      sosBtn:'ЯАРАЛТАЙ SOS', cancel:'Цуцлах', locateBtn:'Байршлаа авах',
+      contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан байдал', crosshair:'Харааны цэгийн өнгө',
+      enableCursor:'Харааны цэгийн туслах идэвхжүүлэх', reset:'Дахин тохируулах', langTitle:'Хэл сонгох',
+      emergQueueMsg:'Тусламж замдаа', selectServiceError:'Дор хаяж нэг үйлчилгээ сонгоно уу',
+      locationRequiredError:'Эхлээд байршлаа аваарай',
+      captchaRequiredError:'Баталгаажуулалтыг гүйцэтгэнэ үү',
+      captchaModalTitle:'Баталгаажуулалт шаардлагатай',
+      captchaModalText:'Үргэлжлүүлэхийн тулд доорх баталгаажуулалтыг гүйцэтгэнэ үү.',
+      captchaConfirm:'Баталгаажуулах',
+      captchaCancel:'Цуцлах',
+      dbNotice:'UPL Үндэсний мэдээллийн сан | Үндэсний хэмжээний синхрончлогдсон өгөгдөл', lostTitle:'Алдагдсан эд зүйлс',
+      btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах',
+      btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
+      btn7:'Нээлттэй файлууд', btn8:'SSPD-д элсэх', btn9:'Цагдаа руу',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'Таны Цаг Буруу Байна',
+      timeCheckSubtitle:'Таны цаг буруу байна. Зөв цаг нь:',
+      utcTime:'UTC Цаг',
+      localTime:'Орон Нутгийн Цаг',
+      buddhistYear:'Буддын Он (BE)',
+      lunarYear:'Цагаан сар',
+      futureYear:'Ирээдүйн Цаг (+993)',
+      unixTimestamp:'Unix Цагийн Тэмдэг',
+      julianDay:'Юлианы Өдөр (JD)',
+      yourTime:'Таны төхөөрөмжийн цаг:',
+      timeWarning:'Таны цаг буруу тул зарим функц ажиллахгүй байж болно.',
+      continueBtn:'Вэбсайт руу Үргэлжлүүлэх',
+      reconnecting:'Дахин холбогдож байна...',
+      // ===== [/CHANGED] =====
+      folderName:'Ил товч', chargerName:'HP Laptop 45W Цэнэглэгч', drinkName:'Lucozade Ундаа',
+      folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
+      folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
+      chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
+      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.'
+    },
+    ja: {
+      emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', reportEmerg:'緊急通報',
+      callNote:'110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能',
+      justice:'正義', professionalism:'専門性', protection:'保護',
+      respTime:'2025年平均応答時間', clearRate:'2025年平均解決率',
+      respTooltip:'具体的には、通報受付者が緊急通話を切り、指令担当者が指令を完了した時点から、最初の警察官が現場に到着し位置を確認するまでの平均時間間隔を指します。その計算には通常、通話処理時間と移動時間が含まれ、現場対応時間は含まれません。この指標は警察の機動力と管轄区域のカバー密度を測定する中核的なKPIであり、数値が低いほど緊急対応能力が高いことを示します。',
+      clearTooltip:'特定の統計期間内において、法的に処理（解決、起訴送致、またはその他の処理）された事件数を、同期間に受理された事件総数で割った平均パーセンテージです。なお、この指標は犯罪が発生したかどうかを直接反映するものではなく、報告された事件の処理効率のみを測定します。米国の統一犯罪報告システムでは、通常、逮捕または例外的な手段による処理をもって解決とみなされます。これは捜査効率と治安管理の質を評価するもう一つの中核的なKPIです。',
+      respVal:'17分04秒', clearVal:'98.2%', respTrend:'2024年より6秒高速', clearTrend:'2024年より0.6%低下',
+      footer:'© 2025-2026 シックスサイド警察署 | 技術サポート Wareflame',
+      modalHead:'緊急通報',
+      directCallHint:'緊急時は110に直接おかけください。SIMカードは不要です。',
+      serviceLabel:'サービスを選択（クリックで選択、複数選択可）',
+      servicePolice:'警察', serviceRescue:'救助', serviceFire:'消防', serviceMedical:'医療',
+      locationLabel:'位置 / GPS座標',
+      visibleLabel:'開けた場所/目に見える場所にいますか？', optYes:'はい', optNo:'いいえ',
+      contactLabel:'連絡先（任意）',
+      commentLabel:'追加コメント', commentPlaceholder:'状況を詳しく説明してください...',
+      sosBtn:'緊急SOS', cancel:'キャンセル', locateBtn:'現在地を取得',
+      contrast:'コントラスト', grayscale:'グレースケール', saturate:'彩度', crosshair:'クロスヘアカラー',
+      enableCursor:'クロスヘアアシストを有効にする', reset:'リセット', langTitle:'言語を選択',
+      emergQueueMsg:'支援が向かっています', selectServiceError:'少なくとも1つのサービスを選択してください',
+      locationRequiredError:'最初に現在地を取得してください',
+      captchaRequiredError:'認証を完了してください',
+      captchaModalTitle:'認証が必要です',
+      captchaModalText:'続行するには下の認証を完了してください。',
+      captchaConfirm:'確認',
+      captchaCancel:'キャンセル',
+      dbNotice:'UPL全国データベース | 全国同期データ', lostTitle:'忘れ物',
+      btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録',
+      btn5:'リクエスト', btn6:'苦情・感謝・提案',
+      btn7:'公開情報', btn8:'SSPD参加', btn9:'警察署へ',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'時計が不正確です',
+      timeCheckSubtitle:'お使いの時計が不正確です。正しい時刻は：',
+      utcTime:'UTC 時刻',
+      localTime:'現地時刻',
+      buddhistYear:'仏暦 (BE)',
+      lunarYear:'旧暦',
+      futureYear:'未来時刻 (+993)',
+      unixTimestamp:'Unix タイムスタンプ',
+      julianDay:'ユリウス日 (JD)',
+      yourTime:'お使いの端末の時刻：',
+      timeWarning:'時計が不正確なため、一部の機能が利用できない可能性があります。',
+      continueBtn:'サイトへ進む',
+      reconnecting:'再接続中...',
+      // ===== [/CHANGED] =====
+      folderName:'透明フォルダ', chargerName:'HPノートPC45W充電器', drinkName:'ルコザード飲料',
+      folderDate:'2026年4月', chargerDate:'2026年1月-2月', drinkDate:'2025年4月-11月',
+      folderDetail:'赤いジッパー。プラスチックに永久マーカーで「2026 Biology」と記載。GCSE生物学資料を含む。報奨金：£10 (≈9.98 UCC)。手がかりは009へ。',
+      chargerDetail:'ノートパソコン充電器。容疑者：黒い縮れ毛の黒人男性、ラトクリフ・オン・ザ・リーク、チャーンウッド、レスターシャー近郊で目撃（2026年1月/2月）。目撃者あり。手がかりは009へ。',
+      drinkDetail:'容疑者：黒い縮れ毛の黒人男性、充電器と同じ場所。2025年4月から11月の間に盗難。手がかりは009へ。'
+    },
+    ko: {
+      emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', reportEmerg:'긴급 신고',
+      callNote:'110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능',
+      justice:'정의', professionalism:'전문성', protection:'보호',
+      respTime:'2025년 평균 응답 시간', clearRate:'2025년 평균 해결율',
+      respTooltip:'구체적으로, 신고 접수원이 긴급 전화를 끊고 배차 담당자가 배차를 완료한 시점부터 첫 번째 경찰관이 현장에 도착하여 위치를 확인할 때까지의 평균 시간 간격을 의미합니다. 계산에는 일반적으로 통화 처리 시간과 이동 시간이 포함되며, 현장 처리 시간은 제외됩니다. 이 지표는 경찰의 기동성과 관할 구역 커버리지 밀도를 측정하는 핵심 KPI로, 수치가 낮을수록 긴급 대응 능력이 높음을 나타냅니다.',
+      clearTooltip:'특정 통계 기간 동안 법적으로 종결(해결, 기소 의견 송치 또는 기타 처리)된 사건 수를 같은 기간 접수된 총 사건 수로 나눈 백분율 평균입니다. 이 지표는 범죄 발생 여부를 직접 반영하지 않으며, 신고된 사건의 처리 효율만을 측정합니다. 미국 통합 범죄 보고 시스템에서는 일반적으로 체포 또는 예외적 수단에 의한 종결을 해결 기준으로 삼습니다. 이는 수사 효율성과 치안 관리 품질을 평가하는 또 다른 핵심 KPI입니다.',
+      respVal:'17분 04초', clearVal:'98.2%', respTrend:'2024년 대비 6초 단축', clearTrend:'2024년 대비 0.6% 하락',
+      footer:'© 2025-2026 식스사이드 경찰국 | 기술 지원 Wareflame',
+      modalHead:'긴급 신고',
+      directCallHint:'긴급 상황시 110으로 직접 전화하세요. SIM 카드가 필요하지 않습니다.',
+      serviceLabel:'서비스 선택 (클릭하여 선택, 여러 개 선택 가능)',
+      servicePolice:'경찰', serviceRescue:'구조', serviceFire:'화재', serviceMedical:'의료',
+      locationLabel:'위치 / GPS 좌표',
+      visibleLabel:'열린 공간/보이는 장소에 있습니까?', optYes:'예', optNo:'아니오',
+      contactLabel:'연락처 (선택 사항)',
+      commentLabel:'추가 코멘트', commentPlaceholder:'상황을 자세히 설명해주세요...',
+      sosBtn:'긴급 SOS', cancel:'취소', locateBtn:'내 위치 가져오기',
+      contrast:'대비', grayscale:'흑백', saturate:'채도', crosshair:'조준선 색상',
+      enableCursor:'조준선 지원 활성화', reset:'초기화', langTitle:'언어 선택',
+      emergQueueMsg:'지원 출동 중', selectServiceError:'최소 하나의 서비스를 선택하세요',
+      locationRequiredError:'먼저 내 위치를 가져오세요',
+      captchaRequiredError:'인증을 완료해주세요',
+      captchaModalTitle:'인증 필요',
+      captchaModalText:'계속하려면 아래 인증을 완료해주세요.',
+      captchaConfirm:'확인',
+      captchaCancel:'취소',
+      dbNotice:'UPL 국가 데이터베이스 | 전국 동기화 데이터', lostTitle:'분실물',
+      btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록',
+      btn5:'요청', btn6:'불만, 감사, 제안',
+      btn7:'공개 정보', btn8:'SSPD 가입', btn9:'경찰서로',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'시계가 부정확합니다',
+      timeCheckSubtitle:'시계가 부정확합니다. 올바른 시간은:',
+      utcTime:'UTC 시간',
+      localTime:'현지 시간',
+      buddhistYear:'불기 (BE)',
+      lunarYear:'음력',
+      futureYear:'미래 시간 (+993)',
+      unixTimestamp:'Unix 타임스탬프',
+      julianDay:'율리우스일 (JD)',
+      yourTime:'기기 시간:',
+      timeWarning:'시계가 부정확하여 일부 기능을 사용하지 못할 수 있습니다.',
+      continueBtn:'웹사이트 계속하기',
+      reconnecting:'다시 연결 중...',
+      // ===== [/CHANGED] =====
+      folderName:'투명 폴더', chargerName:'HP 노트북 45W 충전기', drinkName:'루코자데 음료',
+      folderDate:'2026년 4월', chargerDate:'2026년 1월-2월', drinkDate:'2025년 4월-11월',
+      folderDetail:'빨간색 지퍼. 플라스틱에 "2026 Biology"라고 쓰여 있음. GCSE 생물학 자료 포함. 보상: £10 (≈9.98 UCC). 제보는 009로.',
+      chargerDetail:'노트북 충전기. 용의자: 곱슬머리의 흑인 남성, Ratcliffe on the Wreake, Charnwood, Leicestershire 근처에서 목격됨 (2026년 1월/2월). 목격자 신고. 제보는 009로.',
+      drinkDetail:'용의자: 곱슬머리의 흑인 남성, 충전기와 같은 장소. 2025년 4월-11월 사이 도난. 제보는 009로.'
+    },
+    hi: {
+      emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपातकाल:', reportEmerg:'आपातकाल रिपोर्ट करें',
+      callNote:'110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध',
+      justice:'न्याय', professionalism:'व्यावसायिकता', protection:'सुरक्षा',
+      respTime:'2025 औसत प्रतिक्रिया समय', clearRate:'2025 औसत निपटान दर',
+      respTooltip:'विशेष रूप से, उस समय से औसत समय अंतराल को संदर्भित करता है जब कॉल लेने वाला आपातकालीन कॉल काट देता है और डिस्पैचर कार्य सौंप देता है, तब से लेकर पहला अधिकारी घटनास्थल पर पहुंचकर स्थान की पुष्टि करता है। इसकी गणना में आमतौर पर कॉल हैंडलिंग समय और यात्रा समय शामिल होता है, लेकिन घटनास्थल पर कार्रवाई का समय शामिल नहीं होता। यह मीट्रिक पुलिस की गतिशीलता और क्षेत्राधिकार कवरेज घनत्व को मापने वाला एक मुख्य KPI है; कम मान आपातकालीन प्रतिक्रिया क्षमता को अधिक मजबूत दर्शाते हैं।',
+      clearTooltip:'एक विशिष्ट सांख्यिकीय अवधि के भीतर, कानूनी रूप से बंद (सुलझाए गए, अभियोजन के लिए भेजे गए, या अन्यथा निपटाए गए) मामलों की संख्या को उसी अवधि में दर्ज मामलों की कुल संख्या से विभाजित करके प्राप्त प्रतिशत औसत। ध्यान दें कि यह मीट्रिक सीधे यह नहीं दर्शाता कि अपराध हुआ या नहीं; यह केवल दर्ज मामलों की प्रसंस्करण दक्षता को मापता है। अमेरिकी यूनिफ़ॉर्म क्राइम रिपोर्टिंग प्रणाली में, आमतौर पर गिरफ्तारी या असाधारण स्थितियों में मामले को बंद करना समाशोधन माना जाता है। यह जांच प्रभावशीलता और सार्वजनिक सुरक्षा प्रबंधन गुणवत्ता का आकलन करने के लिए एक अन्य मुख्य KPI है।',
+      respVal:'17मी 04से', clearVal:'98.2%', respTrend:'2024 से 6से तेज', clearTrend:'2024 से 0.6% कम',
+      footer:'© 2025-2026 सिक्ससाइड पुलिस विभाग | तकनीकी सहायता Wareflame',
+      modalHead:'आपातकाल रिपोर्ट',
+      directCallHint:'आपात स्थिति के लिए सीधे 110 डायल करें। SIM कार्ड की आवश्यकता नहीं।',
+      serviceLabel:'सेवाएं चुनें (चुनने के लिए क्लिक करें, एकाधिक की अनुमति)',
+      servicePolice:'पुलिस', serviceRescue:'बचाव', serviceFire:'अग्निशमन', serviceMedical:'चिकित्सा',
+      locationLabel:'स्थान / जीपीएस निर्देशांक',
+      visibleLabel:'क्या आप खुले/दिखाई देने वाले क्षेत्र में हैं?', optYes:'हां', optNo:'नहीं',
+      contactLabel:'संपर्क (वैकल्पिक)',
+      commentLabel:'अतिरिक्त टिप्पणियां', commentPlaceholder:'कृपया अपनी स्थिति का विस्तार से वर्णन करें...',
+      sosBtn:'तत्काल SOS', cancel:'रद्द करें', locateBtn:'मेरा स्थान प्राप्त करें',
+      contrast:'कंट्रास्ट', grayscale:'ग्रेस्केल', saturate:'संतृप्ति', crosshair:'क्रॉसहेयर रंग',
+      enableCursor:'क्रॉसहेयर सहायता सक्षम करें', reset:'रीसेट', langTitle:'भाषा चुनें',
+      emergQueueMsg:'सहायता मार्ग पर', selectServiceError:'कृपया कम से कम एक सेवा चुनें',
+      locationRequiredError:'कृपया पहले अपना स्थान प्राप्त करें',
+      captchaRequiredError:'कृपया सत्यापन पूरा करें',
+      captchaModalTitle:'सत्यापन आवश्यक है',
+      captchaModalText:'जारी रखने के लिए कृपया नीचे दिया गया सत्यापन पूरा करें।',
+      captchaConfirm:'पुष्टि करें',
+      captchaCancel:'रद्द करें',
+      dbNotice:'UPL राष्ट्रीय डेटाबेस | राष्ट्रव्यापी सिंक्रनाइज़ डेटा', lostTitle:'खोई हुई वस्तुएं',
+      btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें',
+      btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
+      btn7:'सार्वजनिक फ़ाइलें', btn8:'SSPD में शामिल हों', btn9:'पुलिस स्टेशन जाएं',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'आपकी घड़ी गलत है',
+      timeCheckSubtitle:'आपकी घड़ी गलत है। सही समय है:',
+      utcTime:'UTC समय',
+      localTime:'स्थानीय समय',
+      buddhistYear:'बौद्ध युग (BE)',
+      lunarYear:'चंद्र कैलेंडर',
+      futureYear:'भविष्य का समय (+993)',
+      unixTimestamp:'यूनिक्स टाइमस्टैम्प',
+      julianDay:'जूलियन दिवस (JD)',
+      yourTime:'आपके डिवाइस का समय:',
+      timeWarning:'आपकी गलत घड़ी के कारण कुछ सुविधाएँ अनुपलब्ध हो सकती हैं।',
+      continueBtn:'वेबसाइट पर जारी रखें',
+      reconnecting:'पुनः कनेक्ट हो रहा है...',
+      // ===== [/CHANGED] =====
+      folderName:'पारदर्शी फ़ोल्डर', chargerName:'HP लैपटॉप 45W चार्जर', drinkName:'ल्यूकोजेड पेय',
+      folderDate:'अप्रैल 2026', chargerDate:'जनवरी-फरवरी 2026', drinkDate:'अप्रैल 2025-नवंबर 2025',
+      folderDetail:'लाल ज़िपर। प्लास्टिक पर "2026 Biology" लिखा है। GCSE जीव विज्ञान सामग्री शामिल है। पुरस्कार: £10 (≈9.98 UCC)। कोई सुराग 009 पर कॉल करें।',
+      chargerDetail:'लैपटॉप चार्जर। संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, रैटक्लिफ ऑन द रीक, चार्नवुड, लीसेस्टरशायर के पास देखा गया (जनवरी/फरवरी 2026)। गवाह ने रिपोर्ट किया। कोई सुराग 009 पर कॉल करें।',
+      drinkDetail:'संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, चार्जर के समान स्थान। अप्रैल 2025 - नवंबर 2025 के बीच चोरी हुआ। कोई सुराग 009 पर कॉल करें।'
+    },
+    'zh-Classical': {
+      emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
+      callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      justice:'義', professionalism:'專', protection:'護',
+      respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
+      footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      modalHead:'急報',
+      directCallHint:'警急直撥110。毋需SIM卡。',
+      serviceLabel:'擇援類 (點選，可多擇)',
+      servicePolice:'警', serviceRescue:'救', serviceFire:'火', serviceMedical:'醫',
+      locationLabel:'所在 / 經緯',
+      visibleLabel:'君在曠野或可見處否？', optYes:'然', optNo:'否',
+      contactLabel:'繫方 (選填)',
+      commentLabel:'附言', commentPlaceholder:'詳述君之情狀...',
+      sosBtn:'急求', cancel:'止', locateBtn:'取吾所在並定址',
+      contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星色',
+      enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
+      emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
+      locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
+      btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
+      btn5:'求', btn6:'訴、謝、議',
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      // ===== [CHANGED] 时间校验弹窗翻译 =====
+      timeCheckTitle:'君之時不準',
+      timeCheckSubtitle:'君之時鐘不準。今時為：',
+      utcTime:'UTC 時',
+      localTime:'本地時',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      futureYear:'未來時 (+993)',
+      unixTimestamp:'Unix 時戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'此乃君之時：',
+      timeWarning:'君時不準，或致部分功能不可用。',
+      continueBtn:'繼續訪網',
+      reconnecting:'重連中...',
+      // ===== [/CHANGED] =====
+      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
+      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
+      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
+      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
     }
-    // 其他语言以此类推...
   };
 
-  let currentLang = 'en';
+  // ======================= 简化农历计算 =======================
+  const SimpleLunar = (function() {
+    // 农历数据 1900-2100，每年用 4 字节表示：
+    // 第1-2字节：春节日期（MMDD）
+    // 第3-4字节：大小月信息（0=小月29天，1=大月30天，从正月到腊月）
+    const LUNAR_DATA = [
+      0x04bd, 0x04ae, 0x0a57, 0x0a4d, 0x0d26, 0x0d53, 0x0d4a, 0x0b44, 0x055d, 0x055b, // 1900-1909
+      0x04ae, 0x0a5d, 0x0a4e, 0x0d15, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x04ae, // 1910-1919
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1920-1929
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1930-1939
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1940-1949
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1950-1959
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1960-1969
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1970-1979
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1980-1989
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 1990-1999
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2000-2009
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2010-2019
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2020-2029
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2030-2039
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2040-2049
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2050-2059
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2060-2069
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2070-2079
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae, // 2080-2089
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae  // 2090-2099
+    ];
 
-  function updateUI() {
-    const t = translations[currentLang] || translations['en'];
-    // 更新现有元素...
-    document.getElementById('emergencyLabel').innerText = t.emergencyLabel;
-    document.getElementById('nonEmergencyLabel').innerText = t.nonEmergencyLabel;
-    document.getElementById('emergencyBtn').innerText = t.reportEmerg;
-    document.getElementById('callNote').innerText = t.callNote;
-    document.getElementById('wordJustice').innerText = t.justice;
-    document.getElementById('wordProfessionalism').innerText = t.professionalism;
-    document.getElementById('wordProtection').innerText = t.protection;
-    document.getElementById('respLabel').innerText = t.respTime;
-    document.getElementById('clearLabel').innerText = t.clearRate;
-    document.getElementById('respTooltip').innerText = t.respTooltip;
-    document.getElementById('clearTooltip').innerText = t.clearTooltip;
-    document.getElementById('respTimeVal').innerText = t.respVal;
-    document.getElementById('clearRateVal').innerText = t.clearVal;
-    document.getElementById('respTrend').innerText = t.respTrend;
-    document.getElementById('clearTrend').innerText = t.clearTrend;
-    document.getElementById('footerText').innerText = t.footer;
-    document.getElementById('modalHead').innerText = t.modalHead;
-    document.getElementById('directCallHint').innerText = t.directCallHint;
-    document.getElementById('serviceLabel').innerText = t.serviceLabel;
-    document.getElementById('servicePoliceBtn').innerText = t.servicePolice;
-    document.getElementById('serviceRescueBtn').innerText = t.serviceRescue;
-    document.getElementById('serviceFireBtn').innerText = t.serviceFire;
-    document.getElementById('serviceMedicalBtn').innerText = t.serviceMedical;
-    document.getElementById('locationLabel').innerText = t.locationLabel;
-    document.getElementById('locateBtn').innerText = t.locateBtn;
-    document.getElementById('visibleLabel').innerText = t.visibleLabel;
-    document.getElementById('optYes').innerText = t.optYes;
-    document.getElementById('optNo').innerText = t.optNo;
-    document.getElementById('contactLabel').innerText = t.contactLabel;
-    document.getElementById('commentLabel').innerText = t.commentLabel;
-    document.getElementById('commentInput').placeholder = t.commentPlaceholder;
-    document.getElementById('submitSosBtn').innerText = t.sosBtn;
-    document.getElementById('cancelModalBtn').innerText = t.cancel;
-    document.getElementById('contrastLabel').innerText = t.contrast;
-    document.getElementById('grayscaleLabel').innerText = t.grayscale;
-    document.getElementById('saturateLabel').innerText = t.saturate;
-    document.getElementById('crosshairLabel').innerText = t.crosshair;
-    document.getElementById('cursorEnableLabel').innerText = t.enableCursor;
-    document.getElementById('resetAccBtn').innerText = t.reset;
-    document.getElementById('langModalTitle').innerText = t.langTitle;
-    document.getElementById('closeLangModal').innerText = t.cancel;
+    // 天干地支
+    const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const LUNAR_MONTH = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+    const LUNAR_DAY = ['初','十','廿','卅'];
+
+    // 获取干支年
+    function getGanZhiYear(year) {
+      let offset = (year - 4) % 60;
+      return GAN[offset % 10] + ZHI[offset % 12] + '年';
+    }
+
+    // 获取某年春节的 Date 对象
+    function getSpringFestival(year) {
+      let data = LUNAR_DATA[year - 1900];
+      let month = Math.floor(data / 100);
+      let day = data % 100;
+      return new Date(year, month - 1, day);
+    }
+
+    // 获取农历月日
+    function getLunarDate(date) {
+      let year = date.getFullYear();
+      let spring = getSpringFestival(year);
+      
+      if (date < spring) {
+        year--;
+        spring = getSpringFestival(year);
+      }
+      
+      let diff = Math.floor((date - spring) / (1000 * 60 * 60 * 24));
+      
+      let data = LUNAR_DATA[year - 1900];
+      let monthBits = data & 0x1FFF; // 低13位表示大小月
+      
+      let month = 0;
+      let dayCount = 0;
+      for (let i = 0; i < 12; i++) {
+        let daysInMonth = (monthBits & (1 << i)) ? 30 : 29;
+        if (diff < daysInMonth) {
+          month = i;
+          dayCount = diff + 1;
+          break;
+        }
+        diff -= daysInMonth;
+      }
+      
+      let dayStr = '';
+      if (dayCount <= 10) dayStr = '初' + (dayCount === 10 ? '十' : LUNAR_DAY[dayCount]);
+      else if (dayCount < 20) dayStr = '十' + (dayCount === 11 ? '一' : dayCount === 12 ? '二' : LUNAR_DAY[dayCount - 10]);
+      else if (dayCount === 20) dayStr = '二十';
+      else if (dayCount < 30) dayStr = '廿' + (dayCount === 21 ? '一' : dayCount === 22 ? '二' : LUNAR_DAY[dayCount - 20]);
+      else dayStr = '三十';
+      
+      return getGanZhiYear(year) + LUNAR_MONTH[month] + '月' + dayStr;
+    }
+
+    return { getLunarDate, getGanZhiYear };
+  })();
+
+  // ======================= 儒略日计算 =======================
+  function getJulianDay(date) {
+    let y = date.getUTCFullYear();
+    let m = date.getUTCMonth() + 1;
+    let d = date.getUTCDate();
+    let h = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
+    
+    if (m <= 2) { y--; m += 12; }
+    let A = Math.floor(y / 100);
+    let B = 2 - A + Math.floor(A / 4);
+    let JD = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h / 24 + B - 1524.5;
+    return JD.toFixed(5);
+  }
+
+  // ======================= Unix 时间戳 =======================
+  function getUnixTimestamp(date) {
+    return Math.floor(date.getTime() / 1000);
+  }
+
+  // ======================= 格式化时间（无星期） =======================
+  function formatDateTime(date, includeSeconds = true) {
+    let y = date.getFullYear();
+    let m = String(date.getMonth() + 1).padStart(2, '0');
+    let d = String(date.getDate()).padStart(2, '0');
+    let h = String(date.getHours()).padStart(2, '0');
+    let min = String(date.getMinutes()).padStart(2, '0');
+    let s = String(date.getSeconds()).padStart(2, '0');
+    return `${y}-${m}-${d} ${h}:${min}:${s}`;
+  }
+
+  function formatShortDateTime(date) {
+    let y = date.getFullYear();
+    let m = String(date.getMonth() + 1).padStart(2, '0');
+    let d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  // ======================= 获取 UTC 时间 =======================
+  async function fetchUTCTime() {
+    try {
+      const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+      const data = await response.json();
+      return new Date(data.utc_datetime);
+    } catch (e) {
+      console.warn('UTC API failed, using local time as fallback');
+      return new Date();
+    }
+  }
+
+  // ======================= 时间校验弹窗控制 =======================
+  const TimeCheckModal = {
+    modal: null,
+    utcDate: null,
+    timer: null,
+    userTimeTimer: null,
+    isActive: false,
+    isClosing: false,
+
+    init() {
+      this.modal = document.getElementById('timeCheckModal');
+      
+      // 绑定继续按钮
+      document.getElementById('continueBtn').onclick = () => this.handleContinue();
+      
+      // 检查是否已弹出过（sessionStorage）
+      if (!sessionStorage.getItem('timeCheckShown')) {
+        let delay = 2000 + Math.random() * 6000; // 2-8 秒
+        setTimeout(() => this.show(), delay);
+      }
+    },
+
+    async show() {
+      if (this.isActive || this.isClosing) return;
+      if (sessionStorage.getItem('timeCheckShown')) return;
+      
+      this.isActive = true;
+      sessionStorage.setItem('timeCheckShown', 'true');
+      
+      // 获取 UTC 时间
+      this.utcDate = await fetchUTCTime();
+      
+      // 更新静态文案
+      this.updateStaticText();
+      
+      // 显示弹窗
+      this.modal.style.display = 'flex';
+      
+      // 开始实时刷新
+      this.startTimer();
+      this.startUserTimeTimer();
+    },
+
+    updateStaticText() {
+      const t = translations[currentLang];
+      if (!t) return;
+      
+      document.getElementById('timeCheckTitle').innerText = t.timeCheckTitle;
+      document.getElementById('timeCheckSubtitle').innerText = t.timeCheckSubtitle;
+      document.getElementById('utcTimeLabel').innerText = t.utcTime;
+      document.getElementById('localTimeLabel').innerText = t.localTime;
+      document.getElementById('buddhistYearLabel').innerText = t.buddhistYear;
+      document.getElementById('lunarYearLabel').innerText = t.lunarYear;
+      document.getElementById('futureYearLabel').innerText = t.futureYear;
+      document.getElementById('unixTimestampLabel').innerText = t.unixTimestamp;
+      document.getElementById('julianDayLabel').innerText = t.julianDay;
+      document.getElementById('yourTimeLabel').innerText = t.yourTime;
+      document.getElementById('timeWarning').innerText = t.timeWarning;
+      document.getElementById('continueBtn').innerText = t.continueBtn;
+      document.getElementById('loadingText').innerText = t.reconnecting;
+    },
+
+    startTimer() {
+      if (this.timer) clearInterval(this.timer);
+      this.timer = setInterval(() => this.refresh(), 1000);
+      this.refresh();
+    },
+
+    startUserTimeTimer() {
+      if (this.userTimeTimer) clearInterval(this.userTimeTimer);
+      this.userTimeTimer = setInterval(() => this.updateUserTime(), 1000);
+      this.updateUserTime();
+    },
+
+    refresh() {
+      if (!this.utcDate) return;
+      
+      // UTC 时间递增 1 秒
+      this.utcDate = new Date(this.utcDate.getTime() + 1000);
+      
+      let utcYear = this.utcDate.getUTCFullYear();
+      let utcMonth = String(this.utcDate.getUTCMonth() + 1).padStart(2, '0');
+      let utcDay = String(this.utcDate.getUTCDate()).padStart(2, '0');
+      let utcHours = String(this.utcDate.getUTCHours()).padStart(2, '0');
+      let utcMins = String(this.utcDate.getUTCMinutes()).padStart(2, '0');
+      let utcSecs = String(this.utcDate.getUTCSeconds()).padStart(2, '0');
+      
+      // UTC 时间
+      document.getElementById('utcTimeValue').innerText = `${utcYear}-${utcMonth}-${utcDay} ${utcHours}:${utcMins}:${utcSecs}`;
+      
+      // 本地时间（基于 UTC + 时区偏移）
+      let localDate = new Date(this.utcDate.getTime());
+      document.getElementById('localTimeValue').innerText = formatDateTime(localDate);
+      
+      // 佛历
+      document.getElementById('buddhistYearValue').innerText = `${utcYear + 543}-${utcMonth}-${utcDay} ${utcHours}:${utcMins}:${utcSecs}`;
+      
+      // 农历
+      document.getElementById('lunarYearValue').innerText = SimpleLunar.getLunarDate(localDate) + ' ' + 
+        String(localDate.getHours()).padStart(2, '0') + ':' + 
+        String(localDate.getMinutes()).padStart(2, '0') + ':' + 
+        String(localDate.getSeconds()).padStart(2, '0');
+      
+      // 未来时间 +993
+      document.getElementById('futureYearValue').innerText = `${utcYear + 993}-${utcMonth}-${utcDay} ${utcHours}:${utcMins}:${utcSecs}`;
+      
+      // Unix 时间戳
+      document.getElementById('unixTimestampValue').innerText = getUnixTimestamp(this.utcDate);
+      
+      // 儒略日
+      document.getElementById('julianDayValue').innerText = getJulianDay(this.utcDate);
+    },
+
+    updateUserTime() {
+      let userDate = new Date();
+      document.getElementById('userTimeValue').innerText = formatDateTime(userDate);
+    },
+
+    handleContinue() {
+      if (this.isClosing) return;
+      this.isClosing = true;
+      
+      const t = translations[currentLang];
+      const btn = document.getElementById('continueBtn');
+      const loading = document.getElementById('loadingText');
+      
+      btn.disabled = true;
+      btn.style.display = 'none';
+      loading.style.display = 'block';
+      
+      let delay = 1000 + Math.random() * 1300; // 1-2.3 秒
+      setTimeout(() => {
+        this.close();
+      }, delay);
+    },
+
+    close() {
+      if (this.timer) clearInterval(this.timer);
+      if (this.userTimeTimer) clearInterval(this.userTimeTimer);
+      this.modal.style.display = 'none';
+      this.isActive = false;
+      this.isClosing = false;
+      
+      // 重置按钮状态
+      const btn = document.getElementById('continueBtn');
+      const loading = document.getElementById('loadingText');
+      btn.disabled = false;
+      btn.style.display = 'block';
+      loading.style.display = 'none';
+    }
+  };
+
+  // ======================= 原有代码继续 =======================
+
+  let currentLang = 'zh-Hans';
+  let currentLatLng = null;
+  let selectedServices = [];
+  let counts = { EMERGENCY: 0 };
+  let mottoIndex = 0, mottoInterval = null;
+  let pendingLostCallback = null;
+  let reportCaptchaWidgetId = null;
+  let lostCaptchaWidgetId = null;
+
+  const FORMSPREE_URL = 'https://formspree.io/f/mjgplavv';
+
+  async function getDeviceInfo() {
+    const userAgent = navigator.userAgent;
+    let device = 'Unknown';
+    let os = 'Unknown';
+    
+    if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      device = 'Apple ' + (/iPhone/i.test(userAgent) ? 'iPhone' : (/iPad/i.test(userAgent) ? 'iPad' : 'iPod'));
+      os = 'iOS';
+      if (/iPhone 15/i.test(userAgent)) device = 'iPhone 15';
+      else if (/iPhone 14/i.test(userAgent)) device = 'iPhone 14';
+      else if (/iPhone 13/i.test(userAgent)) device = 'iPhone 13';
+      else if (/iPhone 12/i.test(userAgent)) device = 'iPhone 12';
+      else if (/iPhone 11/i.test(userAgent)) device = 'iPhone 11';
+    } else if (/Android/i.test(userAgent)) {
+      device = 'Android Device';
+      os = 'Android';
+    } else if (/Windows/i.test(userAgent)) {
+      device = 'Windows PC';
+      os = 'Windows';
+    } else if (/Macintosh|Mac OS/i.test(userAgent)) {
+      device = 'Mac';
+      os = 'macOS';
+    } else if (/Linux/i.test(userAgent)) {
+      device = 'Linux PC';
+      os = 'Linux';
+    }
+    
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let ip = 'Unable to retrieve';
+    try {
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipResponse.json();
+      ip = ipData.ip;
+    } catch (e) {
+      ip = 'IP retrieval failed';
+    }
+    
+    return { device, os, timezone, ip, userAgent };
+  }
+
+  function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notify' + (isError ? ' error' : '');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  async function sendEmailAlert(data) {
+    try {
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        const t = translations[currentLang];
+        showToast(t.sosBtn === '立即求救' ? '报警已发送！警方正在赶往现场' : 'Alert sent! Police are on the way');
+        return true;
+      } else {
+        const t = translations[currentLang];
+        showToast(t.sosBtn === '立即求救' ? '发送失败，请直接拨打110' : 'Send failed, please dial 110 directly', true);
+        return false;
+      }
+    } catch (error) {
+      const t = translations[currentLang];
+      showToast(t.sosBtn === '立即求救' ? '网络错误，请直接拨打110' : 'Network error, please dial 110 directly', true);
+      return false;
+    }
+  }
+
+  function updateMotto() {
+    let mottoDiv = document.getElementById('currentMotto');
+    if(!mottoDiv) return;
+    let list = mottoes[currentLang] || mottoes.en;
+    mottoDiv.style.animation = 'none';
+    setTimeout(() => { mottoDiv.innerText = list[mottoIndex % list.length]; mottoDiv.style.animation = 'fadeInOut 4s ease-in-out forwards'; }, 10);
+    mottoIndex = (mottoIndex + 1) % list.length;
+  }
+  function startMottoCarousel() { if(mottoInterval) clearInterval(mottoInterval); updateMotto(); mottoInterval = setInterval(updateMotto, 4000); }
+
+  function renderServiceButtons() {
+    let t = translations[currentLang];
+    const btns = [
+      { text: t.btn1, url: 'https://uplgov.github.io/sixside/police/form1.htm' },
+      { text: t.btn2, url: 'https://uplgov.github.io/sixside/police/form2.htm' },
+      { text: t.btn3, url: '#', isLost: true },
+      { text: t.btn4, url: 'https://uplgov.github.io/sixside/police/form3.htm' },
+      { text: t.btn5, url: 'https://uplgov.github.io/sixside/police/form4.htm' },
+      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' },
+      { text: t.btn7, url: 'publicfiles.htm' },
+      { text: t.btn8, url: 'jointhepd.htm' },
+      { text: t.btn9, url: 'tothepd.htm' }
+    ];
+    const container = document.getElementById('serviceButtonsGrid');
+    if(!container) return;
+    container.innerHTML = '';
+    btns.forEach(btn => {
+      const card = document.createElement('div');
+      card.className = 'service-card';
+      card.innerHTML = `<h3>${btn.text}</h3>`;
+      if(btn.isLost) {
+        card.onclick = () => { showCaptchaForLost(); };
+      } else {
+        card.onclick = () => window.open(btn.url, '_blank');
+      }
+      container.appendChild(card);
+    });
+  }
+  
+  function showCaptchaForLost() {
+    const t = translations[currentLang];
+    const captchaContainer = document.getElementById('lostCaptcha');
+    if (captchaContainer) {
+      captchaContainer.innerHTML = '<div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54"></div>';
+      if (typeof hcaptcha !== 'undefined') {
+        const newCaptchaDiv = captchaContainer.querySelector('.h-captcha');
+        if (newCaptchaDiv) {
+          lostCaptchaWidgetId = hcaptcha.render(newCaptchaDiv);
+        }
+      }
+    }
     document.getElementById('captchaModalTitle').innerText = t.captchaModalTitle;
     document.getElementById('captchaModalText').innerText = t.captchaModalText;
     document.getElementById('confirmCaptchaBtn').innerText = t.captchaConfirm;
     document.getElementById('cancelCaptchaBtn').innerText = t.captchaCancel;
-
-    // === [NEW] 更新时钟警告 UI ===
-    document.getElementById('timeWarnTitle').innerText = t.timeWarnTitle;
-    document.getElementById('timeWarnMsg').innerText = t.timeWarnMsg;
-    document.getElementById('userTimeLabel').innerText = t.userTimeLabel;
-    document.getElementById('continueBtn').innerText = t.continueBtn;
-
-    renderServiceButtons();
+    document.getElementById('lostCaptchaError').innerText = '';
+    document.getElementById('captchaModal').style.display = 'block';
+    
+    pendingLostCallback = () => { showLostAndFoundContent(); };
   }
-
-  function renderServiceButtons() {
-    const t = translations[currentLang] || translations['en'];
-    const grid = document.getElementById('serviceButtonsGrid');
-    const btns = [
-      {id:'btn1', label:t.btn1}, {id:'btn2', label:t.btn2}, {id:'btn3', label:t.btn3},
-      {id:'btn4', label:t.btn4}, {id:'btn5', label:t.btn5}, {id:'btn6', label:t.btn6},
-      {id:'btn7', label:t.btn7}, {id:'btn8', label:t.btn8}, {id:'btn9', label:t.btn9}
+  
+  function showLostAndFoundContent() {
+    let t = translations[currentLang];
+    let items = [
+      { name: t.folderName, date: t.folderDate, detail: t.folderDetail },
+      { name: t.chargerName, date: t.chargerDate, detail: t.chargerDetail },
+      { name: t.drinkName, date: t.drinkDate, detail: t.drinkDetail }
     ];
-    grid.innerHTML = btns.map(b => `<div class="service-card" onclick="handleServiceClick('${b.id}')"><h3>${b.label}</h3></div>`).join('');
+    let html = '<div class="lost-grid">';
+    items.forEach(item => {
+      html += `<div class="lost-card" onclick="alert('${item.name}\\n\\n${item.detail}')"><div class="lost-header"><span class="lost-name">${item.name}</span><span class="lost-date">${item.date}</span></div></div>`;
+    });
+    html += `</div><div class="db-notice">${t.dbNotice}</div>`;
+    document.getElementById('lostDetailTitle').innerText = t.lostTitle;
+    document.getElementById('lostDetailContent').innerHTML = html;
+    document.getElementById('lostDetailModal').style.display = 'block';
   }
 
-  // === [NEW] 时钟逻辑处理 ===
-  let timeOffsetSeconds = 0; // 与服务器时间的偏差秒数
-  let clockInterval = null;
+  function updateServiceButtonsUI() {
+    const buttons = document.querySelectorAll('.service-option-btn');
+    buttons.forEach(btn => {
+      const service = btn.getAttribute('data-service');
+      if (selectedServices.includes(service)) {
+        btn.classList.add('selected');
+      } else {
+        btn.classList.remove('selected');
+      }
+    });
+  }
+  
+  function initServiceButtons() {
+    const buttons = document.querySelectorAll('.service-option-btn');
+    buttons.forEach(btn => {
+      btn.onclick = () => {
+        const service = btn.getAttribute('data-service');
+        if (selectedServices.includes(service)) {
+          selectedServices = selectedServices.filter(s => s !== service);
+        } else {
+          selectedServices.push(service);
+        }
+        updateServiceButtonsUI();
+        document.getElementById('serviceWarning').innerText = '';
+      };
+    });
+  }
 
-  async function initTimeSync() {
-    try {
-      const response = await fetch('https://worldtimeapi.org/api/ip');
-      const data = await response.json();
-      const serverTime = new Date(data.utc_datetime);
-      const localNow = new Date();
-      timeOffsetSeconds = (serverTime - localNow) / 1000;
-      startRealtimeClock();
-    } catch (e) {
-      console.error("Time sync failed, using fallback.");
-      startRealtimeClock();
+  // ===== [CHANGED] 更新 applyLanguage，添加时间弹窗文案更新 =====
+  function applyLanguage(lang) {
+    let t = translations[lang];
+    if(!t) return;
+    
+    const textIds = [
+      'emergencyLabel', 'nonEmergencyLabel', 'callNote', 'wordJustice', 'wordProfessionalism', 'wordProtection',
+      'respTimeVal', 'clearRateVal', 'respTrend', 'clearTrend', 'respLabel', 'clearLabel', 'footerText',
+      'modalHead', 'directCallHint', 'serviceLabel', 'locationLabel', 'visibleLabel', 'optYes', 'optNo',
+      'contactLabel', 'commentLabel', 'sosBtn', 'cancelModalBtn', 'locateBtn', 'contrastLabel', 'grayscaleLabel',
+      'saturateLabel', 'crosshairLabel', 'cursorEnableLabel', 'resetAccBtn', 'langModalTitle'
+    ];
+    textIds.forEach(id => { 
+      let el = document.getElementById(id); 
+      if(el && t[id] !== undefined) el.innerText = t[id]; 
+    });
+    
+    const respTooltip = document.getElementById('respTooltip');
+    const clearTooltip = document.getElementById('clearTooltip');
+    if (respTooltip && t.respTooltip) respTooltip.innerText = t.respTooltip;
+    if (clearTooltip && t.clearTooltip) clearTooltip.innerText = t.clearTooltip;
+    
+    const policeBtn = document.getElementById('servicePoliceBtn');
+    const rescueBtn = document.getElementById('serviceRescueBtn');
+    const fireBtn = document.getElementById('serviceFireBtn');
+    const medicalBtn = document.getElementById('serviceMedicalBtn');
+    if(policeBtn) policeBtn.innerText = t.servicePolice;
+    if(rescueBtn) rescueBtn.innerText = t.serviceRescue;
+    if(fireBtn) fireBtn.innerText = t.serviceFire;
+    if(medicalBtn) medicalBtn.innerText = t.serviceMedical;
+    
+    const commentInput = document.getElementById('commentInput');
+    if(commentInput && t.commentPlaceholder) commentInput.placeholder = t.commentPlaceholder;
+    
+    const emergencyBtn = document.getElementById('emergencyBtn');
+    if(emergencyBtn && t.reportEmerg) emergencyBtn.innerText = t.reportEmerg;
+    
+    const submitBtn = document.getElementById('submitSosBtn');
+    if(submitBtn && t.sosBtn) submitBtn.innerText = t.sosBtn;
+    
+    // 更新时间弹窗静态文案（如果弹窗处于激活状态）
+    if (TimeCheckModal.isActive) {
+      TimeCheckModal.updateStaticText();
+    }
+    
+    renderServiceButtons();
+    startMottoCarousel();
+  }
+  // ===== [/CHANGED] =====
+
+  function addDispatchCard() {
+    let t = translations[currentLang];
+    counts.EMERGENCY++;
+    let root = document.getElementById('dispatchRoot');
+    let cardId = 'card-EMERGENCY';
+    let card = document.getElementById(cardId);
+    let msg = t.emergQueueMsg;
+    if(!card) {
+      card = document.createElement('div');
+      card.id = cardId;
+      card.className = 'dispatch-card';
+      card.innerHTML = `<div class="num-anim-110">110</div><div class="queue-msg">${msg}</div><div class="count-tag" id="${cardId}-c" style="display:none;">x1</div>`;
+      root.appendChild(card);
+    } else {
+      let msgDiv = card.querySelector('.queue-msg');
+      if(msgDiv) msgDiv.innerText = msg;
+    }
+    let tag = document.getElementById(cardId + '-c');
+    if(counts.EMERGENCY > 1) { tag.style.display = 'block'; tag.innerText = 'x' + counts.EMERGENCY; }
+  }
+
+  let map, currentMarker=null, mapInited=false;
+  function initMap(){ if(!mapInited){ map=L.map('map').setView([52.5, -1.0], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); mapInited=true; } else map.invalidateSize(); }
+  
+  document.getElementById('locateBtn').addEventListener('click',()=>{
+    initMap();
+    document.getElementById('locationError').innerText = '';
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos=>{
+        let lat=pos.coords.latitude, lng=pos.coords.longitude;
+        map.setView([lat,lng],15);
+        if(currentMarker) map.removeLayer(currentMarker);
+        currentMarker=L.marker([lat,lng]).addTo(map).bindPopup('Your location').openPopup();
+        currentLatLng = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('latlngInput').value = currentLatLng;
+      }, err=>{ document.getElementById('locationError').innerText = 'Location failed: ' + err.message; });
+    } else { document.getElementById('locationError').innerText = 'Geolocation not supported'; }
+  });
+
+  function openModal(){ 
+    document.getElementById('reportModal').style.display='block'; 
+    initMap(); 
+    if(currentMarker&&map)map.removeLayer(currentMarker); 
+    currentMarker=null; 
+    currentLatLng=null; 
+    document.getElementById('latlngInput').value=''; 
+    selectedServices = [];
+    updateServiceButtonsUI();
+    document.querySelectorAll('input[name="visibility"]').forEach(r=>r.checked=false); 
+    document.getElementById('contactInput').value=''; 
+    document.getElementById('commentInput').value='';
+    document.getElementById('serviceWarning').innerText=''; 
+    document.getElementById('locationError').innerText='';
+    document.getElementById('captchaError').innerText = '';
+    if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(reportCaptchaWidgetId); } catch(e) {}
     }
   }
+  function closeModal(){ document.getElementById('reportModal').style.display='none'; }
+  document.getElementById('cancelModalBtn').onclick=closeModal;
+  document.getElementById('closeLostDetail').onclick=()=>document.getElementById('lostDetailModal').style.display='none';
+  document.getElementById('closeLangModal').onclick=()=>document.getElementById('langModal').style.display='none';
+  
+  document.getElementById('confirmCaptchaBtn').onclick = async () => {
+    const t = translations[currentLang];
+    let captchaToken = null;
+    
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { captchaToken = hcaptcha.getResponse(lostCaptchaWidgetId); } catch(e) { captchaToken = null; }
+    }
+    
+    if (!captchaToken || captchaToken.length === 0) {
+      document.getElementById('lostCaptchaError').innerText = t.captchaRequiredError;
+      return;
+    }
+    
+    document.getElementById('captchaModal').style.display = 'none';
+    if (pendingLostCallback) { pendingLostCallback(); pendingLostCallback = null; }
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(lostCaptchaWidgetId); } catch(e) {}
+    }
+  };
+  
+  document.getElementById('cancelCaptchaBtn').onclick = () => {
+    document.getElementById('captchaModal').style.display = 'none';
+    pendingLostCallback = null;
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(lostCaptchaWidgetId); } catch(e) {}
+    }
+  };
+  
+  document.getElementById('submitSosBtn').onclick=async () => {
+    let t = translations[currentLang];
+    
+    let captchaToken = null;
+    if (typeof hcaptcha !== 'undefined') {
+      try {
+        if (reportCaptchaWidgetId !== null) {
+          captchaToken = hcaptcha.getResponse(reportCaptchaWidgetId);
+        } else {
+          const captchaElem = document.querySelector('#reportModal .h-captcha');
+          if (captchaElem) { captchaToken = hcaptcha.getResponse(captchaElem); }
+        }
+      } catch(e) { captchaToken = null; }
+    }
+    
+    if (!captchaToken || captchaToken.length === 0) {
+      document.getElementById('captchaError').innerText = t.captchaRequiredError;
+      return;
+    }
+    
+    if(selectedServices.length === 0){ 
+      document.getElementById('serviceWarning').innerText = t.selectServiceError; 
+      return; 
+    }
+    if(!currentLatLng){ 
+      document.getElementById('locationError').innerText = t.locationRequiredError; 
+      return; 
+    }
+    
+    let visibilityRadio = document.querySelector('input[name="visibility"]:checked');
+    let visibility = visibilityRadio ? visibilityRadio.value : 'Not specified';
+    let contact = document.getElementById('contactInput').value || 'Not provided';
+    let comment = document.getElementById('commentInput').value || 'No additional comments';
+    
+    let now = new Date();
+    let timeStr = now.toLocaleString(currentLang === 'zh-Hans' ? 'zh-CN' : 'en-US', { timeZone: 'Asia/Shanghai' });
+    
+    let serviceMap = {
+      'police': t.servicePolice || 'Police',
+      'rescue': t.serviceRescue || 'Rescue', 
+      'fire': t.serviceFire || 'Fire',
+      'medical': t.serviceMedical || 'Medical'
+    };
+    let serviceNames = selectedServices.map(s => serviceMap[s] || s).join(', ');
+    
+    const deviceInfo = await getDeviceInfo();
+    
+    const emailData = {
+      _subject: 'SSPD EMERGENCY ALERT',
+      time: timeStr,
+      location: currentLatLng,
+      latlng: currentLatLng,
+      services: serviceNames,
+      visibility: visibility === 'yes' ? 'Yes (Open/Visible Area)' : (visibility === 'no' ? 'No (Hidden Area)' : 'Not specified'),
+      contact: contact,
+      comment: comment,
+      device: deviceInfo.device,
+      os: deviceInfo.os,
+      timezone: deviceInfo.timezone,
+      ip: deviceInfo.ip,
+      userAgent: deviceInfo.userAgent,
+      'h-captcha-response': captchaToken,
+      message: `ALERT DETAILS\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTime: ${timeStr}\nLocation: ${currentLatLng}\nServices: ${serviceNames}\nVisible Area: ${visibility === 'yes' ? 'Yes' : (visibility === 'no' ? 'No' : 'Not specified')}\nContact: ${contact}\nComment: ${comment}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDEVICE INFORMATION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDevice: ${deviceInfo.device}\nOS: ${deviceInfo.os}\nIP Address: ${deviceInfo.ip}\nTimezone: ${deviceInfo.timezone}\nUser Agent: ${deviceInfo.userAgent}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPlease handle this alert immediately.`
+    };
+    
+    const success = await sendEmailAlert(emailData);
+    if (success) {
+      addDispatchCard();
+      closeModal();
+      if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) {
+        try { hcaptcha.reset(reportCaptchaWidgetId); } catch(e) {}
+      }
+    }
+  };
 
-  function startRealtimeClock() {
-    if(clockInterval) clearInterval(clockInterval);
-    clockInterval = setInterval(() => {
-      // 1. 获取基础标准时间
-      const baseDate = new Date();
-      baseDate.setSeconds(baseDate.getSeconds() + timeOffsetSeconds);
-      
-      // 2. 年份增加 993 年
-      const futureDate = new Date(baseDate);
-      futureDate.setFullYear(futureDate.getFullYear() + 993);
-
-      // 3. 格式化设置（不显示星期）
-      const formatOptions = { 
-        year: 'numeric', month: '2-digit', day: '2-digit', 
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: false, weekday: undefined 
-      };
-
-      // 4. 计算各历法
-      // UTC 时间
-      const utcStr = futureDate.toLocaleString('en-GB', { ...formatOptions, timeZone: 'UTC' });
-      // 本地时区时间
-      const localStr = futureDate.toLocaleString(undefined, formatOptions);
-      // 佛历 (佛历 = 公历 + 543)
-      const buddhistYear = futureDate.getFullYear() + 543;
-      const buddhistStr = `Year ${buddhistYear} BE`;
-      // 农历 (利用 Intl 接口)
-      const lunarStr = new Intl.DateTimeFormat('zh-u-ca-chinese', { year:'numeric', month:'numeric', day:'numeric' }).format(futureDate);
-
-      // 5. 显示用户本地真实时间
-      const userStr = new Date().toLocaleString(undefined, formatOptions);
-
-      // 更新 DOM
-      document.getElementById('clockUtc').innerText = utcStr;
-      document.getElementById('clockLocal').innerText = localStr;
-      document.getElementById('clockBuddhist').innerText = buddhistStr;
-      document.getElementById('clockLunar').innerText = lunarStr;
-      document.getElementById('clockUser').innerText = userStr;
-    }, 1000);
-  }
-
-  // 随机触发进入
-  window.addEventListener('DOMContentLoaded', () => {
-    updateUI();
-    const delay = Math.floor(Math.random() * 6000) + 2000; // 2-8秒
-    setTimeout(() => {
-      document.getElementById('timeWarningOverlay').style.display = 'flex';
-      initTimeSync();
-    }, delay);
+  document.addEventListener('mousemove', (e) => {
+    const cursor = document.getElementById('cursor-highlight');
+    if (cursor && cursor.style.display === 'block') {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    }
   });
 
-  document.getElementById('continueBtn').onclick = () => {
-    document.getElementById('timeWarningOverlay').style.display = 'none';
-    if(clockInterval) clearInterval(clockInterval);
+  function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }
+  function updateCursorStyle(){ let sel=document.getElementById('cursor-color-select'); if(sel){ let [bg,border]=sel.value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); } }
+  document.getElementById('cursor-cb').addEventListener('change',e=>toggleCursorAssist(e.target.checked));
+  document.getElementById('cursor-color-select')?.addEventListener('change',updateCursorStyle);
+  function applyFilters(){ let c=document.getElementById('con-range').value,g=document.getElementById('gray-range').value,s=document.getElementById('sat-range').value; document.getElementById('mainFilter').style.filter=`contrast(${c}) grayscale(${g}) saturate(${s})`; }
+  function resetAcc(){ document.getElementById('con-range').value=1; document.getElementById('gray-range').value=0; document.getElementById('sat-range').value=1; document.getElementById('cursor-cb').checked=false; toggleCursorAssist(false); applyFilters(); }
+  function toggleAccPanel(){ document.getElementById('accPanel').classList.toggle('show'); }
+
+  document.getElementById('emergencyBtn').onclick=openModal;
+  document.getElementById('policeDeptLink').onclick=()=>window.open('https://uplgov.github.io/sixside/police/index.htm','_blank');
+  let popupMenu=null;
+  document.getElementById('navBrand').onclick=(e)=>{ if(popupMenu)popupMenu.remove(); let div=document.createElement('div'); div.className='popup-menu'; div.innerHTML=`<a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/police/index.htm">Police Home</a><a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/">Government Portal</a>`; document.body.appendChild(div); let rect=document.getElementById('navBrand').getBoundingClientRect(); div.style.position='fixed'; div.style.top=rect.bottom+window.scrollY+'px'; div.style.left=rect.left+window.scrollX+'px'; popupMenu=div; setTimeout(()=>document.addEventListener('click',function handler(ev){ if(!div.contains(ev.target)&&ev.target!==document.getElementById('navBrand')){ div.remove(); document.removeEventListener('click',handler); } }),10); };
+
+  function showLangModal() {
+    let modal = document.getElementById('langModal');
+    let grid = document.getElementById('langGrid');
+    let langList = [
+      {code:'en', name:'English (UK)'},{code:'zh-Hans', name:'简体白话'},{code:'es', name:'Español'},{code:'de', name:'Deutsch'},
+      {code:'pt', name:'Português'},{code:'zh-Hant', name:'正體官話'},{code:'fr', name:'Français'},{code:'lzh', name:'简体文言'},
+      {code:'ru', name:'Русский'},{code:'mn', name:'Монгол хэл'},{code:'ja', name:'日本語'},{code:'ko', name:'한국어'},
+      {code:'hi', name:'हिन्दी'},{code:'zh-Classical', name:'華夏文言'}
+    ];
+    grid.innerHTML = '';
+    langList.forEach(l => {
+      let btn = document.createElement('div'); btn.className = 'lang-option'; btn.innerText = l.name;
+      btn.onclick = () => { currentLang = l.code; applyLanguage(currentLang); modal.style.display = 'none'; localStorage.setItem('sspd_lang', currentLang); };
+      grid.appendChild(btn);
+    });
+    modal.style.display = 'flex';
+  }
+  document.getElementById('langSwitchBtn').onclick=()=>showLangModal();
+
+  // ===== [CHANGED] window.onload 添加时间校验弹窗初始化 =====
+  window.onload = function() {
+    initMap();
+    showLangModal();
+    if (typeof hcaptcha !== 'undefined') {
+      const reportCaptchaElem = document.querySelector('#reportModal .h-captcha');
+      if (reportCaptchaElem) {
+        reportCaptchaWidgetId = hcaptcha.render(reportCaptchaElem);
+      }
+      const lostCaptchaElem = document.querySelector('#lostCaptcha .h-captcha');
+      if (lostCaptchaElem) {
+        lostCaptchaWidgetId = hcaptcha.render(lostCaptchaElem);
+      }
+    }
+    // 初始化时间校验弹窗
+    TimeCheckModal.init();
   };
-  // === [/NEW] ===
-
-  // 辅助功能相关代码保持不变...
-  function applyFilters() {
-    const con = document.getElementById('con-range').value;
-    const gray = document.getElementById('gray-range').value;
-    const sat = document.getElementById('sat-range').value;
-    document.getElementById('mainFilter').style.filter = `contrast(${con}) grayscale(${gray}) saturate(${sat})`;
-  }
-  function updateCursorStyle() {
-    const [bg, border] = document.getElementById('cursor-color-select').value.split('|');
-    const ch = document.getElementById('cursor-highlight');
-    ch.style.background = bg; ch.style.borderColor = border;
-  }
-  function toggleCursorAssist(e) { document.getElementById('cursor-highlight').style.display = e?'block':'none'; }
-  function toggleAccPanel() { document.getElementById('accPanel').classList.toggle('show'); }
-  function resetAcc() {
-    document.getElementById('con-range').value=1; document.getElementById('gray-range').value=0;
-    document.getElementById('sat-range').value=1; document.getElementById('cursor-cb').checked=false;
-    toggleCursorAssist(false); applyFilters();
-  }
-  window.addEventListener('mousemove', e => {
-    const ch = document.getElementById('cursor-highlight');
-    ch.style.left = e.clientX + 'px'; ch.style.top = e.clientY + 'px';
-  });
-
-  // 语言切换弹窗
-  document.getElementById('langSwitchBtn').onclick = () => {
-    const grid = document.getElementById('langGrid');
-    grid.innerHTML = Object.keys(translations).map(k => `<div class="lang-option" onclick="changeLang('${k}')">${k.toUpperCase()}</div>`).join('');
-    document.getElementById('langModal').style.display = 'block';
-  };
-  function changeLang(k) { currentLang = k; updateUI(); document.getElementById('langModal').style.display = 'none'; }
-  document.getElementById('closeLangModal').onclick = () => document.getElementById('langModal').style.display = 'none';
-
-  // 模拟业务逻辑
-  function handleServiceClick(id) { alert("Handling service: " + id); }
+  // ===== [/CHANGED] =====
+  
+  let savedLang = localStorage.getItem('sspd_lang');
+  if(savedLang && translations[savedLang]) currentLang = savedLang;
+  applyLanguage(currentLang);
+  initServiceButtons();
 </script>
 </body>
 </html>

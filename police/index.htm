@@ -77,6 +77,65 @@
     .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
     .trend-down.orange { border-top-color: var(--accent-amber); }
     
+    /* ===== [CHANGED] 添加 tooltip 样式 ===== */
+    .stat-label-container {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dashed var(--text-secondary);
+    }
+    .stat-label-container:hover .stat-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    .stat-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      width: 280px;
+      max-width: 80vw;
+      text-align: left;
+      font-weight: normal;
+      z-index: 100;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      pointer-events: none;
+      white-space: normal;
+    }
+    .stat-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px;
+      border-style: solid;
+      border-color: var(--bg-secondary) transparent transparent transparent;
+    }
+    .stat-tooltip::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 9px;
+      border-style: solid;
+      border-color: var(--border-color) transparent transparent transparent;
+      margin-top: 1px;
+    }
+    /* ===== [/CHANGED] ===== */
+
     .motto-carousel {
       min-height: 80px;
       display: flex;
@@ -275,7 +334,29 @@
 <div class="filter-layer" id="mainFilter">
   <div class="container"><header style="text-align:center; padding: 60px 0 20px;"><h1><span class="keyword-glow" id="wordJustice">JUSTICE</span>, <span class="keyword-glow" id="wordProfessionalism">PROFESSIONALISM</span>, <span class="keyword-glow" id="wordProtection">PROTECTION</span>.</h1>
   <div class="motto-carousel" id="mottoCarousel"><div class="motto-text" id="currentMotto">Serving the citizens of Sixside since 1989.</div></div>
-  <div class="stats-container"><div><span class="stat-val" id="respTimeVal">17m 04s</span><div><span class="trend-down"></span> <span id="respTrend">6s VS 2024</span></div><span id="respLabel">2025 AVG RESPONSE TIME</span></div><div style="background:var(--border-color);"></div><div><span class="stat-val" id="clearRateVal">98.2%</span><div><span class="trend-down orange"></span> <span id="clearTrend">0.6% lower VS 2024</span></div><span id="clearLabel">2025 AVG CLEARANCE RATE</span></div></div>
+  <div class="stats-container">
+    <div>
+      <span class="stat-val" id="respTimeVal">17m 04s</span>
+      <div><span class="trend-down"></span> <span id="respTrend">6s VS 2024</span></div>
+      <!-- ===== [CHANGED] 响应时间标签包装为 tooltip 容器 ===== -->
+      <span class="stat-label-container">
+        <span id="respLabel">2025 AVG RESPONSE TIME</span>
+        <span class="stat-tooltip" id="respTooltip"></span>
+      </span>
+      <!-- ===== [/CHANGED] ===== -->
+    </div>
+    <div style="background:var(--border-color);"></div>
+    <div>
+      <span class="stat-val" id="clearRateVal">98.2%</span>
+      <div><span class="trend-down orange"></span> <span id="clearTrend">0.6% lower VS 2024</span></div>
+      <!-- ===== [CHANGED] 办结率标签包装为 tooltip 容器 ===== -->
+      <span class="stat-label-container">
+        <span id="clearLabel">2025 AVG CLEARANCE RATE</span>
+        <span class="stat-tooltip" id="clearTooltip"></span>
+      </span>
+      <!-- ===== [/CHANGED] ===== -->
+    </div>
+  </div>
   </header></div>
   
   <div class="container" style="margin-bottom: 40px;">
@@ -351,7 +432,11 @@
       emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', reportEmerg:'REPORT EMERGENCY', 
       callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
       justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', 
-      respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE', 
+      respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE',
+      // ===== [CHANGED] 添加 tooltip 翻译 =====
+      respTooltip:'Specifically refers to the average time interval from when the call taker hangs up the emergency call and the dispatcher completes dispatch, to when the first officer arrives at the scene and confirms the location. Its calculation typically includes call handling time and travel time, but excludes on-scene handling time. This metric is a core KPI measuring police mobility and jurisdictional coverage density; lower values indicate stronger emergency response capability.',
+      clearTooltip:'Within a specific statistical period, the percentage average obtained by dividing the number of cases lawfully closed (solved, referred for prosecution, or otherwise disposed) by the total number of cases filed in the same period. Note that this metric does not directly reflect whether crime occurred; it only measures the processing efficiency of reported cases. In the U.S. Uniform Crime Reporting system, clearance is typically achieved by arrest or exceptional means. It is another core KPI for assessing detective effectiveness and public security management quality.',
+      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', 
       footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', 
       modalHead:'Emergency Report', 
@@ -385,7 +470,11 @@
       emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', reportEmerg:'报告紧急事件', 
       callNote:'110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 110/009 短信报警可用',
       justice:'正义', professionalism:'专业精神', protection:'保护', 
-      respTime:'2025年平均响应时间', clearRate:'2025年平均办结率', 
+      respTime:'2025年平均响应时间', clearRate:'2025年平均办结率',
+      // ===== [CHANGED] 添加 tooltip 翻译 =====
+      respTooltip:'具体指从接警员挂断报警电话、调度员完成派单起，至第一名警力抵达现场并确认位置止的时间间隔的平均值。其计算口径通常包含通话处理耗时与路途行驶耗时，但不包含现场处置时间。该指标是衡量警务机动性与辖区管控密度的核心关键绩效指标，数值越低代表应急处突能力越强。',
+      clearTooltip:'在特定统计周期内，警方依法办结（破获、移送起诉或作其他处理）的案件数除以同期立案总数所得的百分比平均值。注意，该指标不直接反映犯罪是否发生，仅衡量已报案件的处理效率。在美国统一犯罪报告体系中，通常以逮捕或例外情形结案作为清除标准。它是评估警局侦查效能与治安管控质量的另一项核心关键绩效指标。',
+      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%', 
       footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', 
       modalHead:'紧急报告', 
@@ -420,6 +509,10 @@
       callNote:'110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible',
       justice:'JUSTICIA', professionalism:'PROFESIONALISMO', protection:'PROTECCION',
       respTime:'TIEMPO DE RESPUESTA MEDIO 2025', clearRate:'TASA DE RESOLUCION MEDIA 2025',
+      // ===== [CHANGED] 添加 tooltip 翻译（西班牙语） =====
+      respTooltip:'Específicamente se refiere al intervalo de tiempo promedio desde que el operador cuelga la llamada de emergencia y el despachador completa la asignación, hasta que el primer agente llega al lugar y confirma la ubicación. Su cálculo normalmente incluye el tiempo de gestión de la llamada y el tiempo de desplazamiento, pero excluye el tiempo de intervención en el lugar. Este indicador es un KPI central que mide la movilidad policial y la densidad de cobertura jurisdiccional; valores más bajos indican una mayor capacidad de respuesta ante emergencias.',
+      clearTooltip:'Dentro de un período estadístico específico, el porcentaje promedio obtenido al dividir el número de casos cerrados legalmente (resueltos, remitidos para enjuiciamiento o archivados de otra forma) por el número total de casos registrados en el mismo período. Tenga en cuenta que este indicador no refleja directamente si ocurrió un delito; solo mide la eficiencia en el procesamiento de los casos denunciados. En el sistema Uniform Crime Reporting de EE. UU., el cierre se logra normalmente mediante arresto o medios excepcionales. Es otro KPI central para evaluar la eficacia investigativa y la calidad de la gestión de la seguridad pública.',
+      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menos vs 2024',
       footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Soporte tecnico por Wareflame',
       modalHead:'Reporte de Emergencia',
@@ -454,6 +547,10 @@
       callNote:'110/009 Kostenloser Anruf, keine SIM-Karte erforderlich (Mobilfunkabdeckung erforderlich) | 110/009 SMS-Meldung verfugbar',
       justice:'GERECHTIGKEIT', professionalism:'PROFESSIONALITAT', protection:'SCHUTZ',
       respTime:'DURCHSCHNITTLICHE REAKTIONSZEIT 2025', clearRate:'DURCHSCHNITTLICHE AUFKLARUNGSRATE 2025',
+      // ===== [CHANGED] 添加 tooltip 翻译（德语） =====
+      respTooltip:'Bezeichnet konkret das durchschnittliche Zeitintervall von dem Moment, in dem der Anrufbeantworter den Notruf auflegt und der Disponent den Einsatz zuweist, bis zum Eintreffen der ersten Einsatzkraft vor Ort und der Bestätigung des Standorts. Die Berechnung umfasst in der Regel die Anrufbearbeitungszeit und die Fahrzeit, jedoch nicht die Einsatzzeit vor Ort. Diese Kennzahl ist ein zentraler KPI zur Messung der polizeilichen Mobilität und der Abdeckungsdichte im Zuständigkeitsbereich; niedrigere Werte bedeuten eine höhere Einsatzfähigkeit.',
+      clearTooltip:'Innerhalb eines bestimmten statistischen Zeitraums der prozentuale Durchschnitt, der sich aus der Division der Anzahl der rechtmäßig abgeschlossenen (aufgeklärten, zur Strafverfolgung übergebenen oder anderweitig erledigten) Fälle durch die Gesamtzahl der im gleichen Zeitraum erfassten Fälle ergibt. Beachten Sie, dass diese Kennzahl nicht direkt widerspiegelt, ob eine Straftat stattgefunden hat; sie misst lediglich die Bearbeitungseffizienz gemeldeter Fälle. Im US-amerikanischen Uniform Crime Reporting-System erfolgt die Aufklärung in der Regel durch Festnahme oder Ausnahmefälle. Es ist ein weiterer zentraler KPI zur Bewertung der Ermittlungseffektivität und der Qualität der öffentlichen Sicherheitsverwaltung.',
+      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% niedriger vs 2024',
       footer:'© 2025-2026 POLIZEIBEHORDE SIXSIDE | Technischer Support von Wareflame',
       modalHead:'Notfallmeldung',
@@ -488,6 +585,10 @@
       callNote:'110/009 chamada gratuita, nao precisa de SIM (cobertura celular necessaria) | 110/009 relatorio por SMS disponivel',
       justice:'JUSTICA', professionalism:'PROFISSIONALISMO', protection:'PROTECAO',
       respTime:'TEMPO MEDIO DE RESPOSTA 2025', clearRate:'TAXA MEDIA DE RESOLUCAO 2025',
+      // ===== [CHANGED] 添加 tooltip 翻译（葡萄牙语） =====
+      respTooltip:'Refere-se especificamente ao intervalo de tempo médio desde que o operador desliga a chamada de emergência e o despachante conclui a atribuição, até que o primeiro agente chega ao local e confirma a localização. O seu cálculo normalmente inclui o tempo de atendimento da chamada e o tempo de deslocação, mas exclui o tempo de intervenção no local. Este indicador é um KPI central que mede a mobilidade policial e a densidade de cobertura jurisdicional; valores mais baixos indicam maior capacidade de resposta a emergências.',
+      clearTooltip:'Dentro de um período estatístico específico, a percentagem média obtida dividindo o número de casos legalmente encerrados (resolvidos, remetidos para acusação ou de outra forma arquivados) pelo número total de casos registados no mesmo período. Note que este indicador não reflete diretamente se ocorreu um crime; apenas mede a eficiência de processamento dos casos denunciados. No sistema Uniform Crime Reporting dos EUA, o encerramento é normalmente alcançado por detenção ou meios excecionais. É outro KPI central para avaliar a eficácia da investigação e a qualidade da gestão da segurança pública.',
+      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menor vs 2024',
       footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Suporte tecnico por Wareflame',
       modalHead:'Relatorio de Emergencia',
@@ -522,6 +623,10 @@
       callNote:'110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用',
       justice:'正義', professionalism:'專業精神', protection:'保護',
       respTime:'2025年平均響應時間', clearRate:'2025年平均辦結率',
+      // ===== [CHANGED] 添加 tooltip 翻译（繁体中文） =====
+      respTooltip:'具體指從接警員掛斷報警電話、調度員完成派單起，至第一名警力抵達現場並確認位置止的時間間隔的平均值。其計算口徑通常包含通話處理耗時與路途行駛耗時，但不包含現場處置時間。該指標是衡量警務機動性與轄區管控密度的核心關鍵績效指標，數值越低代表應急處突能力越強。',
+      clearTooltip:'在特定統計週期內，警方依法辦結（破獲、移送起訴或作其他處理）的案件數除以同期立案總數所得的百分比平均值。注意，該指標不直接反映犯罪是否發生，僅衡量已報案件的處理效率。在美國統一犯罪報告體系中，通常以逮捕或例外情形結案作為清除標準。它是評估警局偵查效能與治安管控質量的另一項核心關鍵績效指標。',
+      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%',
       footer:'© 2025-2026 六面警察局 | 技術支援 Wareflame',
       modalHead:'緊急報告',
@@ -556,6 +661,10 @@
       callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
       justice:'JUSTICE', professionalism:'PROFESSIONNALISME', protection:'PROTECTION',
       respTime:'TEMPS DE REPONSE MOYEN 2025', clearRate:'TAUX DE RESOLUTION MOYEN 2025',
+      // ===== [CHANGED] 添加 tooltip 翻译（法语） =====
+      respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartiteur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
+      clearTooltip:'Dans une période statistique donnée, le pourcentage moyen obtenu en divisant le nombre d\'affaires légalement classées (résolues, transmises pour poursuites ou autrement traitées) par le nombre total d\'affaires enregistrées sur la même période. Notez que cet indicateur ne reflète pas directement si un crime a eu lieu ; il mesure uniquement l\'efficacité du traitement des affaires signalées. Dans le système Uniform Crime Reporting américain, le classement est généralement obtenu par arrestation ou moyens exceptionnels. C\'est un autre KPI central pour évaluer l\'efficacité des enquêtes et la qualité de la gestion de la sécurité publique.',
+      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% plus bas vs 2024',
       footer:'© 2025-2026 SERVICE DE POLICE DE SIXSIDE | Support technique par Wareflame',
       modalHead:'Rapport d\'Urgence',
@@ -590,6 +699,10 @@
       callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
       justice:'義', professionalism:'專', protection:'護',
       respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      // ===== [CHANGED] 添加 tooltip 翻译（文言文） =====
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      // ===== [/CHANGED] =====
       respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
       footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
       modalHead:'急報',
@@ -624,6 +737,10 @@
       callNote:'110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен',
       justice:'СПРАВЕДЛИВОСТЬ', professionalism:'ПРОФЕССИОНАЛИЗМ', protection:'ЗАЩИТА',
       respTime:'СРЕДНЕЕ ВРЕМЯ ОТВЕТА 2025', clearRate:'СРЕДНИЙ УРОВЕНЬ РАСКРЫВАЕМОСТИ 2025',
+      // ===== [CHANGED] 添加 tooltip 翻译（俄语） =====
+      respTooltip:'Конкретно означает средний временной интервал с момента, когда оператор вешает трубку после экстренного вызова и диспетчер завершает назначение, до прибытия первого сотрудника на место и подтверждения местоположения. В расчет обычно включается время обработки вызова и время в пути, но исключается время работы на месте. Этот показатель является ключевым KPI, измеряющим мобильность полиции и плотность охвата территории; чем ниже значение, тем выше способность к экстренному реагированию.',
+      clearTooltip:'В течение определенного статистического периода средний процент, полученный путем деления числа дел, законно закрытых (раскрытых, переданных в суд или иным образом урегулированных), на общее число зарегистрированных дел за тот же период. Обратите внимание, что этот показатель не отражает напрямую, произошло ли преступление; он лишь измеряет эффективность обработки зарегистрированных дел. В системе Uniform Crime Reporting США закрытие обычно достигается путем ареста или исключительных обстоятельств. Это еще один ключевой KPI для оценки эффективности расследований и качества управления общественной безопасностью.',
+      // ===== [/CHANGED] =====
       respVal:'17м 04с', clearVal:'98.2%', respTrend:'6с vs 2024', clearTrend:'0.6% ниже vs 2024',
       footer:'© 2025-2026 ПОЛИЦЕЙСКИЙ ДЕПАРТАМЕНТ СИКСАЙД | Техподдержка Wareflame',
       modalHead:'Сообщение о ЧП',
@@ -654,44 +771,52 @@
       drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.'
     },
     mn: {
-      emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГУЙ:', reportEmerg:'ЯАЛТАЙ МЭДЭЭЛЭХ',
-      callNote:'110/009 дуудлага унэгуй, SIM карт шаардлагагүй (YYрэн холбооны хамрах хYрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
+      emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', reportEmerg:'ЯАЛТАЙ МЭДЭЭЛЭХ',
+      callNote:'110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (Үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
       justice:'ШУДАРГА ЁС', professionalism:'МЭРГЭЖИЛ', protection:'ХАМГААЛАЛ',
-      respTime:'2025 ОНЫ ДУНДАЖ ХАРИУ АВСАН ХУГАЦАА', clearRate:'2025 ОНЫ ДУНДАЖ ШИЙДВЭРЛЭЛТИЙН ТУВШИН',
+      respTime:'2025 ОНЫ ДУНДАЖ ХАРИУ АВСАН ХУГАЦАА', clearRate:'2025 ОНЫ ДУНДАЖ ШИЙДВЭРЛЭЛТИЙН ТҮВШИН',
+      // ===== [CHANGED] 添加 tooltip 翻译（蒙古语） =====
+      respTooltip:'Яаралтай дуудлагыг оператор тасалж, диспетчер даалгаврыг гүйцэтгэсэн үеэс эхлэн анхны цагдаагийн албан хаагч газар дээр ирж, байршлыг баталгаажуулах хүртэлх дундаж хугацааны завсар. Тооцоололд дуудлага боловсруулах хугацаа, замд явах хугацаа багтах боловч газар дээр ажиллах хугацаа орохгүй. Энэ үзүүлэлт нь цагдаагийн хөдөлгөөнт чадвар, харьяалах нутаг дэвсгэрийн хамрах хүрээний нягтралыг хэмжих гол KPI юм. Бага утга нь илүү өндөр хариу үйлдэл үзүүлэх чадварыг илтгэнэ.',
+      clearTooltip:'Тухайн статистикийн хугацаанд хуулийн дагуу шийдвэрлэсэн (илрүүлсэн, яллах дүгнэлт үйлдсэн эсвэл өөр аргаар шийдвэрлэсэн) хэргийн тоог мөн хугацаанд бүртгэгдсэн нийт хэргийн тоонд хувааж олсон дундаж хувь. Анхаарна уу: энэ үзүүлэлт нь гэмт хэрэг гарсан эсэхийг шууд илтгэдэггүй; зөвхөн бүртгэгдсэн хэргийн боловсруулалтын үр ашгийг хэмждэг. АНУ-ын Нэгдсэн Гэмт Хэргийн Тайлангийн системд хэргийг ихэвчлэн баривчлах эсвэл онцгой тохиолдлоор шийдвэрлэдэг. Энэ нь мөрдөн байцаалтын үр нөлөө, нийтийн аюулгүй байдлын удирдлагын чанарыг үнэлэх өөр нэг гол KPI юм.',
+      // ===== [/CHANGED] =====
       respVal:'17м 04с', clearVal:'98.2%', respTrend:'2024-ээс 6с хурдан', clearTrend:'2024-ээс 0.6% бага',
       footer:'© 2025-2026 СИКСАЙД ЦАГДААГЫН ГАЗАР | Техникийн дэмжлэг Wareflame',
       modalHead:'Яаралтай мэдээлэх',
       directCallHint:'Яаралтай тохиолдолд 110 руу шууд залгана уу. SIM карт шаардлагагүй.',
-      serviceLabel:'YYйлчилгээ сонгох (дарах замаар сонгох, олон сонголттой)',
+      serviceLabel:'Үйлчилгээ сонгох (дарах замаар сонгох, олон сонголттой)',
       servicePolice:'Цагдаа', serviceRescue:'Аврах', serviceFire:'Гал', serviceMedical:'Эмнэлэг',
       locationLabel:'Байршил / Координат',
-      visibleLabel:'Та нээлттэй Yзэгдэх хэсэгт байна уу?', optYes:'Тийм', optNo:'YгYй',
+      visibleLabel:'Та нээлттэй үзэгдэх хэсэгт байна уу?', optYes:'Тийм', optNo:'Үгүй',
       contactLabel:'Холбоо барих (заавал биш)',
-      commentLabel:'Нэмэлт сэтгэгдэл', commentPlaceholder:'Та нєхцєл байдлыг дэлгэрэнгYй тайлбарлана уу...',
+      commentLabel:'Нэмэлт сэтгэгдэл', commentPlaceholder:'Та нөхцөл байдлыг дэлгэрэнгүй тайлбарлана уу...',
       sosBtn:'ЯАРАЛТАЙ SOS', cancel:'Цуцлах', locateBtn:'Байршлаа авах',
-      contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан байдал', crosshair:'Харааны цэгийн енгө',
-      enableCursor:'Харааны цэгийн туслах идэвхжYYлэх', reset:'Дахин тохируулах', langTitle:'Хэл сонгох',
-      emergQueueMsg:'Тусламж замдаа', selectServiceError:'Дор хаяж нэг Yййлчилгээ сонгоно уу',
+      contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан байдал', crosshair:'Харааны цэгийн өнгө',
+      enableCursor:'Харааны цэгийн туслах идэвхжүүлэх', reset:'Дахин тохируулах', langTitle:'Хэл сонгох',
+      emergQueueMsg:'Тусламж замдаа', selectServiceError:'Дор хаяж нэг үйлчилгээ сонгоно уу',
       locationRequiredError:'Эхлээд байршлаа аваарай',
-      captchaRequiredError:'Баталгаажуулалтыг гYйцэтгэнэ YY',
+      captchaRequiredError:'Баталгаажуулалтыг гүйцэтгэнэ үү',
       captchaModalTitle:'Баталгаажуулалт шаардлагатай',
-      captchaModalText:'YYргэлжлYYлэхийн тулд доорх баталгаажуулалтыг гYйцэтгэнэ YY.',
+      captchaModalText:'Үргэлжлүүлэхийн тулд доорх баталгаажуулалтыг гүйцэтгэнэ үү.',
       captchaConfirm:'Баталгаажуулах',
       captchaCancel:'Цуцлах',
-      dbNotice:'UPL Yндэсний мэдээллийн сан | Yндэсний хэмжээний синхрончлогдсон єгєгдєл', lostTitle:'Алдагдсан эд зYйлс',
-      btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зYйлс', btn4:'Єргєдєл гаргах',
-      btn5:'ХYсэлт', btn6:'Гомдол, талархал, санал',
+      dbNotice:'UPL Үндэсний мэдээллийн сан | Үндэсний хэмжээний синхрончлогдсон өгөгдөл', lostTitle:'Алдагдсан эд зүйлс',
+      btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах',
+      btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
       folderName:'Ил товч', chargerName:'HP Laptop 45W Цэнэглэгч', drinkName:'Lucozade Ундаа',
       folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
       folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
-      chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар устай хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
-      drinkDetail:'Сэжигтэн: буржгар хар устай хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.'
+      chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
+      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.'
     },
     ja: {
       emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', reportEmerg:'緊急通報',
       callNote:'110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能',
       justice:'正義', professionalism:'専門性', protection:'保護',
       respTime:'2025年平均応答時間', clearRate:'2025年平均解決率',
+      // ===== [CHANGED] 添加 tooltip 翻译（日语） =====
+      respTooltip:'具体的には、通報受付者が緊急通話を切り、指令担当者が指令を完了した時点から、最初の警察官が現場に到着し位置を確認するまでの平均時間間隔を指します。その計算には通常、通話処理時間と移動時間が含まれ、現場対応時間は含まれません。この指標は警察の機動力と管轄区域のカバー密度を測定する中核的なKPIであり、数値が低いほど緊急対応能力が高いことを示します。',
+      clearTooltip:'特定の統計期間内において、法的に処理（解決、起訴送致、またはその他の処理）された事件数を、同期間に受理された事件総数で割った平均パーセンテージです。なお、この指標は犯罪が発生したかどうかを直接反映するものではなく、報告された事件の処理効率のみを測定します。米国の統一犯罪報告システムでは、通常、逮捕または例外的な手段による処理をもって解決とみなされます。これは捜査効率と治安管理の質を評価するもう一つの中核的なKPIです。',
+      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'2024年より6秒高速', clearTrend:'2024年より0.6%低下',
       footer:'© 2025-2026 シックスサイド警察署 | 技術サポート Wareflame',
       modalHead:'緊急通報',
@@ -726,6 +851,10 @@
       callNote:'110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능',
       justice:'정의', professionalism:'전문성', protection:'보호',
       respTime:'2025년 평균 응답 시간', clearRate:'2025년 평균 해결율',
+      // ===== [CHANGED] 添加 tooltip 翻译（韩语） =====
+      respTooltip:'구체적으로, 신고 접수원이 긴급 전화를 끊고 배차 담당자가 배차를 완료한 시점부터 첫 번째 경찰관이 현장에 도착하여 위치를 확인할 때까지의 평균 시간 간격을 의미합니다. 계산에는 일반적으로 통화 처리 시간과 이동 시간이 포함되며, 현장 처리 시간은 제외됩니다. 이 지표는 경찰의 기동성과 관할 구역 커버리지 밀도를 측정하는 핵심 KPI로, 수치가 낮을수록 긴급 대응 능력이 높음을 나타냅니다.',
+      clearTooltip:'특정 통계 기간 동안 법적으로 종결(해결, 기소 의견 송치 또는 기타 처리)된 사건 수를 같은 기간 접수된 총 사건 수로 나눈 백분율 평균입니다. 이 지표는 범죄 발생 여부를 직접 반영하지 않으며, 신고된 사건의 처리 효율만을 측정합니다. 미국 통합 범죄 보고 시스템에서는 일반적으로 체포 또는 예외적 수단에 의한 종결을 해결 기준으로 삼습니다. 이는 수사 효율성과 치안 관리 품질을 평가하는 또 다른 핵심 KPI입니다.',
+      // ===== [/CHANGED] =====
       respVal:'17분 04초', clearVal:'98.2%', respTrend:'2024년 대비 6초 단축', clearTrend:'2024년 대비 0.6% 하락',
       footer:'© 2025-2026 식스사이드 경찰국 | 기술 지원 Wareflame',
       modalHead:'긴급 신고',
@@ -760,6 +889,10 @@
       callNote:'110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध',
       justice:'न्याय', professionalism:'व्यावसायिकता', protection:'सुरक्षा',
       respTime:'2025 औसत प्रतिक्रिया समय', clearRate:'2025 औसत निपटान दर',
+      // ===== [CHANGED] 添加 tooltip 翻译（印地语） =====
+      respTooltip:'विशेष रूप से, उस समय से औसत समय अंतराल को संदर्भित करता है जब कॉल लेने वाला आपातकालीन कॉल काट देता है और डिस्पैचर कार्य सौंप देता है, तब से लेकर पहला अधिकारी घटनास्थल पर पहुंचकर स्थान की पुष्टि करता है। इसकी गणना में आमतौर पर कॉल हैंडलिंग समय और यात्रा समय शामिल होता है, लेकिन घटनास्थल पर कार्रवाई का समय शामिल नहीं होता। यह मीट्रिक पुलिस की गतिशीलता और क्षेत्राधिकार कवरेज घनत्व को मापने वाला एक मुख्य KPI है; कम मान आपातकालीन प्रतिक्रिया क्षमता को अधिक मजबूत दर्शाते हैं।',
+      clearTooltip:'एक विशिष्ट सांख्यिकीय अवधि के भीतर, कानूनी रूप से बंद (सुलझाए गए, अभियोजन के लिए भेजे गए, या अन्यथा निपटाए गए) मामलों की संख्या को उसी अवधि में दर्ज मामलों की कुल संख्या से विभाजित करके प्राप्त प्रतिशत औसत। ध्यान दें कि यह मीट्रिक सीधे यह नहीं दर्शाता कि अपराध हुआ या नहीं; यह केवल दर्ज मामलों की प्रसंस्करण दक्षता को मापता है। अमेरिकी यूनिफ़ॉर्म क्राइम रिपोर्टिंग प्रणाली में, आमतौर पर गिरफ्तारी या असाधारण स्थितियों में मामले को बंद करना समाशोधन माना जाता है। यह जांच प्रभावशीलता और सार्वजनिक सुरक्षा प्रबंधन गुणवत्ता का आकलन करने के लिए एक अन्य मुख्य KPI है।',
+      // ===== [/CHANGED] =====
       respVal:'17मी 04से', clearVal:'98.2%', respTrend:'2024 से 6से तेज', clearTrend:'2024 से 0.6% कम',
       footer:'© 2025-2026 सिक्ससाइड पुलिस विभाग | तकनीकी सहायता Wareflame',
       modalHead:'आपातकाल रिपोर्ट',
@@ -794,6 +927,10 @@
       callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
       justice:'義', professionalism:'專', protection:'護',
       respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      // ===== [CHANGED] 添加 tooltip 翻译（华夏文言） =====
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      // ===== [/CHANGED] =====
       respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
       footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
       modalHead:'急報',
@@ -1029,6 +1166,13 @@
       let el = document.getElementById(id); 
       if(el && t[id] !== undefined) el.innerText = t[id]; 
     });
+    
+    // ===== [CHANGED] 更新 tooltip 内容 =====
+    const respTooltip = document.getElementById('respTooltip');
+    const clearTooltip = document.getElementById('clearTooltip');
+    if (respTooltip && t.respTooltip) respTooltip.innerText = t.respTooltip;
+    if (clearTooltip && t.clearTooltip) clearTooltip.innerText = t.clearTooltip;
+    // ===== [/CHANGED] =====
     
     const policeBtn = document.getElementById('servicePoliceBtn');
     const rescueBtn = document.getElementById('serviceRescueBtn');

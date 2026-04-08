@@ -77,7 +77,7 @@
     .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
     .trend-down.orange { border-top-color: var(--accent-amber); }
     
-    /* ===== [CHANGED] 添加 tooltip 样式 ===== */
+    /* tooltip 样式 */
     .stat-label-container {
       position: relative;
       display: inline-block;
@@ -134,7 +134,6 @@
       border-color: var(--border-color) transparent transparent transparent;
       margin-top: 1px;
     }
-    /* ===== [/CHANGED] ===== */
 
     .motto-carousel {
       min-height: 80px;
@@ -162,7 +161,6 @@
       margin: 40px 0;
     }
 
-    /* ===== [CHANGED] service-card: 加入警察蓝红白悬停配色 ===== */
     .service-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
@@ -175,7 +173,6 @@
       position: relative;
       overflow: hidden;
     }
-    /* 顶部蓝红白三色横条，hover 时显现 */
     .service-card::before {
       content: '';
       position: absolute;
@@ -185,7 +182,6 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    /* 左侧竖线发光效果 */
     .service-card::after {
       content: '';
       position: absolute;
@@ -221,7 +217,6 @@
       color: #ffffff;
       text-shadow: 0 0 10px rgba(74, 107, 140, 0.9), 0 0 20px rgba(204, 51, 51, 0.4);
     }
-    /* ===== [/CHANGED] ===== */
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
     .report-modal, .lost-modal, .lang-modal, .captcha-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
@@ -338,23 +333,19 @@
     <div>
       <span class="stat-val" id="respTimeVal">17m 04s</span>
       <div><span class="trend-down"></span> <span id="respTrend">6s VS 2024</span></div>
-      <!-- ===== [CHANGED] 响应时间标签包装为 tooltip 容器 ===== -->
       <span class="stat-label-container">
         <span id="respLabel">2025 AVG RESPONSE TIME</span>
         <span class="stat-tooltip" id="respTooltip"></span>
       </span>
-      <!-- ===== [/CHANGED] ===== -->
     </div>
     <div style="background:var(--border-color);"></div>
     <div>
       <span class="stat-val" id="clearRateVal">98.2%</span>
       <div><span class="trend-down orange"></span> <span id="clearTrend">0.6% lower VS 2024</span></div>
-      <!-- ===== [CHANGED] 办结率标签包装为 tooltip 容器 ===== -->
       <span class="stat-label-container">
         <span id="clearLabel">2025 AVG CLEARANCE RATE</span>
         <span class="stat-tooltip" id="clearTooltip"></span>
       </span>
-      <!-- ===== [/CHANGED] ===== -->
     </div>
   </div>
   </header></div>
@@ -386,7 +377,6 @@
   <div class="form-group"><label id="contactLabel"></label><input type="text" id="contactInput" placeholder="Phone / Email"></div>
   <div class="form-group"><label id="commentLabel"></label><textarea id="commentInput" rows="3" placeholder=""></textarea></div>
   
-  <!-- hCaptcha 人机验证 -->
   <div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54" id="reportCaptcha"></div>
   <div id="captchaError" class="error-msg" style="text-align:center; margin-top:5px;"></div>
   
@@ -397,7 +387,6 @@
 
 <div class="modal-overlay" id="langModal"><div class="lang-modal"><h2 id="langModalTitle">Select Language</h2><div id="langGrid" class="lang-grid"></div><button class="btn-action" id="closeLangModal">Close</button></div></div>
 
-<!-- hCaptcha 验证弹窗（用于 Lost and Found） -->
 <div class="modal-overlay" id="captchaModal"><div class="captcha-modal">
   <h2 id="captchaModalTitle">Verification Required</h2>
   <p id="captchaModalText" style="text-align:center; margin-bottom:20px;">Please complete the verification below to continue.</p>
@@ -433,10 +422,8 @@
       callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
       justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', 
       respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE',
-      // ===== [CHANGED] 添加 tooltip 翻译 =====
       respTooltip:'Specifically refers to the average time interval from when the call taker hangs up the emergency call and the dispatcher completes dispatch, to when the first officer arrives at the scene and confirms the location. Its calculation typically includes call handling time and travel time, but excludes on-scene handling time. This metric is a core KPI measuring police mobility and jurisdictional coverage density; lower values indicate stronger emergency response capability.',
       clearTooltip:'Within a specific statistical period, the percentage average obtained by dividing the number of cases lawfully closed (solved, referred for prosecution, or otherwise disposed) by the total number of cases filed in the same period. Note that this metric does not directly reflect whether crime occurred; it only measures the processing efficiency of reported cases. In the U.S. Uniform Crime Reporting system, clearance is typically achieved by arrest or exceptional means. It is another core KPI for assessing detective effectiveness and public security management quality.',
-      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', 
       footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', 
       modalHead:'Emergency Report', 
@@ -459,7 +446,10 @@
       captchaCancel:'Cancel',
       dbNotice:'UPL National Database | Nationwide synchronized data', lostTitle:'Lost and Found', 
       btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', 
-      btn5:'Request', btn6:'Complaint, Thanks & Suggestion', 
+      btn5:'Request', btn6:'Complaint, Thanks & Suggestion',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Public Files', btn8:'Join SSPD', btn9:'To the PD',
+      // ===== [/CHANGED] =====
       folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', 
       folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', 
       folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
@@ -471,10 +461,8 @@
       callNote:'110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 110/009 短信报警可用',
       justice:'正义', professionalism:'专业精神', protection:'保护', 
       respTime:'2025年平均响应时间', clearRate:'2025年平均办结率',
-      // ===== [CHANGED] 添加 tooltip 翻译 =====
       respTooltip:'具体指从接警员挂断报警电话、调度员完成派单起，至第一名警力抵达现场并确认位置止的时间间隔的平均值。其计算口径通常包含通话处理耗时与路途行驶耗时，但不包含现场处置时间。该指标是衡量警务机动性与辖区管控密度的核心关键绩效指标，数值越低代表应急处突能力越强。',
       clearTooltip:'在特定统计周期内，警方依法办结（破获、移送起诉或作其他处理）的案件数除以同期立案总数所得的百分比平均值。注意，该指标不直接反映犯罪是否发生，仅衡量已报案件的处理效率。在美国统一犯罪报告体系中，通常以逮捕或例外情形结案作为清除标准。它是评估警局侦查效能与治安管控质量的另一项核心关键绩效指标。',
-      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%', 
       footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', 
       modalHead:'紧急报告', 
@@ -497,7 +485,10 @@
       captchaCancel:'取消',
       dbNotice:'UPL 国家数据库 | 全国数据同步', lostTitle:'失物招领', 
       btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', 
-      btn5:'请求', btn6:'投诉、感谢和建议', 
+      btn5:'请求', btn6:'投诉、感谢和建议',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'公开信息', btn8:'加入SSPD', btn9:'前往警察局',
+      // ===== [/CHANGED] =====
       folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', 
       folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', 
       folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
@@ -509,10 +500,8 @@
       callNote:'110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible',
       justice:'JUSTICIA', professionalism:'PROFESIONALISMO', protection:'PROTECCION',
       respTime:'TIEMPO DE RESPUESTA MEDIO 2025', clearRate:'TASA DE RESOLUCION MEDIA 2025',
-      // ===== [CHANGED] 添加 tooltip 翻译（西班牙语） =====
       respTooltip:'Específicamente se refiere al intervalo de tiempo promedio desde que el operador cuelga la llamada de emergencia y el despachador completa la asignación, hasta que el primer agente llega al lugar y confirma la ubicación. Su cálculo normalmente incluye el tiempo de gestión de la llamada y el tiempo de desplazamiento, pero excluye el tiempo de intervención en el lugar. Este indicador es un KPI central que mide la movilidad policial y la densidad de cobertura jurisdiccional; valores más bajos indican una mayor capacidad de respuesta ante emergencias.',
       clearTooltip:'Dentro de un período estadístico específico, el porcentaje promedio obtenido al dividir el número de casos cerrados legalmente (resueltos, remitidos para enjuiciamiento o archivados de otra forma) por el número total de casos registrados en el mismo período. Tenga en cuenta que este indicador no refleja directamente si ocurrió un delito; solo mide la eficiencia en el procesamiento de los casos denunciados. En el sistema Uniform Crime Reporting de EE. UU., el cierre se logra normalmente mediante arresto o medios excepcionales. Es otro KPI central para evaluar la eficacia investigativa y la calidad de la gestión de la seguridad pública.',
-      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menos vs 2024',
       footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Soporte tecnico por Wareflame',
       modalHead:'Reporte de Emergencia',
@@ -536,6 +525,9 @@
       dbNotice:'Base de datos nacional UPL | Datos sincronizados a nivel nacional', lostTitle:'Objetos Perdidos',
       btn1:'Reportar un Crimen', btn2:'Diganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar',
       btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Archivos Públicos', btn8:'Unirse a SSPD', btn9:'Ir a la Policía',
+      // ===== [/CHANGED] =====
       folderName:'Carpeta Transparente', chargerName:'Cargador HP Laptop 45W', drinkName:'Bebida Lucozade',
       folderDate:'Abril 2026', chargerDate:'Ene - Feb 2026', drinkDate:'Abr 2025 - Nov 2025',
       folderDetail:'Cremallera roja. Marcador permanente "2026 Biology" en plastico. Contiene materiales de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Cualquier pista llame al 009.',
@@ -547,10 +539,8 @@
       callNote:'110/009 Kostenloser Anruf, keine SIM-Karte erforderlich (Mobilfunkabdeckung erforderlich) | 110/009 SMS-Meldung verfugbar',
       justice:'GERECHTIGKEIT', professionalism:'PROFESSIONALITAT', protection:'SCHUTZ',
       respTime:'DURCHSCHNITTLICHE REAKTIONSZEIT 2025', clearRate:'DURCHSCHNITTLICHE AUFKLARUNGSRATE 2025',
-      // ===== [CHANGED] 添加 tooltip 翻译（德语） =====
       respTooltip:'Bezeichnet konkret das durchschnittliche Zeitintervall von dem Moment, in dem der Anrufbeantworter den Notruf auflegt und der Disponent den Einsatz zuweist, bis zum Eintreffen der ersten Einsatzkraft vor Ort und der Bestätigung des Standorts. Die Berechnung umfasst in der Regel die Anrufbearbeitungszeit und die Fahrzeit, jedoch nicht die Einsatzzeit vor Ort. Diese Kennzahl ist ein zentraler KPI zur Messung der polizeilichen Mobilität und der Abdeckungsdichte im Zuständigkeitsbereich; niedrigere Werte bedeuten eine höhere Einsatzfähigkeit.',
       clearTooltip:'Innerhalb eines bestimmten statistischen Zeitraums der prozentuale Durchschnitt, der sich aus der Division der Anzahl der rechtmäßig abgeschlossenen (aufgeklärten, zur Strafverfolgung übergebenen oder anderweitig erledigten) Fälle durch die Gesamtzahl der im gleichen Zeitraum erfassten Fälle ergibt. Beachten Sie, dass diese Kennzahl nicht direkt widerspiegelt, ob eine Straftat stattgefunden hat; sie misst lediglich die Bearbeitungseffizienz gemeldeter Fälle. Im US-amerikanischen Uniform Crime Reporting-System erfolgt die Aufklärung in der Regel durch Festnahme oder Ausnahmefälle. Es ist ein weiterer zentraler KPI zur Bewertung der Ermittlungseffektivität und der Qualität der öffentlichen Sicherheitsverwaltung.',
-      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% niedriger vs 2024',
       footer:'© 2025-2026 POLIZEIBEHORDE SIXSIDE | Technischer Support von Wareflame',
       modalHead:'Notfallmeldung',
@@ -574,6 +564,9 @@
       dbNotice:'UPL Nationale Datenbank | Bundesweit synchronisierte Daten', lostTitle:'Fundburo',
       btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundburo', btn4:'Beantragen oder Registrieren',
       btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Öffentliche Dateien', btn8:'SSPD beitreten', btn9:'Zur Polizei',
+      // ===== [/CHANGED] =====
       folderName:'Transparente Mappe', chargerName:'HP Laptop 45W Ladegerat', drinkName:'Lucozade-Getrank',
       folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025',
       folderDetail:'Roter ReiBverschluss. Permanentmarker "2026 Biology" auf Kunststoff. Enthalt GCSE-Biologiematerialien. Belohnung: £10 (≈9.98 UCC). Hinweise bitte unter 009.',
@@ -585,10 +578,8 @@
       callNote:'110/009 chamada gratuita, nao precisa de SIM (cobertura celular necessaria) | 110/009 relatorio por SMS disponivel',
       justice:'JUSTICA', professionalism:'PROFISSIONALISMO', protection:'PROTECAO',
       respTime:'TEMPO MEDIO DE RESPOSTA 2025', clearRate:'TAXA MEDIA DE RESOLUCAO 2025',
-      // ===== [CHANGED] 添加 tooltip 翻译（葡萄牙语） =====
       respTooltip:'Refere-se especificamente ao intervalo de tempo médio desde que o operador desliga a chamada de emergência e o despachante conclui a atribuição, até que o primeiro agente chega ao local e confirma a localização. O seu cálculo normalmente inclui o tempo de atendimento da chamada e o tempo de deslocação, mas exclui o tempo de intervenção no local. Este indicador é um KPI central que mede a mobilidade policial e a densidade de cobertura jurisdicional; valores mais baixos indicam maior capacidade de resposta a emergências.',
       clearTooltip:'Dentro de um período estatístico específico, a percentagem média obtida dividindo o número de casos legalmente encerrados (resolvidos, remetidos para acusação ou de outra forma arquivados) pelo número total de casos registados no mesmo período. Note que este indicador não reflete diretamente se ocorreu um crime; apenas mede a eficiência de processamento dos casos denunciados. No sistema Uniform Crime Reporting dos EUA, o encerramento é normalmente alcançado por detenção ou meios excecionais. É outro KPI central para avaliar a eficácia da investigação e a qualidade da gestão da segurança pública.',
-      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menor vs 2024',
       footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Suporte tecnico por Wareflame',
       modalHead:'Relatorio de Emergencia',
@@ -612,6 +603,9 @@
       dbNotice:'Banco de dados nacional UPL | Dados sincronizados em todo o pais', lostTitle:'Achados e Perdidos',
       btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar',
       btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Arquivos Públicos', btn8:'Juntar-se à SSPD', btn9:'Para a Polícia',
+      // ===== [/CHANGED] =====
       folderName:'Pasta Transparente', chargerName:'Carregador HP Laptop 45W', drinkName:'Bebida Lucozade',
       folderDate:'Abril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Abr 2025 - Nov 2025',
       folderDetail:'Ziper vermelho. Marcador permanente "2026 Biology" no plastico. Contem materiais de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Qualquer pista ligue para 009.',
@@ -623,10 +617,8 @@
       callNote:'110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用',
       justice:'正義', professionalism:'專業精神', protection:'保護',
       respTime:'2025年平均響應時間', clearRate:'2025年平均辦結率',
-      // ===== [CHANGED] 添加 tooltip 翻译（繁体中文） =====
       respTooltip:'具體指從接警員掛斷報警電話、調度員完成派單起，至第一名警力抵達現場並確認位置止的時間間隔的平均值。其計算口徑通常包含通話處理耗時與路途行駛耗時，但不包含現場處置時間。該指標是衡量警務機動性與轄區管控密度的核心關鍵績效指標，數值越低代表應急處突能力越強。',
       clearTooltip:'在特定統計週期內，警方依法辦結（破獲、移送起訴或作其他處理）的案件數除以同期立案總數所得的百分比平均值。注意，該指標不直接反映犯罪是否發生，僅衡量已報案件的處理效率。在美國統一犯罪報告體系中，通常以逮捕或例外情形結案作為清除標準。它是評估警局偵查效能與治安管控質量的另一項核心關鍵績效指標。',
-      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%',
       footer:'© 2025-2026 六面警察局 | 技術支援 Wareflame',
       modalHead:'緊急報告',
@@ -650,6 +642,9 @@
       dbNotice:'UPL 國家數據庫 | 全國數據同步', lostTitle:'失物招領',
       btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊',
       btn5:'請求', btn6:'投訴、感謝和建議',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'公開信息', btn8:'加入SSPD', btn9:'前往警察局',
+      // ===== [/CHANGED] =====
       folderName:'透明文件夾', chargerName:'惠普電腦45瓦充電器', drinkName:'Lucozade飲料',
       folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月',
       folderDetail:'紅色拉鏈。透明塑料上用永久馬克筆寫著"2026 Biology"。內含GCSE生物資料。酬金：10英鎊(≈9.98 UCC)。有線索請撥打009。',
@@ -661,10 +656,8 @@
       callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
       justice:'JUSTICE', professionalism:'PROFESSIONNALISME', protection:'PROTECTION',
       respTime:'TEMPS DE REPONSE MOYEN 2025', clearRate:'TAUX DE RESOLUTION MOYEN 2025',
-      // ===== [CHANGED] 添加 tooltip 翻译（法语） =====
       respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartiteur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
       clearTooltip:'Dans une période statistique donnée, le pourcentage moyen obtenu en divisant le nombre d\'affaires légalement classées (résolues, transmises pour poursuites ou autrement traitées) par le nombre total d\'affaires enregistrées sur la même période. Notez que cet indicateur ne reflète pas directement si un crime a eu lieu ; il mesure uniquement l\'efficacité du traitement des affaires signalées. Dans le système Uniform Crime Reporting américain, le classement est généralement obtenu par arrestation ou moyens exceptionnels. C\'est un autre KPI central pour évaluer l\'efficacité des enquêtes et la qualité de la gestion de la sécurité publique.',
-      // ===== [/CHANGED] =====
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% plus bas vs 2024',
       footer:'© 2025-2026 SERVICE DE POLICE DE SIXSIDE | Support technique par Wareflame',
       modalHead:'Rapport d\'Urgence',
@@ -688,6 +681,9 @@
       dbNotice:'Base de donnees nationale UPL | Donnees synchronisees a l\'echelle nationale', lostTitle:'Objets Perdus',
       btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer',
       btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Fichiers Publics', btn8:'Rejoindre SSPD', btn9:'Vers la Police',
+      // ===== [/CHANGED] =====
       folderName:'Dossier Transparent', chargerName:'Chargeur HP Laptop 45W', drinkName:'Boisson Lucozade',
       folderDate:'Avril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Avr 2025 - Nov 2025',
       folderDetail:'Fermeture eclair rouge. Marqueur permanent "2026 Biology" sur plastique. Contient du materiel de biologie GCSE. Recompense: £10 (≈9.98 UCC). Tout indice appelez le 009.',
@@ -699,10 +695,8 @@
       callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
       justice:'義', professionalism:'專', protection:'護',
       respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
-      // ===== [CHANGED] 添加 tooltip 翻译（文言文） =====
       respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
       clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
-      // ===== [/CHANGED] =====
       respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
       footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
       modalHead:'急報',
@@ -726,6 +720,9 @@
       dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      // ===== [/CHANGED] =====
       folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
       folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
       folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
@@ -737,10 +734,8 @@
       callNote:'110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен',
       justice:'СПРАВЕДЛИВОСТЬ', professionalism:'ПРОФЕССИОНАЛИЗМ', protection:'ЗАЩИТА',
       respTime:'СРЕДНЕЕ ВРЕМЯ ОТВЕТА 2025', clearRate:'СРЕДНИЙ УРОВЕНЬ РАСКРЫВАЕМОСТИ 2025',
-      // ===== [CHANGED] 添加 tooltip 翻译（俄语） =====
       respTooltip:'Конкретно означает средний временной интервал с момента, когда оператор вешает трубку после экстренного вызова и диспетчер завершает назначение, до прибытия первого сотрудника на место и подтверждения местоположения. В расчет обычно включается время обработки вызова и время в пути, но исключается время работы на месте. Этот показатель является ключевым KPI, измеряющим мобильность полиции и плотность охвата территории; чем ниже значение, тем выше способность к экстренному реагированию.',
       clearTooltip:'В течение определенного статистического периода средний процент, полученный путем деления числа дел, законно закрытых (раскрытых, переданных в суд или иным образом урегулированных), на общее число зарегистрированных дел за тот же период. Обратите внимание, что этот показатель не отражает напрямую, произошло ли преступление; он лишь измеряет эффективность обработки зарегистрированных дел. В системе Uniform Crime Reporting США закрытие обычно достигается путем ареста или исключительных обстоятельств. Это еще один ключевой KPI для оценки эффективности расследований и качества управления общественной безопасностью.',
-      // ===== [/CHANGED] =====
       respVal:'17м 04с', clearVal:'98.2%', respTrend:'6с vs 2024', clearTrend:'0.6% ниже vs 2024',
       footer:'© 2025-2026 ПОЛИЦЕЙСКИЙ ДЕПАРТАМЕНТ СИКСАЙД | Техподдержка Wareflame',
       modalHead:'Сообщение о ЧП',
@@ -764,6 +759,9 @@
       dbNotice:'Национальная база данных UPL | Общенациональные синхронизированные данные', lostTitle:'Бюро находок',
       btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку',
       btn5:'Запрос', btn6:'Жалоба, благодарность',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Общественные файлы', btn8:'Вступить в SSPD', btn9:'В полицию',
+      // ===== [/CHANGED] =====
       folderName:'Прозрачная папка', chargerName:'Зарядное устройство HP Laptop 45W', drinkName:'Напиток Lucozade',
       folderDate:'Апрель 2026', chargerDate:'Янв - Фев 2026', drinkDate:'Апр 2025 - Ноя 2025',
       folderDetail:'Красная молния. Перманентный маркер "2026 Biology" на пластике. Содержит материалы по биологии GCSE. Награда: £10 (≈9.98 UCC). Любые подсказки звоните 009.',
@@ -775,10 +773,8 @@
       callNote:'110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (Үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
       justice:'ШУДАРГА ЁС', professionalism:'МЭРГЭЖИЛ', protection:'ХАМГААЛАЛ',
       respTime:'2025 ОНЫ ДУНДАЖ ХАРИУ АВСАН ХУГАЦАА', clearRate:'2025 ОНЫ ДУНДАЖ ШИЙДВЭРЛЭЛТИЙН ТҮВШИН',
-      // ===== [CHANGED] 添加 tooltip 翻译（蒙古语） =====
       respTooltip:'Яаралтай дуудлагыг оператор тасалж, диспетчер даалгаврыг гүйцэтгэсэн үеэс эхлэн анхны цагдаагийн албан хаагч газар дээр ирж, байршлыг баталгаажуулах хүртэлх дундаж хугацааны завсар. Тооцоололд дуудлага боловсруулах хугацаа, замд явах хугацаа багтах боловч газар дээр ажиллах хугацаа орохгүй. Энэ үзүүлэлт нь цагдаагийн хөдөлгөөнт чадвар, харьяалах нутаг дэвсгэрийн хамрах хүрээний нягтралыг хэмжих гол KPI юм. Бага утга нь илүү өндөр хариу үйлдэл үзүүлэх чадварыг илтгэнэ.',
       clearTooltip:'Тухайн статистикийн хугацаанд хуулийн дагуу шийдвэрлэсэн (илрүүлсэн, яллах дүгнэлт үйлдсэн эсвэл өөр аргаар шийдвэрлэсэн) хэргийн тоог мөн хугацаанд бүртгэгдсэн нийт хэргийн тоонд хувааж олсон дундаж хувь. Анхаарна уу: энэ үзүүлэлт нь гэмт хэрэг гарсан эсэхийг шууд илтгэдэггүй; зөвхөн бүртгэгдсэн хэргийн боловсруулалтын үр ашгийг хэмждэг. АНУ-ын Нэгдсэн Гэмт Хэргийн Тайлангийн системд хэргийг ихэвчлэн баривчлах эсвэл онцгой тохиолдлоор шийдвэрлэдэг. Энэ нь мөрдөн байцаалтын үр нөлөө, нийтийн аюулгүй байдлын удирдлагын чанарыг үнэлэх өөр нэг гол KPI юм.',
-      // ===== [/CHANGED] =====
       respVal:'17м 04с', clearVal:'98.2%', respTrend:'2024-ээс 6с хурдан', clearTrend:'2024-ээс 0.6% бага',
       footer:'© 2025-2026 СИКСАЙД ЦАГДААГЫН ГАЗАР | Техникийн дэмжлэг Wareflame',
       modalHead:'Яаралтай мэдээлэх',
@@ -802,6 +798,9 @@
       dbNotice:'UPL Үндэсний мэдээллийн сан | Үндэсний хэмжээний синхрончлогдсон өгөгдөл', lostTitle:'Алдагдсан эд зүйлс',
       btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах',
       btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'Нээлттэй файлууд', btn8:'SSPD-д элсэх', btn9:'Цагдаа руу',
+      // ===== [/CHANGED] =====
       folderName:'Ил товч', chargerName:'HP Laptop 45W Цэнэглэгч', drinkName:'Lucozade Ундаа',
       folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
       folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
@@ -813,10 +812,8 @@
       callNote:'110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能',
       justice:'正義', professionalism:'専門性', protection:'保護',
       respTime:'2025年平均応答時間', clearRate:'2025年平均解決率',
-      // ===== [CHANGED] 添加 tooltip 翻译（日语） =====
       respTooltip:'具体的には、通報受付者が緊急通話を切り、指令担当者が指令を完了した時点から、最初の警察官が現場に到着し位置を確認するまでの平均時間間隔を指します。その計算には通常、通話処理時間と移動時間が含まれ、現場対応時間は含まれません。この指標は警察の機動力と管轄区域のカバー密度を測定する中核的なKPIであり、数値が低いほど緊急対応能力が高いことを示します。',
       clearTooltip:'特定の統計期間内において、法的に処理（解決、起訴送致、またはその他の処理）された事件数を、同期間に受理された事件総数で割った平均パーセンテージです。なお、この指標は犯罪が発生したかどうかを直接反映するものではなく、報告された事件の処理効率のみを測定します。米国の統一犯罪報告システムでは、通常、逮捕または例外的な手段による処理をもって解決とみなされます。これは捜査効率と治安管理の質を評価するもう一つの中核的なKPIです。',
-      // ===== [/CHANGED] =====
       respVal:'17分04秒', clearVal:'98.2%', respTrend:'2024年より6秒高速', clearTrend:'2024年より0.6%低下',
       footer:'© 2025-2026 シックスサイド警察署 | 技術サポート Wareflame',
       modalHead:'緊急通報',
@@ -840,6 +837,9 @@
       dbNotice:'UPL全国データベース | 全国同期データ', lostTitle:'忘れ物',
       btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録',
       btn5:'リクエスト', btn6:'苦情・感謝・提案',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'公開情報', btn8:'SSPD参加', btn9:'警察署へ',
+      // ===== [/CHANGED] =====
       folderName:'透明フォルダ', chargerName:'HPノートPC45W充電器', drinkName:'ルコザード飲料',
       folderDate:'2026年4月', chargerDate:'2026年1月-2月', drinkDate:'2025年4月-11月',
       folderDetail:'赤いジッパー。プラスチックに永久マーカーで「2026 Biology」と記載。GCSE生物学資料を含む。報奨金：£10 (≈9.98 UCC)。手がかりは009へ。',
@@ -851,10 +851,8 @@
       callNote:'110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능',
       justice:'정의', professionalism:'전문성', protection:'보호',
       respTime:'2025년 평균 응답 시간', clearRate:'2025년 평균 해결율',
-      // ===== [CHANGED] 添加 tooltip 翻译（韩语） =====
       respTooltip:'구체적으로, 신고 접수원이 긴급 전화를 끊고 배차 담당자가 배차를 완료한 시점부터 첫 번째 경찰관이 현장에 도착하여 위치를 확인할 때까지의 평균 시간 간격을 의미합니다. 계산에는 일반적으로 통화 처리 시간과 이동 시간이 포함되며, 현장 처리 시간은 제외됩니다. 이 지표는 경찰의 기동성과 관할 구역 커버리지 밀도를 측정하는 핵심 KPI로, 수치가 낮을수록 긴급 대응 능력이 높음을 나타냅니다.',
       clearTooltip:'특정 통계 기간 동안 법적으로 종결(해결, 기소 의견 송치 또는 기타 처리)된 사건 수를 같은 기간 접수된 총 사건 수로 나눈 백분율 평균입니다. 이 지표는 범죄 발생 여부를 직접 반영하지 않으며, 신고된 사건의 처리 효율만을 측정합니다. 미국 통합 범죄 보고 시스템에서는 일반적으로 체포 또는 예외적 수단에 의한 종결을 해결 기준으로 삼습니다. 이는 수사 효율성과 치안 관리 품질을 평가하는 또 다른 핵심 KPI입니다.',
-      // ===== [/CHANGED] =====
       respVal:'17분 04초', clearVal:'98.2%', respTrend:'2024년 대비 6초 단축', clearTrend:'2024년 대비 0.6% 하락',
       footer:'© 2025-2026 식스사이드 경찰국 | 기술 지원 Wareflame',
       modalHead:'긴급 신고',
@@ -878,6 +876,9 @@
       dbNotice:'UPL 국가 데이터베이스 | 전국 동기화 데이터', lostTitle:'분실물',
       btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록',
       btn5:'요청', btn6:'불만, 감사, 제안',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'공개 정보', btn8:'SSPD 가입', btn9:'경찰서로',
+      // ===== [/CHANGED] =====
       folderName:'투명 폴더', chargerName:'HP 노트북 45W 충전기', drinkName:'루코자데 음료',
       folderDate:'2026년 4월', chargerDate:'2026년 1월-2월', drinkDate:'2025년 4월-11월',
       folderDetail:'빨간색 지퍼. 플라스틱에 "2026 Biology"라고 쓰여 있음. GCSE 생물학 자료 포함. 보상: £10 (≈9.98 UCC). 제보는 009로.',
@@ -889,10 +890,8 @@
       callNote:'110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध',
       justice:'न्याय', professionalism:'व्यावसायिकता', protection:'सुरक्षा',
       respTime:'2025 औसत प्रतिक्रिया समय', clearRate:'2025 औसत निपटान दर',
-      // ===== [CHANGED] 添加 tooltip 翻译（印地语） =====
       respTooltip:'विशेष रूप से, उस समय से औसत समय अंतराल को संदर्भित करता है जब कॉल लेने वाला आपातकालीन कॉल काट देता है और डिस्पैचर कार्य सौंप देता है, तब से लेकर पहला अधिकारी घटनास्थल पर पहुंचकर स्थान की पुष्टि करता है। इसकी गणना में आमतौर पर कॉल हैंडलिंग समय और यात्रा समय शामिल होता है, लेकिन घटनास्थल पर कार्रवाई का समय शामिल नहीं होता। यह मीट्रिक पुलिस की गतिशीलता और क्षेत्राधिकार कवरेज घनत्व को मापने वाला एक मुख्य KPI है; कम मान आपातकालीन प्रतिक्रिया क्षमता को अधिक मजबूत दर्शाते हैं।',
       clearTooltip:'एक विशिष्ट सांख्यिकीय अवधि के भीतर, कानूनी रूप से बंद (सुलझाए गए, अभियोजन के लिए भेजे गए, या अन्यथा निपटाए गए) मामलों की संख्या को उसी अवधि में दर्ज मामलों की कुल संख्या से विभाजित करके प्राप्त प्रतिशत औसत। ध्यान दें कि यह मीट्रिक सीधे यह नहीं दर्शाता कि अपराध हुआ या नहीं; यह केवल दर्ज मामलों की प्रसंस्करण दक्षता को मापता है। अमेरिकी यूनिफ़ॉर्म क्राइम रिपोर्टिंग प्रणाली में, आमतौर पर गिरफ्तारी या असाधारण स्थितियों में मामले को बंद करना समाशोधन माना जाता है। यह जांच प्रभावशीलता और सार्वजनिक सुरक्षा प्रबंधन गुणवत्ता का आकलन करने के लिए एक अन्य मुख्य KPI है।',
-      // ===== [/CHANGED] =====
       respVal:'17मी 04से', clearVal:'98.2%', respTrend:'2024 से 6से तेज', clearTrend:'2024 से 0.6% कम',
       footer:'© 2025-2026 सिक्ससाइड पुलिस विभाग | तकनीकी सहायता Wareflame',
       modalHead:'आपातकाल रिपोर्ट',
@@ -916,6 +915,9 @@
       dbNotice:'UPL राष्ट्रीय डेटाबेस | राष्ट्रव्यापी सिंक्रनाइज़ डेटा', lostTitle:'खोई हुई वस्तुएं',
       btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें',
       btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'सार्वजनिक फ़ाइलें', btn8:'SSPD में शामिल हों', btn9:'पुलिस स्टेशन जाएं',
+      // ===== [/CHANGED] =====
       folderName:'पारदर्शी फ़ोल्डर', chargerName:'HP लैपटॉप 45W चार्जर', drinkName:'ल्यूकोजेड पेय',
       folderDate:'अप्रैल 2026', chargerDate:'जनवरी-फरवरी 2026', drinkDate:'अप्रैल 2025-नवंबर 2025',
       folderDetail:'लाल ज़िपर। प्लास्टिक पर "2026 Biology" लिखा है। GCSE जीव विज्ञान सामग्री शामिल है। पुरस्कार: £10 (≈9.98 UCC)। कोई सुराग 009 पर कॉल करें।',
@@ -927,10 +929,8 @@
       callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
       justice:'義', professionalism:'專', protection:'護',
       respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
-      // ===== [CHANGED] 添加 tooltip 翻译（华夏文言） =====
       respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
       clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
-      // ===== [/CHANGED] =====
       respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
       footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
       modalHead:'急報',
@@ -954,6 +954,9 @@
       dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
+      // ===== [CHANGED] 新增三个按钮翻译 =====
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      // ===== [/CHANGED] =====
       folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
       folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
       folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
@@ -1054,6 +1057,7 @@
   }
   function startMottoCarousel() { if(mottoInterval) clearInterval(mottoInterval); updateMotto(); mottoInterval = setInterval(updateMotto, 4000); }
 
+  // ===== [CHANGED] 渲染按钮函数，新增三个按钮 =====
   function renderServiceButtons() {
     let t = translations[currentLang];
     const btns = [
@@ -1062,7 +1066,11 @@
       { text: t.btn3, url: '#', isLost: true },
       { text: t.btn4, url: 'https://uplgov.github.io/sixside/police/form3.htm' },
       { text: t.btn5, url: 'https://uplgov.github.io/sixside/police/form4.htm' },
-      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' }
+      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' },
+      // 新增三个按钮
+      { text: t.btn7, url: 'publicfiles.htm' },
+      { text: t.btn8, url: 'jointhepd.htm' },
+      { text: t.btn9, url: 'tothepd.htm' }
     ];
     const container = document.getElementById('serviceButtonsGrid');
     if(!container) return;
@@ -1081,6 +1089,7 @@
       container.appendChild(card);
     });
   }
+  // ===== [/CHANGED] =====
   
   function showCaptchaForLost() {
     const t = translations[currentLang];
@@ -1167,12 +1176,10 @@
       if(el && t[id] !== undefined) el.innerText = t[id]; 
     });
     
-    // ===== [CHANGED] 更新 tooltip 内容 =====
     const respTooltip = document.getElementById('respTooltip');
     const clearTooltip = document.getElementById('clearTooltip');
     if (respTooltip && t.respTooltip) respTooltip.innerText = t.respTooltip;
     if (clearTooltip && t.clearTooltip) clearTooltip.innerText = t.clearTooltip;
-    // ===== [/CHANGED] =====
     
     const policeBtn = document.getElementById('servicePoliceBtn');
     const rescueBtn = document.getElementById('serviceRescueBtn');
@@ -1381,7 +1388,6 @@
     }
   };
 
-  // ===== [CHANGED] 修复准星辅助：添加 mousemove 监听器使准星跟随鼠标 =====
   document.addEventListener('mousemove', (e) => {
     const cursor = document.getElementById('cursor-highlight');
     if (cursor && cursor.style.display === 'block') {
@@ -1389,7 +1395,6 @@
       cursor.style.top = e.clientY + 'px';
     }
   });
-  // ===== [/CHANGED] =====
 
   function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }
   function updateCursorStyle(){ let sel=document.getElementById('cursor-color-select'); if(sel){ let [bg,border]=sel.value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); } }

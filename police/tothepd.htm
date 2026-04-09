@@ -1,1 +1,547 @@
 
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Go to the PD | SSPD</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #10161f;
+      --text-primary: #e8edf5;
+      --text-secondary: #9aaebf;
+      --border-color: #1a2538;
+      --card-bg: #10161f;
+      --card-border: #222c38;
+      --btn-bg: #1e2a3a;
+      --accent-red: #cc3333;
+      --accent-green: #2ecc71;
+      --accent-amber: #f39c12;
+      --police-blue: #4a6b8c;
+    }
+    body.light {
+      --bg-primary: #f4f6f9; --bg-secondary: #ffffff; --text-primary: #1a2634;
+      --text-secondary: #3a4a5e; --border-color: #d0d8e4; --card-bg: #ffffff;
+      --card-border: #dce2ec; --btn-bg: #eef2f7;
+    }
+    body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
+    
+    .filter-layer { transition: filter 0.2s; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+    .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; position: sticky; top: 0; z-index: 1100; }
+    .emergency-number { color: var(--accent-red); font-weight: bold; }
+    .nonemergency-number { color: var(--accent-amber); font-weight: bold; }
+
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 70px; z-index: 1000; }
+    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; position: relative; cursor: pointer; }
+    .nav-brand span { color: var(--police-blue); cursor: pointer; }
+    
+    .lang-switch-btn, .tool-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; }
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(100%) contrast(1.2); transition: filter 0.2s; }
+    .acc-icon-btn:hover { filter: grayscale(50%) contrast(1); }
+    .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
+    .acc-panel.show { display: block; }
+    .acc-item { margin-bottom: 15px; }
+    .acc-item label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-secondary); }
+
+    .page-title {
+      text-align: center;
+      padding: 60px 0 30px;
+    }
+    .page-title h1 {
+      font-size: 2.8rem;
+      letter-spacing: 3px;
+      color: var(--text-primary);
+      border-bottom: 2px solid var(--police-blue);
+      display: inline-block;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--police-blue);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .address-block {
+      font-size: 1.4rem;
+      font-family: monospace;
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px dashed var(--border-color);
+      color: var(--accent-amber);
+    }
+
+    .phone-block {
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    .phone-number {
+      font-size: 2rem;
+      font-family: monospace;
+      font-weight: bold;
+      color: var(--police-blue);
+    }
+
+    .phone-note {
+      color: var(--accent-red);
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    .route-section {
+      margin-top: 20px;
+    }
+
+    .route-title {
+      font-size: 1.5rem;
+      color: var(--police-blue);
+      margin-bottom: 20px;
+      border-left: 4px solid var(--accent-red);
+      padding-left: 15px;
+    }
+
+    .route-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .route-card h3 {
+      color: var(--accent-amber);
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+
+    .route-detail {
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+
+    .station-name {
+      color: var(--police-blue);
+      font-weight: bold;
+    }
+
+    footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+    
+    .back-link {
+      display: inline-block;
+      margin: 20px 0;
+      color: var(--police-blue);
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .back-link:hover {
+      background: var(--police-blue);
+      color: white;
+    }
+
+    .lang-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
+    .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+    .lang-option { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .lang-option:hover { background: var(--police-blue); transform: translateY(-2px); }
+    .btn-action { width: 100%; padding: 12px; margin-top: 12px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
+  </style>
+</head>
+<body>
+<div class="emergency-top-bar">
+  <span id="emergencyLabel">EMERGENCY:</span> <span class="emergency-number">110</span> 
+  <span style="margin:0 20px;">|</span>
+  <span id="nonEmergencyLabel">NON-EMERGENCY:</span> <span class="nonemergency-number">009</span>
+  <div style="font-size:0.75rem; color:#aaa; margin-top:6px;" id="callNote">110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available</div>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand" onclick="window.location.href='index.htm'">SIXSIDE <span>| POLICE DEPARTMENT</span></div>
+  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
+  <div class="acc-panel" id="accPanel">
+    <div class="acc-item"><label id="contrastLabel">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="grayscaleLabel">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="saturateLabel">Saturate</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
+    <button class="btn-action" id="resetAccBtn" onclick="resetAcc()">Reset</button>
+  </div>
+</nav>
+
+<div class="filter-layer" id="mainFilter">
+  <div class="container">
+    <div class="page-title">
+      <h1 id="pageTitle">Go to the PD</h1>
+    </div>
+
+    <div class="info-card">
+      <div class="address-block" id="addressText">
+        Sixside Police Department<br>
+        Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2
+      </div>
+      
+      <div class="phone-block">
+        <div style="font-size:1rem; color:var(--text-secondary); margin-bottom:8px;" id="phoneLabel">Police Department Phone</div>
+        <div class="phone-number">+875 4 73</div>
+        <div class="phone-note" id="phoneNote">特别标注不是110或009</div>
+      </div>
+
+      <div class="route-section">
+        <div class="route-title" id="trainTitle">乘火车抵达</div>
+        <div class="route-card">
+          <h3 id="trainSubtitle">Train to Yishan Station</h3>
+          <div class="route-detail">
+            <span id="trainDesc1">到达 Yishan Station 后，请从 </span><strong><span id="eastExit">东出口 (East Exit)</span></strong><span id="trainDesc2"> 出站。</span><br>
+            <span id="shortcutNote">无需出站，出站通道内有警察局捷径。</span>
+          </div>
+        </div>
+
+        <div class="route-title" style="margin-top:40px;" id="boatTitle">驾驶船只</div>
+        
+        <div class="route-card">
+          <h3 id="route1Title">线路一 (Route 1)</h3>
+          <div class="route-detail" id="route1Desc">
+            经过 <strong>The Last Hero Point</strong> → 然后经过 <strong>Lava Village</strong> → 
+            进入 <strong>内水湾 (Inner Bay)</strong> → 经过 <strong>Mansion Park</strong> 即可抵达警局码头。
+          </div>
+        </div>
+
+        <div class="route-card">
+          <h3 id="route2Title">线路二 (Route 2)</h3>
+          <div class="route-detail" id="route2Desc">
+            经过 <strong>Yishan Temple</strong> → 向 <strong>Holeshame</strong> 方向行驶便可抵达。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <a href="index.htm" class="back-link" id="backLink">← Back to SSPD Home</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p>
+</footer>
+
+<div class="modal-overlay" id="langModal"><div class="lang-modal"><h2 id="langModalTitle">Select Language</h2><div id="langGrid" class="lang-grid"></div><button class="btn-action" id="closeLangModal">Close</button></div></div>
+
+<script>
+  const translations = {
+    en: {
+      emergencyLabel: 'EMERGENCY:', nonEmergencyLabel: 'NON-EMERGENCY:',
+      callNote: '110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
+      contrastLabel: 'Contrast', grayscaleLabel: 'Grayscale', saturateLabel: 'Saturate',
+      resetAccBtn: 'Reset', pageTitle: 'Go to the PD',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Police Department Phone', phoneNote: 'Note: This is NOT 110 or 009',
+      trainTitle: 'By Train', trainSubtitle: 'Train to Yishan Station',
+      trainDesc1: 'Arrive at Yishan Station, exit via ', eastExit: 'East Exit',
+      trainDesc2: '.', shortcutNote: 'No need to exit the station; there is a police station shortcut inside the exit passage.',
+      boatTitle: 'By Boat',
+      route1Title: 'Route 1', route1Desc: 'Pass <strong>The Last Hero Point</strong> → then pass <strong>Lava Village</strong> → enter <strong>Inner Bay</strong> → pass <strong>Mansion Park</strong> to arrive at the police pier.',
+      route2Title: 'Route 2', route2Desc: 'Pass <strong>Yishan Temple</strong> → head towards <strong>Holeshame</strong> to arrive.',
+      backLink: '← Back to SSPD Home', footerText: '© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame',
+      langModalTitle: 'Select Language', closeLang: 'Close'
+    },
+    es: {
+      emergencyLabel: 'EMERGENCIA:', nonEmergencyLabel: 'NO EMERGENCIA:',
+      callNote: '110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible',
+      contrastLabel: 'Contraste', grayscaleLabel: 'Escala de grises', saturateLabel: 'Saturación',
+      resetAccBtn: 'Reiniciar', pageTitle: 'Ir a la Policía',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Teléfono del Departamento de Policía', phoneNote: 'Nota: Este NO es 110 ni 009',
+      trainTitle: 'En Tren', trainSubtitle: 'Tren a Yishan Station',
+      trainDesc1: 'Llegue a Yishan Station, salga por la ', eastExit: 'Salida Este',
+      trainDesc2: '.', shortcutNote: 'No es necesario salir de la estación; hay un acceso directo a la comisaría en el pasillo de salida.',
+      boatTitle: 'En Barco',
+      route1Title: 'Ruta 1', route1Desc: 'Pase <strong>The Last Hero Point</strong> → luego pase <strong>Lava Village</strong> → entre en <strong>Inner Bay</strong> → pase <strong>Mansion Park</strong> para llegar al muelle policial.',
+      route2Title: 'Ruta 2', route2Desc: 'Pase <strong>Yishan Temple</strong> → diríjase hacia <strong>Holeshame</strong> para llegar.',
+      backLink: '← Volver a Inicio de SSPD', footerText: '© 2025-2026 DEPARTAMENTO DE POLICÍA DE SIXSIDE | Soporte técnico por Wareflame',
+      langModalTitle: 'Seleccionar idioma', closeLang: 'Cerrar'
+    },
+    'zh-Hans': {
+      emergencyLabel: '紧急情况:', nonEmergencyLabel: '非紧急:',
+      callNote: '110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 110/009 短信报警可用',
+      contrastLabel: '对比度', grayscaleLabel: '灰度', saturateLabel: '饱和度',
+      resetAccBtn: '重置', pageTitle: '前往警察局',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '警察局电话', phoneNote: '特别标注不是110或009',
+      trainTitle: '乘火车抵达', trainSubtitle: 'Train to Yishan Station',
+      trainDesc1: '到达 Yishan Station 后，请从 ', eastExit: '东出口 (East Exit)',
+      trainDesc2: ' 出站。', shortcutNote: '无需出站，出站通道内有警察局捷径。',
+      boatTitle: '驾驶船只',
+      route1Title: '线路一 (Route 1)', route1Desc: '经过 <strong>The Last Hero Point</strong> → 然后经过 <strong>Lava Village</strong> → 进入 <strong>内水湾 (Inner Bay)</strong> → 经过 <strong>Mansion Park</strong> 即可抵达警局码头。',
+      route2Title: '线路二 (Route 2)', route2Desc: '经过 <strong>Yishan Temple</strong> → 向 <strong>Holeshame</strong> 方向行驶便可抵达。',
+      backLink: '← 返回SSPD主页', footerText: '© 2025-2026 六面警察局 | 技术支持 Wareflame',
+      langModalTitle: '选择语言', closeLang: '关闭'
+    },
+    pt: {
+      emergencyLabel: 'EMERGÊNCIA:', nonEmergencyLabel: 'NÃO EMERGÊNCIA:',
+      callNote: '110/009 chamada gratuita, não precisa de SIM (cobertura celular necessária) | 110/009 relatório por SMS disponível',
+      contrastLabel: 'Contraste', grayscaleLabel: 'Escala de cinza', saturateLabel: 'Saturação',
+      resetAccBtn: 'Redefinir', pageTitle: 'Ir para a Polícia',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Telefone do Departamento de Polícia', phoneNote: 'Nota: Este NÃO é 110 ou 009',
+      trainTitle: 'De Trem', trainSubtitle: 'Trem para Yishan Station',
+      trainDesc1: 'Chegue à Yishan Station, saia pela ', eastExit: 'Saída Leste',
+      trainDesc2: '.', shortcutNote: 'Não precisa sair da estação; há um atalho para a delegacia no corredor de saída.',
+      boatTitle: 'De Barco',
+      route1Title: 'Rota 1', route1Desc: 'Passe <strong>The Last Hero Point</strong> → depois passe <strong>Lava Village</strong> → entre na <strong>Inner Bay</strong> → passe <strong>Mansion Park</strong> para chegar ao píer policial.',
+      route2Title: 'Rota 2', route2Desc: 'Passe <strong>Yishan Temple</strong> → siga em direção a <strong>Holeshame</strong> para chegar.',
+      backLink: '← Voltar para a Página Inicial da SSPD', footerText: '© 2025-2026 DEPARTAMENTO DE POLÍCIA DE SIXSIDE | Suporte técnico por Wareflame',
+      langModalTitle: 'Selecionar Idioma', closeLang: 'Fechar'
+    },
+    fr: {
+      emergencyLabel: 'URGENCE:', nonEmergencyLabel: 'NON URGENCE:',
+      callNote: '110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
+      contrastLabel: 'Contraste', grayscaleLabel: 'Niveaux de gris', saturateLabel: 'Saturation',
+      resetAccBtn: 'Réinitialiser', pageTitle: 'Aller à la Police',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Téléphone du Département de Police', phoneNote: 'Note : Ce N\'EST PAS le 110 ou le 009',
+      trainTitle: 'En Train', trainSubtitle: 'Train pour Yishan Station',
+      trainDesc1: 'Arrivez à Yishan Station, sortez par la ', eastExit: 'Sortie Est',
+      trainDesc2: '.', shortcutNote: 'Pas besoin de sortir de la gare ; un raccourci vers le commissariat se trouve dans le couloir de sortie.',
+      boatTitle: 'En Bateau',
+      route1Title: 'Itinéraire 1', route1Desc: 'Passez <strong>The Last Hero Point</strong> → puis <strong>Lava Village</strong> → entrez dans <strong>Inner Bay</strong> → passez <strong>Mansion Park</strong> pour arriver au quai de la police.',
+      route2Title: 'Itinéraire 2', route2Desc: 'Passez <strong>Yishan Temple</strong> → dirigez-vous vers <strong>Holeshame</strong> pour arriver.',
+      backLink: '← Retour à l\'accueil de SSPD', footerText: '© 2025-2026 DÉPARTEMENT DE POLICE DE SIXSIDE | Support technique par Wareflame',
+      langModalTitle: 'Choisir la langue', closeLang: 'Fermer'
+    },
+    'zh-Hant': {
+      emergencyLabel: '緊急情況:', nonEmergencyLabel: '非緊急:',
+      callNote: '110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用',
+      contrastLabel: '對比度', grayscaleLabel: '灰階', saturateLabel: '飽和度',
+      resetAccBtn: '重置', pageTitle: '前往警察局',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '警察局電話', phoneNote: '特別標註不是110或009',
+      trainTitle: '乘火車抵達', trainSubtitle: 'Train to Yishan Station',
+      trainDesc1: '到達 Yishan Station 後，請從 ', eastExit: '東出口 (East Exit)',
+      trainDesc2: ' 出站。', shortcutNote: '無需出站，出站通道內有警察局捷徑。',
+      boatTitle: '駕駛船隻',
+      route1Title: '線路一 (Route 1)', route1Desc: '經過 <strong>The Last Hero Point</strong> → 然後經過 <strong>Lava Village</strong> → 進入 <strong>內水灣 (Inner Bay)</strong> → 經過 <strong>Mansion Park</strong> 即可抵達警局碼頭。',
+      route2Title: '線路二 (Route 2)', route2Desc: '經過 <strong>Yishan Temple</strong> → 向 <strong>Holeshame</strong> 方向行駛便可抵達。',
+      backLink: '← 返回SSPD主頁', footerText: '© 2025-2026 六面警察局 | 技術支援 Wareflame',
+      langModalTitle: '選擇語言', closeLang: '關閉'
+    },
+    lzh: {
+      emergencyLabel: '警急:', nonEmergencyLabel: '常事:',
+      callNote: '110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      contrastLabel: '對比', grayscaleLabel: '灰度', saturateLabel: '飽和',
+      resetAccBtn: '復原', pageTitle: '赴警署',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '警署電話', phoneNote: '特註非110或009',
+      trainTitle: '乘火車至', trainSubtitle: 'Train to Yishan Station',
+      trainDesc1: '至 Yishan Station，從 ', eastExit: '東門 (East Exit)',
+      trainDesc2: ' 出。', shortcutNote: '毋需出站，通道內有警署捷徑。',
+      boatTitle: '駕舟',
+      route1Title: '道一 (Route 1)', route1Desc: '經 <strong>The Last Hero Point</strong> → 復經 <strong>Lava Village</strong> → 入 <strong>內水灣 (Inner Bay)</strong> → 過 <strong>Mansion Park</strong> 即抵警碼頭。',
+      route2Title: '道二 (Route 2)', route2Desc: '經 <strong>Yishan Temple</strong> → 向 <strong>Holeshame</strong> 方行即至。',
+      backLink: '← 返SSPD主頁', footerText: '© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      langModalTitle: '擇語', closeLang: '閉'
+    },
+    ru: {
+      emergencyLabel: 'ЧП:', nonEmergencyLabel: 'НЕ ЧП:',
+      callNote: '110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен',
+      contrastLabel: 'Контраст', grayscaleLabel: 'Оттенки серого', saturateLabel: 'Насыщенность',
+      resetAccBtn: 'Сброс', pageTitle: 'В полицию',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Телефон полицейского управления', phoneNote: 'Примечание: это НЕ 110 и не 009',
+      trainTitle: 'На поезде', trainSubtitle: 'Поезд до Yishan Station',
+      trainDesc1: 'Прибыв на Yishan Station, выйдите через ', eastExit: 'Восточный выход',
+      trainDesc2: '.', shortcutNote: 'Выходить со станции не нужно; в переходе есть короткий путь к полиции.',
+      boatTitle: 'На лодке',
+      route1Title: 'Маршрут 1', route1Desc: 'Мимо <strong>The Last Hero Point</strong> → затем <strong>Lava Village</strong> → войдите в <strong>Inner Bay</strong> → мимо <strong>Mansion Park</strong> к полицейскому причалу.',
+      route2Title: 'Маршрут 2', route2Desc: 'Мимо <strong>Yishan Temple</strong> → направляйтесь к <strong>Holeshame</strong>.',
+      backLink: '← На главную SSPD', footerText: '© 2025-2026 ПОЛИЦЕЙСКИЙ ДЕПАРТАМЕНТ СИКСАЙД | Техподдержка Wareflame',
+      langModalTitle: 'Выберите язык', closeLang: 'Закрыть'
+    },
+    'zh-Classical': {
+      emergencyLabel: '警急:', nonEmergencyLabel: '常事:',
+      callNote: '110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      contrastLabel: '對比', grayscaleLabel: '灰度', saturateLabel: '飽和',
+      resetAccBtn: '復原', pageTitle: '赴警署',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '警署電話', phoneNote: '特註非110或009',
+      trainTitle: '乘火車至', trainSubtitle: 'Train to Yishan Station',
+      trainDesc1: '至 Yishan Station，從 ', eastExit: '東門 (East Exit)',
+      trainDesc2: ' 出。', shortcutNote: '毋需出站，通道內有警署捷徑。',
+      boatTitle: '駕舟',
+      route1Title: '道一 (Route 1)', route1Desc: '經 <strong>The Last Hero Point</strong> → 復經 <strong>Lava Village</strong> → 入 <strong>內水灣 (Inner Bay)</strong> → 過 <strong>Mansion Park</strong> 即抵警碼頭。',
+      route2Title: '道二 (Route 2)', route2Desc: '經 <strong>Yishan Temple</strong> → 向 <strong>Holeshame</strong> 方行即至。',
+      backLink: '← 返SSPD主頁', footerText: '© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      langModalTitle: '擇語', closeLang: '閉'
+    },
+    mn: {
+      emergencyLabel: 'ЯАРАЛТАЙ:', nonEmergencyLabel: 'ЯАРАЛТГҮЙ:',
+      callNote: '110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (Үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
+      contrastLabel: 'Ялгаа', grayscaleLabel: 'Саарал', saturateLabel: 'Ханасан байдал',
+      resetAccBtn: 'Дахин тохируулах', pageTitle: 'Цагдаад очих',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'Цагдаагийн газрын утас', phoneNote: 'Тэмдэглэл: Энэ нь 110 эсвэл 009 БИШ',
+      trainTitle: 'Галт тэргээр', trainSubtitle: 'Yishan Station хүрэх галт тэрэг',
+      trainDesc1: 'Yishan Station-д ирээд ', eastExit: 'Зүүн гарц',
+      trainDesc2: '-аар гарна.', shortcutNote: 'Буудлаас гарах шаардлагагүй; гарцын хонгилд цагдаагийн товч зам байгаа.',
+      boatTitle: 'Усан онгоцоор',
+      route1Title: '1-р маршрут', route1Desc: '<strong>The Last Hero Point</strong>-ийг өнгөрөөд → дараа нь <strong>Lava Village</strong>-ийг өнгөрөөд → <strong>Inner Bay</strong>-д ороод → <strong>Mansion Park</strong>-ийг өнгөрч цагдаагийн хөлөг онгоцны зогсоолд хүрнэ.',
+      route2Title: '2-р маршрут', route2Desc: '<strong>Yishan Temple</strong>-ийг өнгөрөөд → <strong>Holeshame</strong> зүг явахад хүрнэ.',
+      backLink: '← SSPD Нүүр хуудас руу буцах', footerText: '© 2025-2026 СИКСАЙД ЦАГДААГЫН ГАЗАР | Техникийн дэмжлэг Wareflame',
+      langModalTitle: 'Хэл сонгох', closeLang: 'Хаах'
+    },
+    ja: {
+      emergencyLabel: '緊急:', nonEmergencyLabel: '非緊急:',
+      callNote: '110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能',
+      contrastLabel: 'コントラスト', grayscaleLabel: 'グレースケール', saturateLabel: '彩度',
+      resetAccBtn: 'リセット', pageTitle: '警察署へ',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '警察署電話', phoneNote: '注：110または009ではありません',
+      trainTitle: '電車で', trainSubtitle: 'Yishan Station行きの電車',
+      trainDesc1: 'Yishan Station到着後、', eastExit: '東口',
+      trainDesc2: 'から出ます。', shortcutNote: '駅を出る必要はありません。出口通路内に警察署への近道があります。',
+      boatTitle: '船で',
+      route1Title: 'ルート1', route1Desc: '<strong>The Last Hero Point</strong>を通過 → <strong>Lava Village</strong>を通過 → <strong>Inner Bay</strong>に入る → <strong>Mansion Park</strong>を通過すると警察桟橋に到着。',
+      route2Title: 'ルート2', route2Desc: '<strong>Yishan Temple</strong>を通過 → <strong>Holeshame</strong>方面へ向かうと到着。',
+      backLink: '← SSPDホームへ戻る', footerText: '© 2025-2026 シックスサイド警察署 | 技術サポート Wareflame',
+      langModalTitle: '言語を選択', closeLang: '閉じる'
+    },
+    ko: {
+      emergencyLabel: '긴급:', nonEmergencyLabel: '비긴급:',
+      callNote: '110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능',
+      contrastLabel: '대비', grayscaleLabel: '흑백', saturateLabel: '채도',
+      resetAccBtn: '초기화', pageTitle: '경찰서 가기',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: '경찰서 전화', phoneNote: '참고: 110 또는 009가 아님',
+      trainTitle: '기차로', trainSubtitle: 'Yishan Station 행 기차',
+      trainDesc1: 'Yishan Station 도착 후 ', eastExit: '동쪽 출구',
+      trainDesc2: '로 나오세요.', shortcutNote: '역 밖으로 나갈 필요 없이 출구 통로에 경찰서 지름길이 있습니다.',
+      boatTitle: '배로',
+      route1Title: '루트 1', route1Desc: '<strong>The Last Hero Point</strong> 통과 → <strong>Lava Village</strong> 통과 → <strong>Inner Bay</strong> 진입 → <strong>Mansion Park</strong> 지나면 경찰 부두 도착.',
+      route2Title: '루트 2', route2Desc: '<strong>Yishan Temple</strong> 통과 → <strong>Holeshame</strong> 방향으로 가면 도착.',
+      backLink: '← SSPD 홈으로 돌아가기', footerText: '© 2025-2026 식스사이드 경찰국 | 기술 지원 Wareflame',
+      langModalTitle: '언어 선택', closeLang: '닫기'
+    },
+    hi: {
+      emergencyLabel: 'आपातकाल:', nonEmergencyLabel: 'गैर-आपातकाल:',
+      callNote: '110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध',
+      contrastLabel: 'कंट्रास्ट', grayscaleLabel: 'ग्रेस्केल', saturateLabel: 'संतृप्ति',
+      resetAccBtn: 'रीसेट', pageTitle: 'पुलिस स्टेशन जाएं',
+      addressText: 'Sixside Police Department<br>Bay Boarder, Yishan, Sixside, UPL, SASEA SS1 YS2',
+      phoneLabel: 'पुलिस विभाग का फोन', phoneNote: 'नोट: यह 110 या 009 नहीं है',
+      trainTitle: 'ट्रेन से', trainSubtitle: 'Yishan Station के लिए ट्रेन',
+      trainDesc1: 'Yishan Station पहुंचकर, ', eastExit: 'पूर्वी निकास',
+      trainDesc2: ' से बाहर निकलें।', shortcutNote: 'स्टेशन से बाहर निकलने की आवश्यकता नहीं है; निकास मार्ग में पुलिस स्टेशन का शॉर्टकट है।',
+      boatTitle: 'नाव से',
+      route1Title: 'रूट 1', route1Desc: '<strong>The Last Hero Point</strong> से गुजरें → फिर <strong>Lava Village</strong> से → <strong>Inner Bay</strong> में प्रवेश करें → <strong>Mansion Park</strong> से गुजरकर पुलिस घाट पर पहुंचें।',
+      route2Title: 'रूट 2', route2Desc: '<strong>Yishan Temple</strong> से गुजरें → <strong>Holeshame</strong> की ओर बढ़ें।',
+      backLink: '← SSPD होम पर वापस जाएं', footerText: '© 2025-2026 सिक्ससाइड पुलिस विभाग | तकनीकी सहायता Wareflame',
+      langModalTitle: 'भाषा चुनें', closeLang: 'बंद करें'
+    }
+  };
+
+  let currentLang = 'en';
+
+  function applyLanguage(lang) {
+    const t = translations[lang];
+    if (!t) return;
+    
+    document.getElementById('emergencyLabel').innerText = t.emergencyLabel;
+    document.getElementById('nonEmergencyLabel').innerText = t.nonEmergencyLabel;
+    document.getElementById('callNote').innerText = t.callNote;
+    document.getElementById('contrastLabel').innerText = t.contrastLabel;
+    document.getElementById('grayscaleLabel').innerText = t.grayscaleLabel;
+    document.getElementById('saturateLabel').innerText = t.saturateLabel;
+    document.getElementById('resetAccBtn').innerText = t.resetAccBtn;
+    document.getElementById('pageTitle').innerText = t.pageTitle;
+    document.getElementById('addressText').innerHTML = t.addressText;
+    document.getElementById('phoneLabel').innerText = t.phoneLabel;
+    document.getElementById('phoneNote').innerText = t.phoneNote;
+    document.getElementById('trainTitle').innerText = t.trainTitle;
+    document.getElementById('trainSubtitle').innerText = t.trainSubtitle;
+    document.getElementById('trainDesc1').innerText = t.trainDesc1;
+    document.getElementById('eastExit').innerText = t.eastExit;
+    document.getElementById('trainDesc2').innerText = t.trainDesc2;
+    document.getElementById('shortcutNote').innerText = t.shortcutNote;
+    document.getElementById('boatTitle').innerText = t.boatTitle;
+    document.getElementById('route1Title').innerText = t.route1Title;
+    document.getElementById('route1Desc').innerHTML = t.route1Desc;
+    document.getElementById('route2Title').innerText = t.route2Title;
+    document.getElementById('route2Desc').innerHTML = t.route2Desc;
+    document.getElementById('backLink').innerHTML = t.backLink;
+    document.getElementById('footerText').innerText = t.footerText;
+    document.getElementById('langModalTitle').innerText = t.langModalTitle;
+    document.getElementById('closeLangModal').innerText = t.closeLang;
+    
+    localStorage.setItem('sspd_tothepd_lang', lang);
+  }
+
+  function showLangModal() {
+    const modal = document.getElementById('langModal');
+    const grid = document.getElementById('langGrid');
+    const langList = [
+      {code:'en', name:'English'}, {code:'es', name:'Español'}, {code:'zh-Hans', name:'简体白话'},
+      {code:'pt', name:'Português'}, {code:'fr', name:'Français'}, {code:'zh-Hant', name:'正體官話'},
+      {code:'lzh', name:'简体文言'}, {code:'ru', name:'Русский'}, {code:'zh-Classical', name:'華夏文言'},
+      {code:'mn', name:'Монгол хэл'}, {code:'ja', name:'日本語'}, {code:'ko', name:'한국어'}, {code:'hi', name:'हिन्दी'}
+    ];
+    grid.innerHTML = '';
+    langList.forEach(l => {
+      const btn = document.createElement('div');
+      btn.className = 'lang-option';
+      btn.innerText = l.name;
+      btn.onclick = () => {
+        currentLang = l.code;
+        applyLanguage(currentLang);
+        modal.style.display = 'none';
+      };
+      grid.appendChild(btn);
+    });
+    modal.style.display = 'flex';
+  }
+
+  function applyFilters() {
+    let c = document.getElementById('con-range').value;
+    let g = document.getElementById('gray-range').value;
+    let s = document.getElementById('sat-range').value;
+    document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
+  }
+  
+  function resetAcc() {
+    document.getElementById('con-range').value = 1;
+    document.getElementById('gray-range').value = 0;
+    document.getElementById('sat-range').value = 1;
+    applyFilters();
+  }
+  
+  function toggleAccPanel() {
+    document.getElementById('accPanel').classList.toggle('show');
+  }
+
+  document.getElementById('langSwitchBtn').onclick = showLangModal;
+  document.getElementById('closeLangModal').onclick = () => document.getElementById('langModal').style.display = 'none';
+
+  document.addEventListener('click', function(e) {
+    const panel = document.getElementById('accPanel');
+    const btn = document.querySelector('.acc-icon-btn');
+    if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target) && panel.classList.contains('show')) {
+      panel.classList.remove('show');
+    }
+  });
+
+  const savedLang = localStorage.getItem('sspd_tothepd_lang');
+  if (savedLang && translations[savedLang]) {
+    currentLang = savedLang;
+  }
+  applyLanguage(currentLang);
+</script>
+</body>
+</html>

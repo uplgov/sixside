@@ -15,6 +15,13 @@
       --card-bg: #10161f;
       --card-border: #222c38;
       --btn-bg: #1e2a3a;
+      --accent: #5f7f9e;
+      --sec-bg: #071220;
+      --sec-border: #1a3a5c;
+      --sec-text: #7aabcc;
+      --sec-icon: #4a8ab0;
+      --quick-card: #0f1c2a;
+      --quick-border: #1e3248;
     }
     body.light {
       --bg-primary: #f4f6f9;
@@ -25,6 +32,12 @@
       --card-bg: #ffffff;
       --card-border: #dce2ec;
       --btn-bg: #eef2f7;
+      --sec-bg: #e8f4fd;
+      --sec-border: #b8d8f0;
+      --sec-text: #2a5f80;
+      --sec-icon: #3a7fa8;
+      --quick-card: #f0f6ff;
+      --quick-border: #c8dff0;
     }
     body {
       font-family: 'Georgia', 'Times New Roman', Times, serif;
@@ -33,143 +46,398 @@
       line-height: 1.5;
       transition: background 0.2s, color 0.2s;
     }
+
+    /* ========== SECURITY BANNER ========== */
+    #securityBanner {
+      background: var(--sec-bg);
+      border-bottom: 1px solid var(--sec-border);
+    }
+    #securityFull {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, padding 0.45s ease;
+      padding: 0 2rem;
+    }
+    #securityFull.open {
+      max-height: 180px;
+      opacity: 1;
+      padding: 14px 2rem;
+    }
+    #securityFull-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    #closeBannerBtn {
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: #cc3333;
+      border: none; cursor: pointer;
+      position: relative;
+      transition: background 0.18s;
+    }
+    #closeBannerBtn::before, #closeBannerBtn::after {
+      content: '';
+      position: absolute;
+      width: 7px; height: 1.5px;
+      background: transparent;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      transition: background 0.18s;
+    }
+    #closeBannerBtn::after { transform: translate(-50%, -50%) rotate(-45deg); }
+    #closeBannerBtn:hover { background: #888; }
+    #closeBannerBtn:hover::before, #closeBannerBtn:hover::after { background: #fff; }
+    .security-body { flex: 1; }
+    .security-body h3 {
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: var(--sec-text);
+      margin-bottom: 10px;
+      font-family: 'Georgia', serif;
+      letter-spacing: 0.02em;
+    }
+    .security-items {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .security-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--sec-text);
+    }
+    .security-item img {
+      width: 16px; height: 16px;
+      object-fit: contain;
+      opacity: 0.85;
+      filter: hue-rotate(180deg) brightness(1.2);
+    }
+    body.light .security-item img { filter: none; opacity: 0.7; }
+    .security-item span { opacity: 0.9; }
+
+    #securityCollapsed {
+      padding: 7px 2rem;
+      font-size: 0.72rem;
+      color: var(--sec-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+      font-family: 'Georgia', serif;
+      letter-spacing: 0.01em;
+    }
+    #securityCollapsed:hover { opacity: 0.7; }
+    #securityCollapsed::before {
+      content: '›';
+      font-size: 0.9rem;
+      transition: transform 0.2s;
+    }
+    #securityCollapsed:hover::before { transform: translateX(2px); }
+    /* ========== END SECURITY BANNER ========== */
+
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
     .top-nav {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      padding: 1rem 2rem;
+      padding: 0.9rem 2rem;
       border-bottom: 1px solid var(--border-color);
       background: var(--bg-secondary);
       flex-wrap: wrap;
+      gap: 0.5rem;
     }
-    .nav-left { display: flex; align-items: baseline; gap: 0.5rem; }
-    .home-button { font-size: 1.2rem; font-weight: bold; background: none; border: none; color: var(--text-primary); cursor: pointer; }
+    .nav-left { display: flex; align-items: center; gap: 0.5rem; }
+    .home-button {
+      font-size: 1.15rem; font-weight: bold;
+      background: none; border: none;
+      color: var(--text-primary); cursor: pointer;
+      font-family: 'Georgia', serif;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+    .home-button:hover { color: var(--accent); }
     .nav-divider { color: var(--text-secondary); }
-    .current-location { color: var(--text-secondary); }
-    .toolbar { display: flex; gap: 0.8rem; align-items: center; }
-    .btn-square { background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.3rem 0.8rem; cursor: pointer; color: var(--text-primary); }
+    .current-location { color: var(--text-secondary); font-size: 0.9rem; }
+    .toolbar { display: flex; gap: 0.6rem; align-items: center; }
+    .btn-square {
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      border-radius: 4px; padding: 0.3rem 0.9rem;
+      cursor: pointer; color: var(--text-primary);
+      font-size: 0.82rem; font-family: 'Georgia', serif;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .btn-square:hover { border-color: var(--accent); background: var(--card-bg); }
     .accessibility-wrapper { position: relative; }
     .accessibility-toggle {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 30px;
-      padding: 0.2rem 0.6rem;
-      cursor: pointer;
-      font-size: 1.2rem;
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      border-radius: 30px; padding: 0.2rem 0.6rem;
+      cursor: pointer; font-size: 1.2rem;
       filter: grayscale(1) brightness(0.9);
     }
     .accessibility-panel {
       position: absolute; top: 40px; right: 0; width: 320px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.2rem;
-      z-index: 900;
+      background: var(--bg-secondary); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 1.2rem; z-index: 900;
       opacity: 0; visibility: hidden; transform: translateY(-8px);
       transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
     }
     .accessibility-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
     .accessibility-panel h4 { font-size: 1.1rem; margin-bottom: 1rem; text-align: center; }
     .accessibility-panel label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.3rem; }
-    .accessibility-panel input { width: 100%; margin: 0.2rem 0; cursor: pointer; }
-    .accessibility-panel select { width: 100%; padding: 0.3rem; margin: 0.2rem 0; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; }
-    .accessibility-panel button { width: 100%; margin-top: 1rem; padding: 0.4rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; color: var(--text-primary); }
-    .hero { display: flex; align-items: center; justify-content: space-between; padding: 2rem 0; gap: 2rem; flex-wrap: wrap; }
-    .hero-text h1 { font-size: 3.5rem; }
-    .logo-large { max-width: 220px; height: auto; }
-    .section-title { font-size: 1.8rem; border-left: 4px solid #5f7f9e; padding-left: 1rem; margin: 2rem 0 1rem; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: 0.2s; }
-    .card:hover { transform: translateY(-2px); border-color: var(--text-secondary); }
-    .view-all-btn { display: inline-block; margin: 0.5rem 0 1rem; padding: 0.5rem 1.2rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 30px; cursor: pointer; }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px); z-index: 1100; display: flex; align-items: center; justify-content: center;
+    .accessibility-panel input[type=range] { width: 100%; margin: 0.2rem 0; cursor: pointer; }
+    .accessibility-panel select {
+      width: 100%; padding: 0.3rem; margin: 0.2rem 0;
+      background: var(--btn-bg); color: var(--text-primary);
+      border: 1px solid var(--border-color); border-radius: 4px;
     }
-    .all-depts-modal, .lang-modal { background: var(--bg-secondary); border-radius: 16px; max-width: 700px; width: 85%; max-height: 80vh; overflow-y: auto; padding: 1.5rem; }
-    .lang-modal { max-width: 400px; text-align: center; }
-    .lang-option { position: relative; display: block; width: 100%; margin: 0.5rem 0; padding: 0.5rem; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; color: var(--text-primary); }
-    .lang-welcome { position: absolute; left: 50%; top: -28px; transform: translateX(-50%); background: var(--card-border); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
-    .lang-option:hover .lang-welcome { opacity: 1; }
-    .footer { margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.8rem; }
-    .detail-section { margin: 2rem 0; padding: 1.5rem; background: var(--card-bg); border-radius: 12px; }
-    .back-home { display: inline-block; margin-bottom: 1rem; cursor: pointer; color: var(--text-secondary); }
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; }
-    .highlight-cursor { cursor: none; }
-    .highlight-cursor:before { content: ''; position: fixed; top: var(--mouse-y, 0); left: var(--mouse-x, 0); width: 28px; height: 28px; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); }
-    /* 画廊详情页样式 */
-    .gallery-detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin: 1.5rem 0;
+    .accessibility-panel button {
+      width: 100%; margin-top: 1rem; padding: 0.4rem;
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      border-radius: 4px; cursor: pointer; color: var(--text-primary);
     }
-    .gallery-detail-item {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: 0.2s;
+
+    /* ========== HERO ========== */
+    .hero {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2.5rem 0 1.5rem; gap: 2rem; flex-wrap: wrap;
     }
-    .gallery-detail-item:hover { transform: translateY(-4px); border-color: var(--text-secondary); }
-    .gallery-detail-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
-    .gallery-detail-caption { padding: 0.8rem; font-size: 0.85rem; text-align: center; color: var(--text-secondary); }
-    .gallery-license {
-      font-size: 0.75rem;
-      text-align: center;
-      margin-top: 1rem;
-      padding: 0.8rem;
-      background: var(--btn-bg);
-      border-radius: 8px;
+    .hero-text h1 { font-size: 3.5rem; letter-spacing: -0.01em; }
+    .hero-text p { font-style: italic; color: var(--text-secondary); margin-top: 0.3rem; font-size: 1.05rem; }
+    .logo-large { max-width: 200px; height: auto; opacity: 0.92; }
+
+    /* ========== QUICK SERVICES ========== */
+    .quick-services {
+      margin: 0.5rem 0 2rem;
+      padding: 1.5rem;
+      background: var(--quick-card);
+      border: 1px solid var(--quick-border);
+      border-radius: 14px;
+    }
+    .quick-services-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
       color: var(--text-secondary);
+      margin-bottom: 1rem;
+      font-family: 'Georgia', serif;
     }
-    .gallery-license a { color: var(--text-secondary); }
-    /* Lightbox */
-    .lightbox {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 2000;
+    .quick-services-row {
       display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .quick-btn {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: 0.2s;
-    }
-    .lightbox.show { visibility: visible; opacity: 1; }
-    .lightbox img { max-width: 90%; max-height: 80%; object-fit: contain; }
-    .lightbox-close {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 40px;
-      color: white;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-    .lightbox-download {
-      position: absolute;
-      bottom: 30px;
-      right: 30px;
+      gap: 8px;
+      padding: 10px 18px;
       background: var(--btn-bg);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 8px 16px;
-      color: white;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-family: 'Georgia', serif;
       cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s, color 0.2s;
+      white-space: nowrap;
+    }
+    .quick-btn:hover {
+      border-color: var(--accent);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+    .quick-btn-icon {
+      width: 18px; height: 18px;
+      opacity: 0.7;
+      font-style: normal;
+      font-size: 1rem;
+    }
+    /* ========== END QUICK SERVICES ========== */
+
+    .section-title {
+      font-size: 1.7rem;
+      border-left: 4px solid var(--accent);
+      padding-left: 1rem;
+      margin: 2.2rem 0 1rem;
+      letter-spacing: -0.01em;
+    }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; margin: 1.2rem 0; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 1.2rem; cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .card::before {
+      content: ''; position: absolute;
+      left: 0; top: 12px; bottom: 12px;
+      width: 3px; border-radius: 0 2px 2px 0;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .card:hover::before { opacity: 1; }
+    .card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+    .card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
+    .view-all-btn {
+      display: inline-block; margin: 0.5rem 0 1rem;
+      padding: 0.5rem 1.4rem;
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      border-radius: 30px; cursor: pointer;
+      font-size: 0.85rem; font-family: 'Georgia', serif;
+      color: var(--text-primary);
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .view-all-btn:hover { border-color: var(--accent); transform: translateX(3px); }
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
+      z-index: 1100; display: flex; align-items: center; justify-content: center;
+    }
+    .all-depts-modal, .lang-modal {
+      background: var(--bg-secondary); border-radius: 16px;
+      max-width: 700px; width: 85%; max-height: 80vh;
+      overflow-y: auto; padding: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+    .lang-modal { max-width: 400px; text-align: center; }
+    .lang-option {
+      position: relative; display: block; width: 100%;
+      margin: 0.5rem 0; padding: 0.5rem;
+      background: var(--btn-bg); border: 1px solid var(--border-color);
+      border-radius: 8px; cursor: pointer; color: var(--text-primary);
+      transition: border-color 0.15s;
+    }
+    .lang-option:hover { border-color: var(--accent); }
+    .lang-welcome {
+      position: absolute; left: 50%; top: -28px; transform: translateX(-50%);
+      background: var(--card-border); padding: 2px 8px;
+      border-radius: 20px; font-size: 0.7rem; white-space: nowrap;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .lang-option:hover .lang-welcome { opacity: 1; }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      margin-top: 3rem;
+      padding: 2rem 0 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-block h4 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+    }
+    .footer-block p, .footer-block a {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      display: block;
       text-decoration: none;
     }
+    .footer-block a:hover { color: var(--text-primary); }
+    .footer-donate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-family: 'Georgia', serif;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .footer-donate-btn:hover { background: var(--accent); color: #fff; }
+    .footer-divider {
+      border: none; border-top: 1px solid var(--border-color);
+      margin: 0 0 1rem;
+    }
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .footer-bottom a { color: var(--text-secondary); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--text-primary); }
+    /* ========== END FOOTER ========== */
+
+    .detail-section {
+      margin: 2rem 0; padding: 1.5rem;
+      background: var(--card-bg); border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+    .back-home { display: inline-block; margin-bottom: 1rem; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; transition: color 0.15s; }
+    .back-home:hover { color: var(--text-primary); }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; font-size: 0.88rem; }
+    th { background: var(--btn-bg); }
+    .highlight-cursor { cursor: none; }
+    .gallery-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+    .gallery-detail-item { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.2s; }
+    .gallery-detail-item:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .gallery-detail-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .gallery-detail-caption { padding: 0.8rem; font-size: 0.85rem; text-align: center; color: var(--text-secondary); }
+    .gallery-license { font-size: 0.75rem; text-align: center; margin-top: 1rem; padding: 0.8rem; background: var(--btn-bg); border-radius: 8px; color: var(--text-secondary); }
+    .gallery-license a { color: var(--text-secondary); }
+    .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.2s; }
+    .lightbox.show { visibility: visible; opacity: 1; }
+    .lightbox img { max-width: 90%; max-height: 80%; object-fit: contain; }
+    .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
+    .lightbox-download { position: absolute; bottom: 30px; right: 30px; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 16px; color: white; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
   </style>
 </head>
 <body>
+
+<!-- ========== SECURITY BANNER ========== -->
+<div id="securityBanner">
+  <div id="securityFull">
+    <div id="securityFull-inner">
+      <button id="closeBannerBtn" title="Close"></button>
+      <div class="security-body">
+        <h3 id="securityTitle">您怎么知道这个网站是安全的？</h3>
+        <div class="security-items">
+          <div class="security-item">
+            <img src="Government.png" alt="Official domain" id="securityImgGov">
+            <span id="securityDomain">uplgov 是 UPL 政府官方且唯一的域名</span>
+          </div>
+          <div class="security-item">
+            <img src="Lock.png" alt="Secure connection" id="securityImgLock">
+            <span id="securityHttps">https 代表您的连接已加密且安全</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="securityCollapsed">
+    <span id="securityCollapsedText">了解为什么此网页是安全的</span>
+  </div>
+</div>
+<!-- ========== END SECURITY BANNER ========== -->
+
 <div class="top-nav">
   <div class="nav-left">
     <button class="home-button" id="homeBtn">Sixside</button>
@@ -211,6 +479,13 @@
       <img src="SixsideLogo.png" alt="Sixside Logo" class="logo-large" id="logoImg">
     </div>
 
+    <!-- ========== QUICK SERVICES ========== -->
+    <div class="quick-services" id="quickServicesSection">
+      <div class="quick-services-title" id="quickServicesTitle">Quick Services</div>
+      <div class="quick-services-row" id="quickServicesRow"></div>
+    </div>
+    <!-- ========== END QUICK SERVICES ========== -->
+
     <div class="section-title" id="aboutTitle">About Sixside</div>
     <div class="card-grid" id="aboutGrid"></div>
 
@@ -224,13 +499,38 @@
   <div id="detailView" style="display: none;"></div>
 </div>
 
-<div class="footer">
-  <p id="copyrightLine">© Sixside Provincial Government</p>
-  <p id="techSupportLine">Technical support and maintenance provided by Wareflame</p>
-  <p><a href="#" id="privacyLink">Privacy</a> | <a href="#" id="licenseLink">Licence</a> | <a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLink">UPL National Portal</a></p>
-</div>
+<!-- ========== FOOTER ========== -->
+<footer class="footer container">
+  <div class="footer-grid">
+    <div class="footer-block">
+      <h4 id="footerSupportLabel">Support Sixside</h4>
+      <a href="#" class="footer-donate-btn" id="donateBtn">
+        ♡ <span id="donateText">Donate to the Sixside Government</span>
+      </a>
+    </div>
+    <div class="footer-block">
+      <h4 id="footerContactLabel">Contact</h4>
+      <p id="contactPhone">+875 4 4683766368</p>
+    </div>
+    <div class="footer-block">
+      <h4 id="footerMediaLabel">Media Partnerships</h4>
+      <p id="mediaPhone">+875 4 4683766368 63</p>
+    </div>
+    <div class="footer-block">
+      <h4 id="footerLinksLabel">Links</h4>
+      <a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLink">UPL National Portal</a>
+      <a href="#" id="privacyLink">Privacy</a>
+      <a href="#" id="licenseLink">Licence</a>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">
+    <p id="copyrightLine">© Sixside Provincial Government</p>
+    <p id="techSupportLine">Technical support and maintenance provided by Wareflame</p>
+  </div>
+</footer>
+<!-- ========== END FOOTER ========== -->
 
-<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
   <button class="lightbox-close" id="lightboxClose">×</button>
   <img id="lightboxImg" src="" alt="">
@@ -238,278 +538,317 @@
 </div>
 
 <script>
-  // 画廊图片数据
+  // ===== Gallery images =====
   const galleryImages = [
-    { file: "Landscape1.png", nameEn: "Cherry Blossoms Looking Far", nameZhSimple: "樱花树下向远望", nameZhClassical: "櫻花樹下向遠望", nameZhTraditional: "櫻花樹下向遠望", nameZhHuaxia: "櫻花遠眺", nameEs: "Cerezos mirando a lo lejos", namePt: "Cerejeiras olhando ao longe", nameDe: "Kirschblüten in die Ferne blickend", nameFr: "Cerisiers regardant au loin", nameRu: "Цветущая сакура вдалеке", nameMn: "Алс харсан интоорын цэцэг" },
-    { file: "Landscape2.png", nameEn: "Inland Bay Rapid Underground Waterway", nameZhSimple: "内水湾快捷地下水道", nameZhClassical: "內水灣快捷地下水道", nameZhTraditional: "內水灣快捷地下水道", nameZhHuaxia: "內灣快水道", nameEs: "Canal subterráneo rápido de la bahía interior", namePt: "Canal subterrâneo rápido da baía interior", nameDe: "Schneller unterirdischer Wasserweg der Innenbucht", nameFr: "Voie navigable souterraine rapide de la baie intérieure", nameRu: "Быстрый подземный водный путь внутренней бухты", nameMn: "Дотоод булангийн хурдан газар доорх усан зам" },
-    { file: "Landscape3.png", nameEn: "Last Hero Point Overlook", nameZhSimple: "英雄角俯瞰", nameZhClassical: "英雄角俯瞰", nameZhTraditional: "英雄角俯瞰", nameZhHuaxia: "英傑角俯瞰", nameEs: "Mirador del Último Héroe", namePt: "Mirante do Último Herói", nameDe: "Blick vom Letzten Heldenpunkt", nameFr: "Point de vue du Dernier Héros", nameRu: "Обзор Последней точки героя", nameMn: "Сүүлчийн баатрын цэгийн харагдац" }
+    { file:"Landscape1.png", nameEn:"Cherry Blossoms Looking Far", nameZhSimple:"樱花树下向远望", nameZhClassical:"櫻花樹下向遠望", nameZhTraditional:"櫻花樹下向遠望", nameZhHuaxia:"櫻花遠眺", nameEs:"Cerezos mirando a lo lejos", namePt:"Cerejeiras olhando ao longe", nameDe:"Kirschblüten in die Ferne blickend", nameFr:"Cerisiers regardant au loin", nameRu:"Цветущая сакура вдалеке", nameMn:"Алс харсан интоорын цэцэг" },
+    { file:"Landscape2.png", nameEn:"Inland Bay Rapid Underground Waterway", nameZhSimple:"内水湾快捷地下水道", nameZhClassical:"內水灣快捷地下水道", nameZhTraditional:"內水灣快捷地下水道", nameZhHuaxia:"內灣快水道", nameEs:"Canal subterráneo rápido de la bahía interior", namePt:"Canal subterrâneo rápido da baía interior", nameDe:"Schneller unterirdischer Wasserweg der Innenbucht", nameFr:"Voie navigable souterraine rapide de la baie intérieure", nameRu:"Быстрый подземный водный путь внутренней бухты", nameMn:"Дотоод булангийн хурдан газар доорх усан зам" },
+    { file:"Landscape3.png", nameEn:"Last Hero Point Overlook", nameZhSimple:"英雄角俯瞰", nameZhClassical:"英雄角俯瞰", nameZhTraditional:"英雄角俯瞰", nameZhHuaxia:"英傑角俯瞰", nameEs:"Mirador del Último Héroe", namePt:"Mirante do Último Herói", nameDe:"Blick vom Letzten Heldenpunkt", nameFr:"Point de vue du Dernier Héros", nameRu:"Обзор Последней точки героя", nameMn:"Сүүлчийн баатрын цэгийн харагдац" }
   ];
 
-  // ======================= 部门数据 =======================
+  // ===== Department data (unchanged) =====
   const allDepts = [
-    { id: "governor", nameEn: "Governor's Office", head: "Amina Okonkwo", descEn: "Executive leadership.",
-      nameZhSimple: "省长办公室", nameZhClassical: "省長辦公室", nameZhTraditional: "省長辦公室", nameZhHuaxia: "省長之署",
-      nameEs: "Oficina del Gobernador", namePt: "Gabinete do Governador", nameDe: "Büro des Gouverneurs",
-      nameFr: "Cabinet du Gouverneur", nameRu: "Канцелярия губернатора", nameMn: "Засаг даргын тамгын газар",
-      descZhSimple: "行政领导", descZhClassical: "行政治理", descZhTraditional: "行政領導", descZhHuaxia: "行政治理",
-      descEs: "Liderazgo ejecutivo", descPt: "Liderança executiva", descDe: "Exekutivführung",
-      descFr: "Direction exécutive", descRu: "Руководство", descMn: "Гүйцэтгэх удирдлага" },
-    { id: "pd", nameEn: "Sixside PD", head: "Marius van der Berg", descEn: "Public safety, patrol.",
-      nameZhSimple: "六面警察局", nameZhClassical: "六面警察局", nameZhTraditional: "六面警察局", nameZhHuaxia: "六面警察署",
-      nameEs: "Policía de Sixside", namePt: "Polícia de Sixside", nameDe: "Polizei Sixside",
-      nameFr: "Police de Sixside", nameRu: "Полиция Sixside", nameMn: "Sixside цагдаа",
-      descZhSimple: "公共安全、巡逻", descZhClassical: "治安、巡邏", descZhTraditional: "公共安全、巡邏", descZhHuaxia: "治安巡邏",
-      descEs: "Seguridad pública, patrullaje", descPt: "Segurança pública, patrulha", descDe: "Öffentliche Sicherheit",
-      descFr: "Sécurité publique, patrouille", descRu: "Общественная безопасность", descMn: "Олон нийтийн аюулгүй байдал" },
-    { id: "pser", nameEn: "Public Safety & Emergency", head: "Mei Lin", descEn: "Fire, rescue, ambulance.",
-      nameZhSimple: "公共安全与应急", nameZhClassical: "公共安全與應急", nameZhTraditional: "公共安全與應急", nameZhHuaxia: "公安應急署",
-      nameEs: "Seguridad Pública y Emergencias", namePt: "Segurança Pública e Emergência", nameDe: "Öffentliche Sicherheit und Notfall",
-      nameFr: "Sécurité publique et urgences", nameRu: "Общественная безопасность и чрезвычайные ситуации", nameMn: "Олон нийтийн аюулгүй байдал ба онцгой байдал",
-      descZhSimple: "消防、救援、救护", descZhClassical: "消防、救援、救護", descZhTraditional: "消防、救援、救護", descZhHuaxia: "消防救護",
-      descEs: "Bomberos, rescate, ambulancia", descPt: "Bombeiros, resgate, ambulância", descDe: "Feuerwehr, Rettung",
-      descFr: "Incendie, secours, ambulance", descRu: "Пожарная охрана, спасение", descMn: "Гал, аврах, түргэн тусламж" },
-    { id: "hes", nameEn: "HESS Office", head: "Fatima Al-Hassan", descEn: "Health, Education, Social Care and Support.",
-      nameZhSimple: "健康、教育、社会关怀和社会支持部", nameZhClassical: "健康、教育、社會關懷和社會支持部", nameZhTraditional: "健康、教育、社會關懷和社會支持部", nameZhHuaxia: "康教社安部",
-      nameEs: "Oficina de Salud, Educación, Asistencia Social", namePt: "Gabinete da Saúde, Educação, Apoio Social", nameDe: "Amt für Gesundheit, Bildung, Soziales",
-      nameFr: "Bureau de la Santé, de l'Éducation et du Soutien Social", nameRu: "Управление здравоохранения, образования и социальной поддержки", nameMn: "Эрүүл мэнд, боловсрол, нийгмийн халамжийн газар",
-      descZhSimple: "健康、教育、社会关怀和社会支持", descZhClassical: "健康、教育、社會關懷和社會支持", descZhTraditional: "健康、教育、社會關懷和社會支持", descZhHuaxia: "康教社安",
-      descEs: "Salud, Educación, Asistencia Social", descPt: "Saúde, Educação, Apoio Social", descDe: "Gesundheit, Bildung, Soziales",
-      descFr: "Santé, Éducation, Soutien social", descRu: "Здравоохранение, образование, социальная поддержка", descMn: "Эрүүл мэнд, боловсрол, нийгмийн халамж" },
-    { id: "maffa", nameEn: "MAFFA", head: "Kenji Tanaka", descEn: "Mining, Agriculture, Forestry, Fisheries.",
-      nameZhSimple: "矿农林渔管理局", nameZhClassical: "礦農林漁管理局", nameZhTraditional: "礦農林漁管理局", nameZhHuaxia: "礦農林漁署",
-      nameEs: "Administración de Minería, Agricultura, Silvicultura, Pesca", namePt: "Administração de Mineração, Agricultura, Florestas, Pescas", nameDe: "Verwaltung für Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei",
-      nameFr: "Administration des mines, de l'agriculture, des forêts et de la pêche", nameRu: "Управление горнодобывающей промышленности, сельского хозяйства, лесного хозяйства и рыболовства", nameMn: "Уул уурхай, хөдөө аж ахуй, ой, загасны захиргаа",
-      descZhSimple: "矿业、农业、林业、渔业", descZhClassical: "礦業、農業、林業、漁業", descZhTraditional: "礦業、農業、林業、漁業", descZhHuaxia: "礦農林漁",
-      descEs: "Minería, Agricultura, Silvicultura, Pesca", descPt: "Mineração, Agricultura, Florestas, Pescas", descDe: "Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei",
-      descFr: "Mines, agriculture, forêts, pêche", descRu: "Горнодобывающая промышленность, сельское хозяйство, лесное хозяйство, рыболовство", descMn: "Уул уурхай, хөдөө аж ахуй, ой, загас" },
-    { id: "sra", nameEn: "Sixside Revenue Authority", head: "Carlos Fernández", descEn: "Taxation, fiscal policy.",
-      nameZhSimple: "六面财政收入署", nameZhClassical: "六面財政收入署", nameZhTraditional: "六面財政收入署", nameZhHuaxia: "六面財政署",
-      nameEs: "Autoridad Fiscal de Sixside", namePt: "Autoridade Fiscal de Sixside", nameDe: "Steuerbehörde Sixside",
-      nameFr: "Autorité fiscale de Sixside", nameRu: "Налоговое управление Sixside", nameMn: "Sixside татварын газар",
-      descZhSimple: "税收、财政政策", descZhClassical: "稅收、財政政策", descZhTraditional: "稅收、財政政策", descZhHuaxia: "稅財政",
-      descEs: "Impuestos, política fiscal", descPt: "Impostos, política fiscal", descDe: "Steuern, Finanzpolitik",
-      descFr: "Impôts, politique fiscale", descRu: "Налоги, фискальная политика", descMn: "Татвар, санхүүгийн бодлого" },
-    { id: "hl", nameEn: "HL Trust", head: "Eleanor Ashworth", descEn: "Heritage, hiking routes.",
-      nameZhSimple: "遗产与土地信托", nameZhClassical: "遺產與土地信託", nameZhTraditional: "遺產與土地信託", nameZhHuaxia: "遺產信託",
-      nameEs: "Fideicomiso de Patrimonio y Tierras", namePt: "Fideicomisso de Património e Terras", nameDe: "Stiftung für Kulturerbe und Land",
-      nameFr: "Fiducie du patrimoine et des terres", nameRu: "Трастовый фонд наследия и земель", nameMn: "Өв ба газрын итгэл",
-      descZhSimple: "遗产、徒步路线", descZhClassical: "遺產、徒步路線", descZhTraditional: "遺產、徒步路線", descZhHuaxia: "遺產步道",
-      descEs: "Patrimonio, rutas de senderismo", descPt: "Património, rotas de caminhada", descDe: "Kulturerbe, Wanderwege",
-      descFr: "Patrimoine, sentiers de randonnée", descRu: "Наследие, туристические маршруты", descMn: "Өв, явган аялалын зам" }
+    { id:"governor", nameEn:"Governor's Office", head:"Amina Okonkwo", descEn:"Executive leadership.", nameZhSimple:"省长办公室", nameZhClassical:"省長辦公室", nameZhTraditional:"省長辦公室", nameZhHuaxia:"省長之署", nameEs:"Oficina del Gobernador", namePt:"Gabinete do Governador", nameDe:"Büro des Gouverneurs", nameFr:"Cabinet du Gouverneur", nameRu:"Канцелярия губернатора", nameMn:"Засаг даргын тамгын газар", descZhSimple:"行政领导", descZhClassical:"行政治理", descZhTraditional:"行政領導", descZhHuaxia:"行政治理", descEs:"Liderazgo ejecutivo", descPt:"Liderança executiva", descDe:"Exekutivführung", descFr:"Direction exécutive", descRu:"Руководство", descMn:"Гүйцэтгэх удирдлага" },
+    { id:"pd", nameEn:"Sixside PD", head:"Marius van der Berg", descEn:"Public safety, patrol.", nameZhSimple:"六面警察局", nameZhClassical:"六面警察局", nameZhTraditional:"六面警察局", nameZhHuaxia:"六面警察署", nameEs:"Policía de Sixside", namePt:"Polícia de Sixside", nameDe:"Polizei Sixside", nameFr:"Police de Sixside", nameRu:"Полиция Sixside", nameMn:"Sixside цагдаа", descZhSimple:"公共安全、巡逻", descZhClassical:"治安、巡邏", descZhTraditional:"公共安全、巡邏", descZhHuaxia:"治安巡邏", descEs:"Seguridad pública, patrullaje", descPt:"Segurança pública, patrulha", descDe:"Öffentliche Sicherheit", descFr:"Sécurité publique, patrouille", descRu:"Общественная безопасность", descMn:"Олон нийтийн аюулгүй байдал" },
+    { id:"pser", nameEn:"Public Safety & Emergency", head:"Mei Lin", descEn:"Fire, rescue, ambulance.", nameZhSimple:"公共安全与应急", nameZhClassical:"公共安全與應急", nameZhTraditional:"公共安全與應急", nameZhHuaxia:"公安應急署", nameEs:"Seguridad Pública y Emergencias", namePt:"Segurança Pública e Emergência", nameDe:"Öffentliche Sicherheit und Notfall", nameFr:"Sécurité publique et urgences", nameRu:"Общественная безопасность и чрезвычайные ситуации", nameMn:"Олон нийтийн аюулгүй байдал ба онцгой байдал", descZhSimple:"消防、救援、救护", descZhClassical:"消防、救援、救護", descZhTraditional:"消防、救援、救護", descZhHuaxia:"消防救護", descEs:"Bomberos, rescate, ambulancia", descPt:"Bombeiros, resgate, ambulância", descDe:"Feuerwehr, Rettung", descFr:"Incendie, secours, ambulance", descRu:"Пожарная охрана, спасение", descMn:"Гал, аврах, түргэн тусламж" },
+    { id:"hes", nameEn:"HESS Office", head:"Fatima Al-Hassan", descEn:"Health, Education, Social Care and Support.", nameZhSimple:"健康、教育、社会关怀和社会支持部", nameZhClassical:"健康、教育、社會關懷和社會支持部", nameZhTraditional:"健康、教育、社會關懷和社會支持部", nameZhHuaxia:"康教社安部", nameEs:"Oficina de Salud, Educación, Asistencia Social", namePt:"Gabinete da Saúde, Educação, Apoio Social", nameDe:"Amt für Gesundheit, Bildung, Soziales", nameFr:"Bureau de la Santé, de l'Éducation et du Soutien Social", nameRu:"Управление здравоохранения, образования и социальной поддержки", nameMn:"Эрүүл мэнд, боловсрол, нийгмийн халамжийн газар", descZhSimple:"健康、教育、社会关怀和社会支持", descZhClassical:"健康、教育、社會關懷和社會支持", descZhTraditional:"健康、教育、社會關懷和社會支持", descZhHuaxia:"康教社安", descEs:"Salud, Educación, Asistencia Social", descPt:"Saúde, Educação, Apoio Social", descDe:"Gesundheit, Bildung, Soziales", descFr:"Santé, Éducation, Soutien social", descRu:"Здравоохранение, образование, социальная поддержка", descMn:"Эрүүл мэнд, боловсрол, нийгмийн халамж" },
+    { id:"maffa", nameEn:"MAFFA", head:"Kenji Tanaka", descEn:"Mining, Agriculture, Forestry, Fisheries.", nameZhSimple:"矿农林渔管理局", nameZhClassical:"礦農林漁管理局", nameZhTraditional:"礦農林漁管理局", nameZhHuaxia:"礦農林漁署", nameEs:"Administración de Minería, Agricultura, Silvicultura, Pesca", namePt:"Administração de Mineração, Agricultura, Florestas, Pescas", nameDe:"Verwaltung für Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei", nameFr:"Administration des mines, de l'agriculture, des forêts et de la pêche", nameRu:"Управление горнодобывающей промышленности, сельского хозяйства, лесного хозяйства и рыболовства", nameMn:"Уул уурхай, хөдөө аж ахуй, ой, загасны захиргаа", descZhSimple:"矿业、农业、林业、渔业", descZhClassical:"礦業、農業、林業、漁業", descZhTraditional:"礦業、農業、林業、漁業", descZhHuaxia:"礦農林漁", descEs:"Minería, Agricultura, Silvicultura, Pesca", descPt:"Mineração, Agricultura, Florestas, Pescas", descDe:"Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei", descFr:"Mines, agriculture, forêts, pêche", descRu:"Горнодобывающая промышленность, сельское хозяйство, лесное хозяйство, рыболовство", descMn:"Уул уурхай, хөдөө аж ахуй, ой, загас" },
+    { id:"sra", nameEn:"Sixside Revenue Authority", head:"Carlos Fernández", descEn:"Taxation, fiscal policy.", nameZhSimple:"六面财政收入署", nameZhClassical:"六面財政收入署", nameZhTraditional:"六面財政收入署", nameZhHuaxia:"六面財政署", nameEs:"Autoridad Fiscal de Sixside", namePt:"Autoridade Fiscal de Sixside", nameDe:"Steuerbehörde Sixside", nameFr:"Autorité fiscale de Sixside", nameRu:"Налоговое управление Sixside", nameMn:"Sixside татварын газар", descZhSimple:"税收、财政政策", descZhClassical:"稅收、財政政策", descZhTraditional:"稅收、財政政策", descZhHuaxia:"稅財政", descEs:"Impuestos, política fiscal", descPt:"Impostos, política fiscal", descDe:"Steuern, Finanzpolitik", descFr:"Impôts, politique fiscale", descRu:"Налоги, фискальная политика", descMn:"Татвар, санхүүгийн бодлого" },
+    { id:"hl", nameEn:"HL Trust", head:"Eleanor Ashworth", descEn:"Heritage, hiking routes.", nameZhSimple:"遗产与土地信托", nameZhClassical:"遺產與土地信託", nameZhTraditional:"遺產與土地信託", nameZhHuaxia:"遺產信託", nameEs:"Fideicomiso de Patrimonio y Tierras", namePt:"Fideicomisso de Património e Terras", nameDe:"Stiftung für Kulturerbe und Land", nameFr:"Fiducie du patrimoine et des terres", nameRu:"Трастовый фонд наследия и земель", nameMn:"Өв ба газрын итгэл", descZhSimple:"遗产、徒步路线", descZhClassical:"遺產、徒步路線", descZhTraditional:"遺產、徒步路線", descZhHuaxia:"遺產步道", descEs:"Patrimonio, rutas de senderismo", descPt:"Património, rotas de caminhada", descDe:"Kulturerbe, Wanderwege", descFr:"Patrimoine, sentiers de randonnée", descRu:"Наследие, туристические маршруты", descMn:"Өв, явган аялалын зам" }
   ];
 
   const otherOffices = [
-    { nameEn: "Provincial Council", head: "Janusz Kowalski", descEn: "Legislature, budget.",
-      nameZhSimple: "省议会", nameZhClassical: "省議會", nameZhTraditional: "省議會", nameZhHuaxia: "省議會",
-      nameEs: "Consejo Provincial", namePt: "Conselho Provincial", nameDe: "Provinzrat",
-      nameFr: "Conseil provincial", nameRu: "Провинциальный совет", nameMn: "Мужийн зөвлөл",
-      descZhSimple: "立法、预算", descZhClassical: "立法、預算", descZhTraditional: "立法、預算", descZhHuaxia: "立法預算",
-      descEs: "Legislatura, presupuesto", descPt: "Legislatura, orçamento", descDe: "Legislative, Haushalt",
-      descFr: "Législature, budget", descRu: "Законодательство, бюджет", descMn: "Хууль тогтоомж, төсөв" },
-    { nameEn: "Justice Office", head: "Priya Patel", descEn: "Legal affairs.",
-      nameZhSimple: "司法办公室", nameZhClassical: "司法辦公室", nameZhTraditional: "司法辦公室", nameZhHuaxia: "司法署",
-      nameEs: "Oficina de Justicia", namePt: "Gabinete da Justiça", nameDe: "Justizamt",
-      nameFr: "Cabinet de la Justice", nameRu: "Юридическое управление", nameMn: "Хуулийн газар",
-      descZhSimple: "法律事务", descZhClassical: "法律事務", descZhTraditional: "法律事務", descZhHuaxia: "律法事",
-      descEs: "Asuntos legales", descPt: "Assuntos legais", descDe: "Rechtliche Angelegenheiten",
-      descFr: "Affaires juridiques", descRu: "Юридические вопросы", descMn: "Хуулийн асуудал" },
-    { nameEn: "Land & Housing", head: "Solveig Haugen", descEn: "Land registry, housing.",
-      nameZhSimple: "土地与住房办公室", nameZhClassical: "土地與住房辦公室", nameZhTraditional: "土地與住房辦公室", nameZhHuaxia: "地宅署",
-      nameEs: "Oficina de Tierras y Vivienda", namePt: "Gabinete de Terras e Habitação", nameDe: "Amt für Land und Wohnungswesen",
-      nameFr: "Bureau des terres et du logement", nameRu: "Управление земельных ресурсов и жилья", nameMn: "Газар, орон сууцны газар",
-      descZhSimple: "土地登记、住房", descZhClassical: "土地登記、住房", descZhTraditional: "土地登記、住房", descZhHuaxia: "地契宅",
-      descEs: "Registro de tierras, vivienda", descPt: "Registo de terras, habitação", descDe: "Grundbuch, Wohnungswesen",
-      descFr: "Registre foncier, logement", descRu: "Земельный кадастр, жильё", descMn: "Газрын бүртгэл, орон сууц" },
-    { nameEn: "Transport & Infrastructure", head: "Wei Chen", descEn: "Roads, public toilets.",
-      nameZhSimple: "交通与基础设施管理局", nameZhClassical: "交通與基礎設施管理局", nameZhTraditional: "交通與基礎設施管理局", nameZhHuaxia: "交通基建署",
-      nameEs: "Administración de Transporte e Infraestructura", namePt: "Administração de Transportes e Infraestrutura", nameDe: "Verwaltung für Verkehr und Infrastruktur",
-      nameFr: "Administration des transports et des infrastructures", nameRu: "Управление транспорта и инфраструктуры", nameMn: "Тээвэр, дэд бүтцийн газар",
-      descZhSimple: "道路、公共厕所", descZhClassical: "道路、公共廁所", descZhTraditional: "道路、公共廁所", descZhHuaxia: "道公廁",
-      descEs: "Carreteras, baños públicos", descPt: "Estradas, sanitários públicos", descDe: "Straßen, öffentliche Toiletten",
-      descFr: "Routes, toilettes publiques", descRu: "Дороги, общественные туалеты", descMn: "Зам, нийтийн жорлон" }
+    { nameEn:"Provincial Council", head:"Janusz Kowalski", descEn:"Legislature, budget.", nameZhSimple:"省议会", nameZhClassical:"省議會", nameZhTraditional:"省議會", nameZhHuaxia:"省議會", nameEs:"Consejo Provincial", namePt:"Conselho Provincial", nameDe:"Provinzrat", nameFr:"Conseil provincial", nameRu:"Провинциальный совет", nameMn:"Мужийн зөвлөл", descZhSimple:"立法、预算", descZhClassical:"立法、預算", descZhTraditional:"立法、預算", descZhHuaxia:"立法預算", descEs:"Legislatura, presupuesto", descPt:"Legislatura, orçamento", descDe:"Legislative, Haushalt", descFr:"Législature, budget", descRu:"Законодательство, бюджет", descMn:"Хууль тогтоомж, төсөв" },
+    { nameEn:"Justice Office", head:"Priya Patel", descEn:"Legal affairs.", nameZhSimple:"司法办公室", nameZhClassical:"司法辦公室", nameZhTraditional:"司法辦公室", nameZhHuaxia:"司法署", nameEs:"Oficina de Justicia", namePt:"Gabinete da Justiça", nameDe:"Justizamt", nameFr:"Cabinet de la Justice", nameRu:"Юридическое управление", nameMn:"Хуулийн газар", descZhSimple:"法律事务", descZhClassical:"法律事務", descZhTraditional:"法律事務", descZhHuaxia:"律法事", descEs:"Asuntos legales", descPt:"Assuntos legais", descDe:"Rechtliche Angelegenheiten", descFr:"Affaires juridiques", descRu:"Юридические вопросы", descMn:"Хуулийн асуудал" },
+    { nameEn:"Land & Housing", head:"Solveig Haugen", descEn:"Land registry, housing.", nameZhSimple:"土地与住房办公室", nameZhClassical:"土地與住房辦公室", nameZhTraditional:"土地與住房辦公室", nameZhHuaxia:"地宅署", nameEs:"Oficina de Tierras y Vivienda", namePt:"Gabinete de Terras e Habitação", nameDe:"Amt für Land und Wohnungswesen", nameFr:"Bureau des terres et du logement", nameRu:"Управление земельных ресурсов и жилья", nameMn:"Газар, орон сууцны газар", descZhSimple:"土地登记、住房", descZhClassical:"土地登記、住房", descZhTraditional:"土地登記、住房", descZhHuaxia:"地契宅", descEs:"Registro de tierras, vivienda", descPt:"Registo de terras, habitação", descDe:"Grundbuch, Wohnungswesen", descFr:"Registre foncier, logement", descRu:"Земельный кадастр, жильё", descMn:"Газрын бүртгэл, орон сууц" },
+    { nameEn:"Transport & Infrastructure", head:"Wei Chen", descEn:"Roads, public toilets.", nameZhSimple:"交通与基础设施管理局", nameZhClassical:"交通與基礎設施管理局", nameZhTraditional:"交通與基礎設施管理局", nameZhHuaxia:"交通基建署", nameEs:"Administración de Transporte e Infraestructura", namePt:"Administração de Transportes e Infraestrutura", nameDe:"Verwaltung für Verkehr und Infrastruktur", nameFr:"Administration des transports et des infrastructures", nameRu:"Управление транспорта и инфраструктуры", nameMn:"Тээвэр, дэд бүтцийн газар", descZhSimple:"道路、公共厕所", descZhClassical:"道路、公共廁所", descZhTraditional:"道路、公共廁所", descZhHuaxia:"道公廁", descEs:"Carreteras, baños públicos", descPt:"Estradas, sanitários públicos", descDe:"Straßen, öffentliche Toiletten", descFr:"Routes, toilettes publiques", descRu:"Дороги, общественные туалеты", descMn:"Зам, нийтийн жорлон" }
   ];
 
   const featuredIds = ["governor", "pd", "hes"];
 
-  // 语言顺序和配置
-  const langOrder = ["en", "es", "pt", "de", "zh-simple", "zh-classical", "zh-traditional", "zh-huaxia", "fr", "ru", "mn"];
+  // ===== Language data (all original + NEW keys) =====
+  const langOrder = ["en","es","pt","de","zh-simple","zh-classical","zh-traditional","zh-huaxia","fr","ru","mn"];
   const langData = {
-    en: { name: "English", welcome: "Welcome", code: "en",
-      mainTitle: "Sixside", mainSubtitle: "The Enduring Spirit of the Mountains",
-      aboutTitle: "About Sixside", historyTitle: "History", historyText: "Generations have lived in harmony with this land.",
-      geographyTitle: "Geography", geographyText: "Mountains, bamboo, vines, streams.",
-      populationTitle: "Population", populationText: "People walk hidden paths, preserve ancient ways.",
-      galleryCardTitle: "Gallery", galleryDetailTitle: "Gallery",
-      galleryLicenseText: "© Sixside Provincial Government · These images are licensed under CC BY 4.0. You may use them for commercial purposes, provided you give appropriate credit to 'Sixside Provincial Government'.",
-      govTitle: "Government & Agencies", otherTitle: "Other Offices",
-      viewAllBtn: "View All Departments", copyrightLine: "© Sixside Provincial Government",
-      techSupportLine: "Technical support and maintenance provided by Wareflame",
-      nationalLink: "UPL National Portal", privacyText: "Privacy: No data collected.", licenseText: "All rights reserved.",
-      themeToggle: "Dark/Light", langToggle: "Language",
-      accessTitle: "Accessibility", contrastLabel: "Contrast", grayscaleLabel: "Grayscale", saturateLabel: "Saturation",
-      cursorColorLabel: "Cursor Highlight Colour", cursorRed: "Red", cursorYellow: "Yellow", cursorEnableLabel: "Enable Cursor Highlight",
-      resetBtn: "Reset Default" },
-    es: { name: "Español", welcome: "Hola", code: "es",
-      mainTitle: "Sixside", mainSubtitle: "El espíritu eterno de las montañas",
-      aboutTitle: "Sobre Sixside", historyTitle: "Historia", historyText: "Generaciones han vivido en armonía con esta tierra.",
-      geographyTitle: "Geografía", geographyText: "Montañas, bambú, vides, arroyos.",
-      populationTitle: "Población", populationText: "La gente camina por senderos ocultos.",
-      galleryCardTitle: "Galería", galleryDetailTitle: "Galería",
-      galleryLicenseText: "© Gobierno Provincial de Sixside · Estas imágenes están bajo licencia CC BY 4.0. Puede usarlas con fines comerciales, siempre que dé el crédito apropiado a 'Gobierno Provincial de Sixside'.",
-      govTitle: "Gobierno y Agencias", otherTitle: "Otras Oficinas",
-      viewAllBtn: "Ver todos los departamentos", copyrightLine: "© Gobierno Provincial de Sixside",
-      techSupportLine: "Soporte técnico y mantenimiento proporcionados por Wareflame",
-      nationalLink: "Portal Nacional UPL", privacyText: "Privacidad: No se recopilan datos.", licenseText: "Todos los derechos reservados.",
-      themeToggle: "Oscuro/Claro", langToggle: "Idioma",
-      accessTitle: "Accesibilidad", contrastLabel: "Contraste", grayscaleLabel: "Escala de grises", saturateLabel: "Saturación",
-      cursorColorLabel: "Color del cursor", cursorRed: "Rojo", cursorYellow: "Amarillo", cursorEnableLabel: "Activar resaltado del cursor",
-      resetBtn: "Restaurar predeterminado" },
-    pt: { name: "Português", welcome: "Olá", code: "pt",
-      mainTitle: "Sixside", mainSubtitle: "O espírito eterno das montanhas",
-      aboutTitle: "Sobre Sixside", historyTitle: "História", historyText: "Gerações viveram em harmonia com esta terra.",
-      geographyTitle: "Geografia", geographyText: "Montanhas, bambu, vinhas, riachos.",
-      populationTitle: "População", populationText: "As pessoas andam por caminhos escondidos.",
-      galleryCardTitle: "Galeria", galleryDetailTitle: "Galeria",
-      galleryLicenseText: "© Governo Provincial de Sixside · Estas imagens estão licenciadas sob CC BY 4.0. Pode usá-las para fins comerciais, desde que dê o crédito apropriado a 'Governo Provincial de Sixside'.",
-      govTitle: "Governo e Agências", otherTitle: "Outros Escritórios",
-      viewAllBtn: "Ver todos os departamentos", copyrightLine: "© Governo Provincial de Sixside",
-      techSupportLine: "Suporte técnico e manutenção fornecidos por Wareflame",
-      nationalLink: "Portal Nacional UPL", privacyText: "Privacidade: nenhum dado coletado.", licenseText: "Todos os direitos reservados.",
-      themeToggle: "Escuro/Claro", langToggle: "Idioma",
-      accessTitle: "Acessibilidade", contrastLabel: "Contraste", grayscaleLabel: "Escala de cinza", saturateLabel: "Saturação",
-      cursorColorLabel: "Cor do cursor", cursorRed: "Vermelho", cursorYellow: "Amarelo", cursorEnableLabel: "Ativar destaque do cursor",
-      resetBtn: "Restaurar padrão" },
-    de: { name: "Deutsch", welcome: "Hallo", code: "de",
-      mainTitle: "Sixside", mainSubtitle: "Der ewige Geist der Berge",
-      aboutTitle: "Über Sixside", historyTitle: "Geschichte", historyText: "Generationen lebten im Einklang mit diesem Land.",
-      geographyTitle: "Geografie", geographyText: "Berge, Bambus, Reben, Bäche.",
-      populationTitle: "Bevölkerung", populationText: "Menschen gehen verborgene Pfade.",
-      galleryCardTitle: "Galerie", galleryDetailTitle: "Galerie",
-      galleryLicenseText: "© Sixside Provinzregierung · Diese Bilder sind unter CC BY 4.0 lizenziert. Sie dürfen sie für kommerzielle Zwecke verwenden, sofern Sie die Sixside Provinzregierung angemessen nennen.",
-      govTitle: "Regierung & Behörden", otherTitle: "Andere Ämter",
-      viewAllBtn: "Alle Abteilungen anzeigen", copyrightLine: "© Sixside Provinzregierung",
-      techSupportLine: "Technische Unterstützung und Wartung durch Wareflame",
-      nationalLink: "UPL Nationalportal", privacyText: "Datenschutz: Keine Datenerhebung.", licenseText: "Alle Rechte vorbehalten.",
-      themeToggle: "Dunkel/Hell", langToggle: "Sprache",
-      accessTitle: "Barrierefreiheit", contrastLabel: "Kontrast", grayscaleLabel: "Graustufen", saturateLabel: "Sättigung",
-      cursorColorLabel: "Cursorfarbe", cursorRed: "Rot", cursorYellow: "Gelb", cursorEnableLabel: "Cursor hervorheben",
-      resetBtn: "Standard wiederherstellen" },
-    "zh-simple": { name: "简体白话", welcome: "你好", code: "zh-simple", useZh: true,
-      mainTitle: "Sixside", mainSubtitle: "山魂永驻",
-      aboutTitle: "关于 Sixside", historyTitle: "历史", historyText: "世代与这片土地和谐共生。",
-      geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
-      populationTitle: "人口", populationText: "人民行走于隐秘小径，守护古老方式。",
-      galleryCardTitle: "画廊", galleryDetailTitle: "画廊",
-      galleryLicenseText: "© Sixside 省政府 · 这些图片采用 CC BY 4.0 许可。您可以将其用于商业目的，但须注明“Sixside 省政府”。",
-      govTitle: "政府部门", otherTitle: "其他机构",
-      viewAllBtn: "查看全部部门", copyrightLine: "© Sixside 省政府",
-      techSupportLine: "技术支持和维护由 Wareflame 提供",
-      nationalLink: "UPL 国家门户", privacyText: "隐私政策：不收集个人数据。", licenseText: "保留所有权利。",
-      themeToggle: "深色/浅色", langToggle: "语言",
-      accessTitle: "辅助功能", contrastLabel: "对比度", grayscaleLabel: "灰度", saturateLabel: "饱和度",
-      cursorColorLabel: "鼠标高亮颜色", cursorRed: "红色", cursorYellow: "黄色", cursorEnableLabel: "开启鼠标高亮",
-      resetBtn: "恢复默认" },
-    "zh-classical": { name: "简体文言", welcome: "汝安", code: "zh-classical", useZh: true,
-      mainTitle: "Sixside", mainSubtitle: "山魂永驻",
-      aboutTitle: "六面志", historyTitle: "史", historyText: "世代与此土相谐。",
-      geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
-      populationTitle: "民", populationText: "民行隐径，守古法。",
-      galleryCardTitle: "畫苑", galleryDetailTitle: "畫苑",
-      galleryLicenseText: "© 六面省政府 · 此圖依 CC BY 4.0 許可。可商用，惟須註明「六面省政府」。",
-      govTitle: "官府", otherTitle: "他署",
-      viewAllBtn: "悉览诸部", copyrightLine: "© 六面省政府",
-      techSupportLine: "技护由 Wareflame 供之",
-      nationalLink: "UPL 国门", privacyText: "隐策：不敛民息。", licenseText: "悉权保留。",
-      themeToggle: "深浅", langToggle: "语",
-      accessTitle: "辅功", contrastLabel: "对比", grayscaleLabel: "灰阶", saturateLabel: "饱和",
-      cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黄", cursorEnableLabel: "启鼠标",
-      resetBtn: "复原" },
-    "zh-traditional": { name: "正體官話", welcome: "你好", code: "zh-traditional", useZh: true,
-      mainTitle: "Sixside", mainSubtitle: "山魂永駐",
-      aboutTitle: "關於 Sixside", historyTitle: "歷史", historyText: "世代與這片土地和諧共生。",
-      geographyTitle: "地理", geographyText: "群山、竹林、藤蔓、清溪。",
-      populationTitle: "人口", populationText: "人民行走於隱秘小徑，守護古老方式。",
-      galleryCardTitle: "畫廊", galleryDetailTitle: "畫廊",
-      galleryLicenseText: "© Sixside 省政府 · 這些圖片採用 CC BY 4.0 許可。您可以將其用於商業目的，但須註明「Sixside 省政府」。",
-      govTitle: "政府部門", otherTitle: "其他機構",
-      viewAllBtn: "查看全部部門", copyrightLine: "© Sixside 省政府",
-      techSupportLine: "技術支持和維護由 Wareflame 提供",
-      nationalLink: "UPL 國家門戶", privacyText: "隱私政策：不收集個人數據。", licenseText: "保留所有權利。",
-      themeToggle: "深色/淺色", langToggle: "語言",
-      accessTitle: "輔助功能", contrastLabel: "對比度", grayscaleLabel: "灰度", saturateLabel: "飽和度",
-      cursorColorLabel: "鼠標高亮顏色", cursorRed: "紅色", cursorYellow: "黃色", cursorEnableLabel: "開啟鼠標高亮",
-      resetBtn: "恢復默認" },
-    "zh-huaxia": { name: "華夏文言", welcome: "汝安", code: "zh-huaxia", useZh: true,
-      mainTitle: "Sixside", mainSubtitle: "山魂永駐",
-      aboutTitle: "六面志", historyTitle: "史", historyText: "世代與此土相諧。",
-      geographyTitle: "地", geographyText: "群山、竹、藤、溪。",
-      populationTitle: "民", populationText: "民行隱徑，守古法。",
-      galleryCardTitle: "畫苑", galleryDetailTitle: "畫苑",
-      galleryLicenseText: "© 六面省政府 · 此圖依 CC BY 4.0 許可。可商用，惟須註明「六面省政府」。",
-      govTitle: "官府", otherTitle: "他署",
-      viewAllBtn: "悉覽諸部", copyrightLine: "© 六面省政府",
-      techSupportLine: "技護由 Wareflame 供之",
-      nationalLink: "UPL 國門", privacyText: "隱策：不斂民息。", licenseText: "悉權保留。",
-      themeToggle: "深淺", langToggle: "語",
-      accessTitle: "輔功", contrastLabel: "對比", grayscaleLabel: "灰階", saturateLabel: "飽和",
-      cursorColorLabel: "鼠色", cursorRed: "赤", cursorYellow: "黃", cursorEnableLabel: "啟鼠標",
-      resetBtn: "復原" },
-    fr: { name: "Français", welcome: "Bonjour", code: "fr",
-      mainTitle: "Sixside", mainSubtitle: "L'esprit éternel des montagnes",
-      aboutTitle: "À propos de Sixside", historyTitle: "Histoire", historyText: "Des générations ont vécu en harmonie avec cette terre.",
-      geographyTitle: "Géographie", geographyText: "Montagnes, bambou, vignes, ruisseaux.",
-      populationTitle: "Population", populationText: "Les gens marchent sur des sentiers cachés.",
-      galleryCardTitle: "Galerie", galleryDetailTitle: "Galerie",
-      galleryLicenseText: "© Gouvernement provincial de Sixside · Ces images sont sous licence CC BY 4.0. Vous pouvez les utiliser à des fins commerciales, à condition de mentionner 'Gouvernement provincial de Sixside'.",
-      govTitle: "Gouvernement et Agences", otherTitle: "Autres Bureaux",
-      viewAllBtn: "Voir tous les départements", copyrightLine: "© Gouvernement provincial de Sixside",
-      techSupportLine: "Soutien technique et maintenance fournis par Wareflame",
-      nationalLink: "Portail national UPL", privacyText: "Confidentialité : aucune donnée collectée.", licenseText: "Tous droits réservés.",
-      themeToggle: "Sombre/Clair", langToggle: "Langue",
-      accessTitle: "Accessibilité", contrastLabel: "Contraste", grayscaleLabel: "Niveaux de gris", saturateLabel: "Saturation",
-      cursorColorLabel: "Couleur du curseur", cursorRed: "Rouge", cursorYellow: "Jaune", cursorEnableLabel: "Activer la surbrillance du curseur",
-      resetBtn: "Rétablir les paramètres par défaut" },
-    ru: { name: "Русский", welcome: "Здравствуйте", code: "ru",
-      mainTitle: "Sixside", mainSubtitle: "Вечный дух гор",
-      aboutTitle: "О Sixside", historyTitle: "История", historyText: "Поколения жили в гармонии с этой землёй.",
-      geographyTitle: "География", geographyText: "Горы, бамбук, ручьи.",
-      populationTitle: "Население", populationText: "Люди ходят скрытыми тропами.",
-      galleryCardTitle: "Галерея", galleryDetailTitle: "Галерея",
-      galleryLicenseText: "© Правительство Sixside · Эти изображения лицензированы по CC BY 4.0. Вы можете использовать их в коммерческих целях при условии указания 'Правительство Sixside'.",
-      govTitle: "Правительство", otherTitle: "Другие офисы",
-      viewAllBtn: "Показать все отделы", copyrightLine: "© Правительство Sixside",
-      techSupportLine: "Техническая поддержка и обслуживание предоставлены Wareflame",
-      nationalLink: "Национальный портал UPL", privacyText: "Конфиденциальность: данные не собираются.", licenseText: "Все права защищены.",
-      themeToggle: "Тёмный/Светлый", langToggle: "Язык",
-      accessTitle: "Специальные возможности", contrastLabel: "Контраст", grayscaleLabel: "Ч/б", saturateLabel: "Насыщенность",
-      cursorColorLabel: "Цвет курсора", cursorRed: "Красный", cursorYellow: "Жёлтый", cursorEnableLabel: "Включить подсветку курсора",
-      resetBtn: "Сбросить" },
-    mn: { name: "Монгол", welcome: "Сайн уу", code: "mn",
-      mainTitle: "Sixside", mainSubtitle: "Уулын мөнхийн сүнс",
-      aboutTitle: "Sixside-ийн тухай", historyTitle: "Түүх", historyText: "Үе үе энэ газартай зохицон амьдарч байсан.",
-      geographyTitle: "Газар зүй", geographyText: "Уулс, хулс, ус, горхи.",
-      populationTitle: "Хүн ам", populationText: "Хүмүүс далд замаар явдаг.",
-      galleryCardTitle: "Галлерей", galleryDetailTitle: "Галлерей",
-      galleryLicenseText: "© Sixside мужийн засгийн газар · Эдгээр зургийг CC BY 4.0 лицензээр ашиглаж болно. Та тэдгээрийг арилжааны зориулалтаар ашиглахдаа 'Sixside мужийн засгийн газар' гэж дурдах ёстой.",
-      govTitle: "Засгийн газар ба Агентлагууд", otherTitle: "Бусад Албан газар",
-      viewAllBtn: "Бүх хэлтсийг харах", copyrightLine: "© Sixside мужийн засгийн газар",
-      techSupportLine: "Техникийн дэмжлэг, засвар үйлчилгээг Wareflame хангана",
-      nationalLink: "UPL Үндэсний Портал", privacyText: "Нууцлал: Мэдээлэл цуглуулахгүй.", licenseText: "Бүх эрх хуулиар хамгаалагдсан.",
-      themeToggle: "Хар/Цагаан", langToggle: "Хэл",
-      accessTitle: "Хүртээмж", contrastLabel: "Тодосгол", grayscaleLabel: "Саарал", saturateLabel: "Ханасан байдал",
-      cursorColorLabel: "Хулганы өнгө", cursorRed: "Улаан", cursorYellow: "Шар", cursorEnableLabel: "Хулганы тодруулгыг идэвхжүүлэх",
-      resetBtn: "Анхны төлөв" }
+    en: { name:"English", welcome:"Welcome", code:"en",
+      mainTitle:"Sixside", mainSubtitle:"The Enduring Spirit of the Mountains",
+      aboutTitle:"About Sixside", historyTitle:"History", historyText:"Generations have lived in harmony with this land.",
+      geographyTitle:"Geography", geographyText:"Mountains, bamboo, vines, streams.",
+      populationTitle:"Population", populationText:"People walk hidden paths, preserve ancient ways.",
+      galleryCardTitle:"Gallery", galleryDetailTitle:"Gallery",
+      galleryLicenseText:"© Sixside Provincial Government · These images are licensed under CC BY 4.0. You may use them for commercial purposes, provided you give appropriate credit to 'Sixside Provincial Government'.",
+      govTitle:"Government & Agencies", otherTitle:"Other Offices",
+      viewAllBtn:"View All Departments", copyrightLine:"© Sixside Provincial Government",
+      techSupportLine:"Technical support and maintenance provided by Wareflame",
+      nationalLink:"UPL National Portal", privacyText:"Privacy: No data collected.", licenseText:"All rights reserved.",
+      themeToggle:"Dark/Light", langToggle:"Language",
+      accessTitle:"Accessibility", contrastLabel:"Contrast", grayscaleLabel:"Grayscale", saturateLabel:"Saturation",
+      cursorColorLabel:"Cursor Highlight Colour", cursorRed:"Red", cursorYellow:"Yellow", cursorEnableLabel:"Enable Cursor Highlight",
+      resetBtn:"Reset Default",
+      securityTitle:"How do you know this website is safe?",
+      securityDomain:"uplgov is the official and only domain of the UPL Government",
+      securityHttps:"https means your connection is encrypted and secure",
+      securityCollapsed:"Learn why this page is safe",
+      quickServicesTitle:"Quick Services",
+      quickJobs:"Jobs & Apprenticeships", quickDemocracy:"Democratic Sixside", quickLibrary:"Sixside Library",
+      footerSupportLabel:"Support Sixside", donateText:"Donate to the Sixside Government",
+      footerContactLabel:"Contact", footerMediaLabel:"Media Partnerships", footerLinksLabel:"Links" },
+    es: { name:"Español", welcome:"Hola", code:"es",
+      mainTitle:"Sixside", mainSubtitle:"El espíritu eterno de las montañas",
+      aboutTitle:"Sobre Sixside", historyTitle:"Historia", historyText:"Generaciones han vivido en armonía con esta tierra.",
+      geographyTitle:"Geografía", geographyText:"Montañas, bambú, vides, arroyos.",
+      populationTitle:"Población", populationText:"La gente camina por senderos ocultos.",
+      galleryCardTitle:"Galería", galleryDetailTitle:"Galería",
+      galleryLicenseText:"© Gobierno Provincial de Sixside · Estas imágenes están bajo licencia CC BY 4.0.",
+      govTitle:"Gobierno y Agencias", otherTitle:"Otras Oficinas",
+      viewAllBtn:"Ver todos los departamentos", copyrightLine:"© Gobierno Provincial de Sixside",
+      techSupportLine:"Soporte técnico y mantenimiento proporcionados por Wareflame",
+      nationalLink:"Portal Nacional UPL", privacyText:"Privacidad: No se recopilan datos.", licenseText:"Todos los derechos reservados.",
+      themeToggle:"Oscuro/Claro", langToggle:"Idioma",
+      accessTitle:"Accesibilidad", contrastLabel:"Contraste", grayscaleLabel:"Escala de grises", saturateLabel:"Saturación",
+      cursorColorLabel:"Color del cursor", cursorRed:"Rojo", cursorYellow:"Amarillo", cursorEnableLabel:"Activar resaltado del cursor",
+      resetBtn:"Restaurar predeterminado",
+      securityTitle:"¿Cómo sabe que este sitio web es seguro?",
+      securityDomain:"uplgov es el dominio oficial y único del Gobierno UPL",
+      securityHttps:"https significa que su conexión está cifrada y segura",
+      securityCollapsed:"Aprenda por qué esta página es segura",
+      quickServicesTitle:"Servicios Rápidos",
+      quickJobs:"Empleo y Aprendizaje", quickDemocracy:"Sixside Democrático", quickLibrary:"Biblioteca de Sixside",
+      footerSupportLabel:"Apoyar a Sixside", donateText:"Donar al Gobierno de Sixside",
+      footerContactLabel:"Contacto", footerMediaLabel:"Medios de comunicación", footerLinksLabel:"Enlaces" },
+    pt: { name:"Português", welcome:"Olá", code:"pt",
+      mainTitle:"Sixside", mainSubtitle:"O espírito eterno das montanhas",
+      aboutTitle:"Sobre Sixside", historyTitle:"História", historyText:"Gerações viveram em harmonia com esta terra.",
+      geographyTitle:"Geografia", geographyText:"Montanhas, bambu, vinhas, riachos.",
+      populationTitle:"População", populationText:"As pessoas andam por caminhos escondidos.",
+      galleryCardTitle:"Galeria", galleryDetailTitle:"Galeria",
+      galleryLicenseText:"© Governo Provincial de Sixside · Estas imagens estão licenciadas sob CC BY 4.0.",
+      govTitle:"Governo e Agências", otherTitle:"Outros Escritórios",
+      viewAllBtn:"Ver todos os departamentos", copyrightLine:"© Governo Provincial de Sixside",
+      techSupportLine:"Suporte técnico e manutenção fornecidos por Wareflame",
+      nationalLink:"Portal Nacional UPL", privacyText:"Privacidade: nenhum dado coletado.", licenseText:"Todos os direitos reservados.",
+      themeToggle:"Escuro/Claro", langToggle:"Idioma",
+      accessTitle:"Acessibilidade", contrastLabel:"Contraste", grayscaleLabel:"Escala de cinza", saturateLabel:"Saturação",
+      cursorColorLabel:"Cor do cursor", cursorRed:"Vermelho", cursorYellow:"Amarelo", cursorEnableLabel:"Ativar destaque do cursor",
+      resetBtn:"Restaurar padrão",
+      securityTitle:"Como sabe que este website é seguro?",
+      securityDomain:"uplgov é o domínio oficial e único do Governo UPL",
+      securityHttps:"https significa que a sua ligação está encriptada e segura",
+      securityCollapsed:"Saiba por que esta página é segura",
+      quickServicesTitle:"Serviços Rápidos",
+      quickJobs:"Empregos e Estágios", quickDemocracy:"Sixside Democrático", quickLibrary:"Biblioteca de Sixside",
+      footerSupportLabel:"Apoie Sixside", donateText:"Doe ao Governo de Sixside",
+      footerContactLabel:"Contato", footerMediaLabel:"Parcerias de Mídia", footerLinksLabel:"Links" },
+    de: { name:"Deutsch", welcome:"Hallo", code:"de",
+      mainTitle:"Sixside", mainSubtitle:"Der ewige Geist der Berge",
+      aboutTitle:"Über Sixside", historyTitle:"Geschichte", historyText:"Generationen lebten im Einklang mit diesem Land.",
+      geographyTitle:"Geografie", geographyText:"Berge, Bambus, Reben, Bäche.",
+      populationTitle:"Bevölkerung", populationText:"Menschen gehen verborgene Pfade.",
+      galleryCardTitle:"Galerie", galleryDetailTitle:"Galerie",
+      galleryLicenseText:"© Sixside Provinzregierung · Diese Bilder sind unter CC BY 4.0 lizenziert.",
+      govTitle:"Regierung & Behörden", otherTitle:"Andere Ämter",
+      viewAllBtn:"Alle Abteilungen anzeigen", copyrightLine:"© Sixside Provinzregierung",
+      techSupportLine:"Technische Unterstützung und Wartung durch Wareflame",
+      nationalLink:"UPL Nationalportal", privacyText:"Datenschutz: Keine Datenerhebung.", licenseText:"Alle Rechte vorbehalten.",
+      themeToggle:"Dunkel/Hell", langToggle:"Sprache",
+      accessTitle:"Barrierefreiheit", contrastLabel:"Kontrast", grayscaleLabel:"Graustufen", saturateLabel:"Sättigung",
+      cursorColorLabel:"Cursorfarbe", cursorRed:"Rot", cursorYellow:"Gelb", cursorEnableLabel:"Cursor hervorheben",
+      resetBtn:"Standard wiederherstellen",
+      securityTitle:"Wie wissen Sie, dass diese Website sicher ist?",
+      securityDomain:"uplgov ist die offizielle und einzige Domain der UPL-Regierung",
+      securityHttps:"https bedeutet, dass Ihre Verbindung verschlüsselt und sicher ist",
+      securityCollapsed:"Erfahren Sie, warum diese Seite sicher ist",
+      quickServicesTitle:"Schnelldienste",
+      quickJobs:"Jobs & Ausbildung", quickDemocracy:"Demokratisches Sixside", quickLibrary:"Sixside Bibliothek",
+      footerSupportLabel:"Sixside unterstützen", donateText:"Spenden an die Sixside-Regierung",
+      footerContactLabel:"Kontakt", footerMediaLabel:"Medienpartnerschaften", footerLinksLabel:"Links" },
+    "zh-simple": { name:"简体白话", welcome:"你好", code:"zh-simple", useZh:true,
+      mainTitle:"Sixside", mainSubtitle:"山魂永驻",
+      aboutTitle:"关于 Sixside", historyTitle:"历史", historyText:"世代与这片土地和谐共生。",
+      geographyTitle:"地理", geographyText:"群山、竹林、藤蔓、清溪。",
+      populationTitle:"人口", populationText:"人民行走于隐秘小径，守护古老方式。",
+      galleryCardTitle:"画廊", galleryDetailTitle:"画廊",
+      galleryLicenseText:"© Sixside 省政府 · 这些图片采用 CC BY 4.0 许可。",
+      govTitle:"政府部门", otherTitle:"其他机构",
+      viewAllBtn:"查看全部部门", copyrightLine:"© Sixside 省政府",
+      techSupportLine:"技术支持和维护由 Wareflame 提供",
+      nationalLink:"UPL 国家门户", privacyText:"隐私政策：不收集个人数据。", licenseText:"保留所有权利。",
+      themeToggle:"深色/浅色", langToggle:"语言",
+      accessTitle:"辅助功能", contrastLabel:"对比度", grayscaleLabel:"灰度", saturateLabel:"饱和度",
+      cursorColorLabel:"鼠标高亮颜色", cursorRed:"红色", cursorYellow:"黄色", cursorEnableLabel:"开启鼠标高亮",
+      resetBtn:"恢复默认",
+      securityTitle:"您怎么知道这个网站是安全的？",
+      securityDomain:"uplgov 是 UPL 政府官方且唯一的域名",
+      securityHttps:"https 代表您的连接已加密且安全",
+      securityCollapsed:"了解为什么此网页是安全的",
+      quickServicesTitle:"快捷服务",
+      quickJobs:"找工作和学徒", quickDemocracy:"民主 Sixside", quickLibrary:"Sixside 图书馆",
+      footerSupportLabel:"支持 Sixside", donateText:"向 Sixside 政府捐款",
+      footerContactLabel:"联系电话", footerMediaLabel:"媒体合作", footerLinksLabel:"链接" },
+    "zh-classical": { name:"简体文言", welcome:"汝安", code:"zh-classical", useZh:true,
+      mainTitle:"Sixside", mainSubtitle:"山魂永驻",
+      aboutTitle:"六面志", historyTitle:"史", historyText:"世代与此土相谐。",
+      geographyTitle:"地", geographyText:"群山、竹、藤、溪。",
+      populationTitle:"民", populationText:"民行隐径，守古法。",
+      galleryCardTitle:"畫苑", galleryDetailTitle:"畫苑",
+      galleryLicenseText:"© 六面省政府 · 此圖依 CC BY 4.0 許可。",
+      govTitle:"官府", otherTitle:"他署",
+      viewAllBtn:"悉览诸部", copyrightLine:"© 六面省政府",
+      techSupportLine:"技护由 Wareflame 供之",
+      nationalLink:"UPL 国门", privacyText:"隐策：不敛民息。", licenseText:"悉权保留。",
+      themeToggle:"深浅", langToggle:"语",
+      accessTitle:"辅功", contrastLabel:"对比", grayscaleLabel:"灰阶", saturateLabel:"饱和",
+      cursorColorLabel:"鼠色", cursorRed:"赤", cursorYellow:"黄", cursorEnableLabel:"启鼠标",
+      resetBtn:"复原",
+      securityTitle:"汝何知此站安全？",
+      securityDomain:"uplgov 乃 UPL 政府官方唯一域名",
+      securityHttps:"https 代汝之连接安全加密",
+      securityCollapsed:"知此页安全之由",
+      quickServicesTitle:"速服",
+      quickJobs:"求职学徒", quickDemocracy:"民主六面", quickLibrary:"六面图书",
+      footerSupportLabel:"助六面", donateText:"捐于六面省政府",
+      footerContactLabel:"电话", footerMediaLabel:"媒合", footerLinksLabel:"链" },
+    "zh-traditional": { name:"正體官話", welcome:"你好", code:"zh-traditional", useZh:true,
+      mainTitle:"Sixside", mainSubtitle:"山魂永駐",
+      aboutTitle:"關於 Sixside", historyTitle:"歷史", historyText:"世代與這片土地和諧共生。",
+      geographyTitle:"地理", geographyText:"群山、竹林、藤蔓、清溪。",
+      populationTitle:"人口", populationText:"人民行走於隱秘小徑，守護古老方式。",
+      galleryCardTitle:"畫廊", galleryDetailTitle:"畫廊",
+      galleryLicenseText:"© Sixside 省政府 · 這些圖片採用 CC BY 4.0 許可。",
+      govTitle:"政府部門", otherTitle:"其他機構",
+      viewAllBtn:"查看全部部門", copyrightLine:"© Sixside 省政府",
+      techSupportLine:"技術支持和維護由 Wareflame 提供",
+      nationalLink:"UPL 國家門戶", privacyText:"隱私政策：不收集個人數據。", licenseText:"保留所有權利。",
+      themeToggle:"深色/淺色", langToggle:"語言",
+      accessTitle:"輔助功能", contrastLabel:"對比度", grayscaleLabel:"灰度", saturateLabel:"飽和度",
+      cursorColorLabel:"鼠標高亮顏色", cursorRed:"紅色", cursorYellow:"黃色", cursorEnableLabel:"開啟鼠標高亮",
+      resetBtn:"恢復默認",
+      securityTitle:"您怎麼知道這個網站是安全的？",
+      securityDomain:"uplgov 是 UPL 政府官方且唯一的域名",
+      securityHttps:"https 代表您的連接已加密且安全",
+      securityCollapsed:"了解為什麼此網頁是安全的",
+      quickServicesTitle:"快捷服務",
+      quickJobs:"找工作和學徒", quickDemocracy:"民主 Sixside", quickLibrary:"Sixside 圖書館",
+      footerSupportLabel:"支持 Sixside", donateText:"向 Sixside 政府捐款",
+      footerContactLabel:"聯絡電話", footerMediaLabel:"媒體合作", footerLinksLabel:"連結" },
+    "zh-huaxia": { name:"華夏文言", welcome:"汝安", code:"zh-huaxia", useZh:true,
+      mainTitle:"Sixside", mainSubtitle:"山魂永駐",
+      aboutTitle:"六面志", historyTitle:"史", historyText:"世代與此土相諧。",
+      geographyTitle:"地", geographyText:"群山、竹、藤、溪。",
+      populationTitle:"民", populationText:"民行隱徑，守古法。",
+      galleryCardTitle:"畫苑", galleryDetailTitle:"畫苑",
+      galleryLicenseText:"© 六面省政府 · 此圖依 CC BY 4.0 許可。",
+      govTitle:"官府", otherTitle:"他署",
+      viewAllBtn:"悉覽諸部", copyrightLine:"© 六面省政府",
+      techSupportLine:"技護由 Wareflame 供之",
+      nationalLink:"UPL 國門", privacyText:"隱策：不斂民息。", licenseText:"悉權保留。",
+      themeToggle:"深淺", langToggle:"語",
+      accessTitle:"輔功", contrastLabel:"對比", grayscaleLabel:"灰階", saturateLabel:"飽和",
+      cursorColorLabel:"鼠色", cursorRed:"赤", cursorYellow:"黃", cursorEnableLabel:"啟鼠標",
+      resetBtn:"復原",
+      securityTitle:"汝何知此站安全？",
+      securityDomain:"uplgov 乃 UPL 政府官方唯一域名",
+      securityHttps:"https 代汝之連接安全加密",
+      securityCollapsed:"知此頁安全之由",
+      quickServicesTitle:"速服",
+      quickJobs:"求職學徒", quickDemocracy:"民主六面", quickLibrary:"六面圖書館",
+      footerSupportLabel:"助六面", donateText:"捐於六面省政府",
+      footerContactLabel:"電話", footerMediaLabel:"媒合", footerLinksLabel:"鏈" },
+    fr: { name:"Français", welcome:"Bonjour", code:"fr",
+      mainTitle:"Sixside", mainSubtitle:"L'esprit éternel des montagnes",
+      aboutTitle:"À propos de Sixside", historyTitle:"Histoire", historyText:"Des générations ont vécu en harmonie avec cette terre.",
+      geographyTitle:"Géographie", geographyText:"Montagnes, bambou, vignes, ruisseaux.",
+      populationTitle:"Population", populationText:"Les gens marchent sur des sentiers cachés.",
+      galleryCardTitle:"Galerie", galleryDetailTitle:"Galerie",
+      galleryLicenseText:"© Gouvernement provincial de Sixside · Ces images sont sous licence CC BY 4.0.",
+      govTitle:"Gouvernement et Agences", otherTitle:"Autres Bureaux",
+      viewAllBtn:"Voir tous les départements", copyrightLine:"© Gouvernement provincial de Sixside",
+      techSupportLine:"Soutien technique et maintenance fournis par Wareflame",
+      nationalLink:"Portail national UPL", privacyText:"Confidentialité : aucune donnée collectée.", licenseText:"Tous droits réservés.",
+      themeToggle:"Sombre/Clair", langToggle:"Langue",
+      accessTitle:"Accessibilité", contrastLabel:"Contraste", grayscaleLabel:"Niveaux de gris", saturateLabel:"Saturation",
+      cursorColorLabel:"Couleur du curseur", cursorRed:"Rouge", cursorYellow:"Jaune", cursorEnableLabel:"Activer la surbrillance du curseur",
+      resetBtn:"Rétablir les paramètres par défaut",
+      securityTitle:"Comment savez-vous que ce site est sécurisé ?",
+      securityDomain:"uplgov est le domaine officiel et unique du Gouvernement UPL",
+      securityHttps:"https signifie que votre connexion est chiffrée et sécurisée",
+      securityCollapsed:"Découvrez pourquoi cette page est sécurisée",
+      quickServicesTitle:"Services Rapides",
+      quickJobs:"Emploi & Apprentissage", quickDemocracy:"Sixside Démocratique", quickLibrary:"Bibliothèque de Sixside",
+      footerSupportLabel:"Soutenir Sixside", donateText:"Faire un don au Gouvernement de Sixside",
+      footerContactLabel:"Contact", footerMediaLabel:"Partenariats médias", footerLinksLabel:"Liens" },
+    ru: { name:"Русский", welcome:"Здравствуйте", code:"ru",
+      mainTitle:"Sixside", mainSubtitle:"Вечный дух гор",
+      aboutTitle:"О Sixside", historyTitle:"История", historyText:"Поколения жили в гармонии с этой землёй.",
+      geographyTitle:"География", geographyText:"Горы, бамбук, ручьи.",
+      populationTitle:"Население", populationText:"Люди ходят скрытыми тропами.",
+      galleryCardTitle:"Галерея", galleryDetailTitle:"Галерея",
+      galleryLicenseText:"© Правительство Sixside · Эти изображения лицензированы по CC BY 4.0.",
+      govTitle:"Правительство", otherTitle:"Другие офисы",
+      viewAllBtn:"Показать все отделы", copyrightLine:"© Правительство Sixside",
+      techSupportLine:"Техническая поддержка и обслуживание предоставлены Wareflame",
+      nationalLink:"Национальный портал UPL", privacyText:"Конфиденциальность: данные не собираются.", licenseText:"Все права защищены.",
+      themeToggle:"Тёмный/Светлый", langToggle:"Язык",
+      accessTitle:"Специальные возможности", contrastLabel:"Контраст", grayscaleLabel:"Ч/б", saturateLabel:"Насыщенность",
+      cursorColorLabel:"Цвет курсора", cursorRed:"Красный", cursorYellow:"Жёлтый", cursorEnableLabel:"Включить подсветку курсора",
+      resetBtn:"Сбросить",
+      securityTitle:"Как вы знаете, что этот сайт безопасен?",
+      securityDomain:"uplgov — официальный и единственный домен Правительства UPL",
+      securityHttps:"https означает, что ваше соединение зашифровано и безопасно",
+      securityCollapsed:"Узнайте, почему эта страница безопасна",
+      quickServicesTitle:"Быстрые Услуги",
+      quickJobs:"Работа и ученичество", quickDemocracy:"Демократический Sixside", quickLibrary:"Библиотека Sixside",
+      footerSupportLabel:"Поддержать Sixside", donateText:"Пожертвовать правительству Sixside",
+      footerContactLabel:"Контакт", footerMediaLabel:"Медиапартнёрства", footerLinksLabel:"Ссылки" },
+    mn: { name:"Монгол", welcome:"Сайн уу", code:"mn",
+      mainTitle:"Sixside", mainSubtitle:"Уулын мөнхийн сүнс",
+      aboutTitle:"Sixside-ийн тухай", historyTitle:"Түүх", historyText:"Үе үе энэ газартай зохицон амьдарч байсан.",
+      geographyTitle:"Газар зүй", geographyText:"Уулс, хулс, ус, горхи.",
+      populationTitle:"Хүн ам", populationText:"Хүмүүс далд замаар явдаг.",
+      galleryCardTitle:"Галлерей", galleryDetailTitle:"Галлерей",
+      galleryLicenseText:"© Sixside мужийн засгийн газар · Эдгээр зургийг CC BY 4.0 лицензээр ашиглаж болно.",
+      govTitle:"Засгийн газар ба Агентлагууд", otherTitle:"Бусад Албан газар",
+      viewAllBtn:"Бүх хэлтсийг харах", copyrightLine:"© Sixside мужийн засгийн газар",
+      techSupportLine:"Техникийн дэмжлэг, засвар үйлчилгээг Wareflame хангана",
+      nationalLink:"UPL Үндэсний Портал", privacyText:"Нууцлал: Мэдээлэл цуглуулахгүй.", licenseText:"Бүх эрх хуулиар хамгаалагдсан.",
+      themeToggle:"Хар/Цагаан", langToggle:"Хэл",
+      accessTitle:"Хүртээмж", contrastLabel:"Тодосгол", grayscaleLabel:"Саарал", saturateLabel:"Ханасан байдал",
+      cursorColorLabel:"Хулганы өнгө", cursorRed:"Улаан", cursorYellow:"Шар", cursorEnableLabel:"Хулганы тодруулгыг идэвхжүүлэх",
+      resetBtn:"Анхны төлөв",
+      securityTitle:"Энэ вэбсайт аюулгүй гэдгийг та яаж мэдэх вэ?",
+      securityDomain:"uplgov нь UPL засгийн газрын албан ёсны цорын ганц домэйн юм",
+      securityHttps:"https нь таны холболт шифрлэгдсэн, аюулгүй гэсэн үг",
+      securityCollapsed:"Энэ хуудас яагаад аюулгүй болохыг мэдэж авах",
+      quickServicesTitle:"Хурдан Үйлчилгээ",
+      quickJobs:"Ажил ба суралцах боломж", quickDemocracy:"Ардчилсан Sixside", quickLibrary:"Sixside номын сан",
+      footerSupportLabel:"Sixside-г дэмжих", donateText:"Sixside засгийн газарт хандив өргөх",
+      footerContactLabel:"Холбоо барих", footerMediaLabel:"Медиа хамтын ажиллагаа", footerLinksLabel:"Холбоосууд" }
   };
 
   let currentLang = "en";
 
-  // Gallery 相关函数
+  // ===== Security banner logic =====
+  let bannerOpen = false;
+
+  function openBanner() {
+    document.getElementById("securityFull").classList.add("open");
+    document.getElementById("securityCollapsed").style.display = "none";
+    bannerOpen = true;
+  }
+  function closeBanner() {
+    document.getElementById("securityFull").classList.remove("open");
+    document.getElementById("securityCollapsed").style.display = "flex";
+    bannerOpen = false;
+  }
+
+  document.getElementById("closeBannerBtn").onclick = (e) => { e.stopPropagation(); closeBanner(); };
+  document.getElementById("securityCollapsed").onclick = openBanner;
+
+  // Auto-open on page load with animation
+  document.getElementById("securityCollapsed").style.display = "flex";
+  setTimeout(() => openBanner(), 350);
+
+  // ===== Gallery functions (unchanged) =====
   function getGalleryCaption(img, langCode) {
-    const nameMap = {
-      en: img.nameEn, es: img.nameEs, pt: img.namePt, de: img.nameDe, fr: img.nameFr, ru: img.nameRu, mn: img.nameMn,
-      "zh-simple": img.nameZhSimple, "zh-classical": img.nameZhClassical,
-      "zh-traditional": img.nameZhTraditional, "zh-huaxia": img.nameZhHuaxia
-    };
+    const nameMap = { en:img.nameEn, es:img.nameEs, pt:img.namePt, de:img.nameDe, fr:img.nameFr, ru:img.nameRu, mn:img.nameMn, "zh-simple":img.nameZhSimple, "zh-classical":img.nameZhClassical, "zh-traditional":img.nameZhTraditional, "zh-huaxia":img.nameZhHuaxia };
     return nameMap[langCode] || img.nameEn;
   }
 
@@ -517,24 +856,11 @@
     document.getElementById("homeView").style.display = "none";
     const detailDiv = document.getElementById("detailView");
     const data = langData[currentLang];
-    const galleryHtml = galleryImages.map(img => `
-      <div class="gallery-detail-item" data-file="${img.file}">
-        <img src="${img.file}" alt="${getGalleryCaption(img, currentLang)}" loading="lazy">
-        <div class="gallery-detail-caption">${getGalleryCaption(img, currentLang)}</div>
-      </div>
-    `).join("");
-    detailDiv.innerHTML = `
-      <div class="detail-section">
-        <div class="back-home" id="backHomeBtn">← Back</div>
-        <h2>${data.galleryDetailTitle}</h2>
-        <div class="gallery-detail-grid">${galleryHtml}</div>
-        <div class="gallery-license">${data.galleryLicenseText}</div>
-      </div>
-    `;
+    const galleryHtml = galleryImages.map(img => `<div class="gallery-detail-item" data-file="${img.file}"><img src="${img.file}" alt="${getGalleryCaption(img, currentLang)}" loading="lazy"><div class="gallery-detail-caption">${getGalleryCaption(img, currentLang)}</div></div>`).join("");
+    detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${data.galleryDetailTitle}</h2><div class="gallery-detail-grid">${galleryHtml}</div><div class="gallery-license">${data.galleryLicenseText}</div></div>`;
     detailDiv.style.display = "block";
     document.getElementById("currentLocation").innerText = data.galleryDetailTitle;
     document.getElementById("backHomeBtn").onclick = goHome;
-    // 绑定画廊图片点击事件
     document.querySelectorAll(".gallery-detail-item").forEach(item => {
       item.addEventListener("click", () => {
         const file = item.getAttribute("data-file");
@@ -549,35 +875,33 @@
 
   function getDeptName(dept, langCode) {
     if (langCode === "en") return dept.nameEn;
-    const map = {
-      es: dept.nameEs, pt: dept.namePt, de: dept.nameDe, fr: dept.nameFr, ru: dept.nameRu, mn: dept.nameMn,
-      "zh-simple": dept.nameZhSimple, "zh-classical": dept.nameZhClassical,
-      "zh-traditional": dept.nameZhTraditional, "zh-huaxia": dept.nameZhHuaxia
-    };
-    const translated = map[langCode];
-    return `${dept.nameEn} (${translated})`;
+    const map = { es:dept.nameEs, pt:dept.namePt, de:dept.nameDe, fr:dept.nameFr, ru:dept.nameRu, mn:dept.nameMn, "zh-simple":dept.nameZhSimple, "zh-classical":dept.nameZhClassical, "zh-traditional":dept.nameZhTraditional, "zh-huaxia":dept.nameZhHuaxia };
+    return `${dept.nameEn} (${map[langCode]})`;
   }
-
   function getOtherName(other, langCode) {
     if (langCode === "en") return other.nameEn;
-    const map = {
-      es: other.nameEs, pt: other.namePt, de: other.nameDe, fr: other.nameFr, ru: other.nameRu, mn: other.nameMn,
-      "zh-simple": other.nameZhSimple, "zh-classical": other.nameZhClassical,
-      "zh-traditional": other.nameZhTraditional, "zh-huaxia": other.nameZhHuaxia
-    };
-    const translated = map[langCode];
-    return `${other.nameEn} (${translated})`;
+    const map = { es:other.nameEs, pt:other.namePt, de:other.nameDe, fr:other.nameFr, ru:other.nameRu, mn:other.nameMn, "zh-simple":other.nameZhSimple, "zh-classical":other.nameZhClassical, "zh-traditional":other.nameZhTraditional, "zh-huaxia":other.nameZhHuaxia };
+    return `${other.nameEn} (${map[langCode]})`;
+  }
+  function getDesc(d, langCode) {
+    if (langCode === "en") return d.descEn;
+    const map = { es:d.descEs, pt:d.descPt, de:d.descDe, fr:d.descFr, ru:d.descRu, mn:d.descMn, "zh-simple":d.descZhSimple, "zh-classical":d.descZhClassical, "zh-traditional":d.descZhTraditional, "zh-huaxia":d.descZhHuaxia };
+    return map[langCode] || d.descEn;
   }
 
-  function getDesc(deptOrOther, langCode) {
-    if (langCode === "en") return deptOrOther.descEn;
-    const map = {
-      es: deptOrOther.descEs, pt: deptOrOther.descPt, de: deptOrOther.descDe,
-      fr: deptOrOther.descFr, ru: deptOrOther.descRu, mn: deptOrOther.descMn,
-      "zh-simple": deptOrOther.descZhSimple, "zh-classical": deptOrOther.descZhClassical,
-      "zh-traditional": deptOrOther.descZhTraditional, "zh-huaxia": deptOrOther.descZhHuaxia
-    };
-    return map[langCode] || deptOrOther.descEn;
+  // ===== Render quick services =====
+  function renderQuickServices() {
+    const data = langData[currentLang];
+    document.getElementById("quickServicesTitle").innerText = data.quickServicesTitle;
+    const services = [
+      { label: data.quickJobs,      icon: "◈", url: "https://uplgov.github.io/findoppotunities.htm" },
+      { label: data.quickDemocracy, icon: "◎", url: "https://uplgov.github.io/democracy.htm" },
+      { label: data.quickLibrary,   icon: "▣", url: "https://uplgov.github.io/provicial-library.htm" }
+    ];
+    const row = document.getElementById("quickServicesRow");
+    row.innerHTML = services.map(s =>
+      `<a class="quick-btn" href="${s.url}" target="_blank"><span class="quick-btn-icon">${s.icon}</span>${s.label}</a>`
+    ).join("");
   }
 
   function applyLanguage(langCode) {
@@ -605,6 +929,17 @@
     document.getElementById("cursorYellow").innerText = data.cursorYellow;
     document.getElementById("cursorEnableLabel").innerText = data.cursorEnableLabel;
     document.getElementById("resetAccessibilityBtn").innerText = data.resetBtn;
+    // Security banner
+    document.getElementById("securityTitle").innerText = data.securityTitle;
+    document.getElementById("securityDomain").innerText = data.securityDomain;
+    document.getElementById("securityHttps").innerText = data.securityHttps;
+    document.getElementById("securityCollapsedText").innerText = data.securityCollapsed;
+    // Footer
+    document.getElementById("footerSupportLabel").innerText = data.footerSupportLabel;
+    document.getElementById("donateText").innerText = data.donateText;
+    document.getElementById("footerContactLabel").innerText = data.footerContactLabel;
+    document.getElementById("footerMediaLabel").innerText = data.footerMediaLabel;
+    document.getElementById("footerLinksLabel").innerText = data.footerLinksLabel;
     localStorage.setItem("sixside_lang", langCode);
     currentLang = langCode;
     renderHome();
@@ -623,11 +958,12 @@
     const featuredDepts = document.getElementById("featuredDepts");
     featuredDepts.innerHTML = featuredIds.map(id => {
       const dept = allDepts.find(d => d.id === id);
-      return `<div class="card" data-id="${dept.id}"><h3>${getDeptName(dept, currentLang)}</h3><p>${getDesc(dept, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${dept.head}</p></div>`;
+      return `<div class="card" data-id="${dept.id}"><h3>${getDeptName(dept, currentLang)}</h3><p>${getDesc(dept, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">Head: ${dept.head}</p></div>`;
     }).join("");
     const otherGrid = document.getElementById("otherOfficesGrid");
-    otherGrid.innerHTML = otherOffices.map(o => `<div class="card"><h3>${getOtherName(o, currentLang)}</h3><p>${getDesc(o, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem;">Head: ${o.head}</p></div>`).join("");
+    otherGrid.innerHTML = otherOffices.map(o => `<div class="card"><h3>${getOtherName(o, currentLang)}</h3><p>${getDesc(o, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">Head: ${o.head}</p></div>`).join("");
     document.querySelectorAll(".card[data-id]").forEach(card => { card.addEventListener("click", () => showDetail(card.getAttribute("data-id"))); });
+    renderQuickServices();
   }
 
   function showDetail(id) {
@@ -636,7 +972,7 @@
     document.getElementById("homeView").style.display = "none";
     const detailDiv = document.getElementById("detailView");
     let extra = "";
-    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><tr><thead><tr><th>Item</th><th>Rate</th><tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
+    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><table><thead><tr><th>Item</th><th>Rate</th></tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
     detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${getDeptName(dept, currentLang)}</h2><p><strong>Head:</strong> ${dept.head}</p><p>${getDesc(dept, currentLang)}</p>${extra}</div>`;
     detailDiv.style.display = "block";
     document.getElementById("backHomeBtn").onclick = goHome;
@@ -655,7 +991,7 @@
     modal.innerHTML = `<div class="all-depts-modal"><h3>${langData[currentLang].viewAllBtn}</h3><div id="allDeptsList"></div><button class="btn-square" id="closeModalBtn" style="margin-top:1rem;">Close</button></div>`;
     document.body.appendChild(modal);
     const listDiv = modal.querySelector("#allDeptsList");
-    listDiv.innerHTML = allDepts.map(d => `<div class="card" data-id="${d.id}" style="margin-bottom:0.8rem;"><h3>${getDeptName(d, currentLang)}</h3><p>${getDesc(d, currentLang)}</p><p>Head: ${d.head}</p></div>`).join("");
+    listDiv.innerHTML = allDepts.map(d => `<div class="card" data-id="${d.id}" style="margin-bottom:0.8rem;"><h3>${getDeptName(d, currentLang)}</h3><p>${getDesc(d, currentLang)}</p><p style="font-size:0.75rem; color:var(--text-secondary);">Head: ${d.head}</p></div>`).join("");
     modal.querySelectorAll(".card").forEach(card => { card.addEventListener("click", () => { modal.remove(); showDetail(card.getAttribute("data-id")); }); });
     modal.querySelector("#closeModalBtn").onclick = () => modal.remove();
   }
@@ -671,18 +1007,16 @@
     modal.querySelector("#closeLangBtn").onclick = () => modal.remove();
   }
 
-  // 辅助功能控件
+  // Accessibility controls (unchanged)
   const contrastSlider = document.getElementById("contrastSlider");
   const grayscaleSlider = document.getElementById("grayscaleSlider");
   const saturateSlider = document.getElementById("saturateSlider");
-  const contrastVal = document.getElementById("contrastVal");
-  const grayscaleVal = document.getElementById("grayscaleVal");
-  const saturateVal = document.getElementById("saturateVal");
   let filterTimeout;
   function applyFilters() {
     const c = contrastSlider.value, g = grayscaleSlider.value, s = saturateSlider.value;
     document.body.style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
-    contrastVal.innerText = c; grayscaleVal.innerText = g; saturateVal.innerText = s;
+    const cv = document.getElementById("contrastVal"), gv = document.getElementById("grayscaleVal"), sv = document.getElementById("saturateVal");
+    if(cv) cv.innerText = c; if(gv) gv.innerText = g; if(sv) sv.innerText = s;
   }
   function handleSliderInput() { if (filterTimeout) clearTimeout(filterTimeout); filterTimeout = setTimeout(applyFilters, 16); }
   contrastSlider.addEventListener("input", handleSliderInput);
@@ -696,9 +1030,8 @@
   function updateCursor() {
     if (cursorActive) {
       document.body.classList.add("highlight-cursor");
-      const color = cursorColorSelect.value;
       document.body.classList.remove("cursor-red", "cursor-yellow");
-      document.body.classList.add(`cursor-${color}`);
+      document.body.classList.add(`cursor-${cursorColorSelect.value}`);
       document.body.style.cursor = "none";
     } else {
       document.body.classList.remove("highlight-cursor", "cursor-red", "cursor-yellow");
@@ -710,8 +1043,7 @@
   document.addEventListener("mousemove", (e) => { if (cursorActive) { document.body.style.setProperty("--mouse-x", e.clientX + "px"); document.body.style.setProperty("--mouse-y", e.clientY + "px"); } });
   document.getElementById("resetAccessibilityBtn").onclick = () => {
     contrastSlider.value = "1"; grayscaleSlider.value = "0"; saturateSlider.value = "1";
-    applyFilters();
-    cursorCheckbox.checked = false; cursorActive = false; updateCursor();
+    applyFilters(); cursorCheckbox.checked = false; cursorActive = false; updateCursor();
   };
 
   document.getElementById("homeBtn").onclick = goHome;
@@ -720,15 +1052,13 @@
   const toggleBtn = document.getElementById("accessibilityToggle");
   const panel = document.getElementById("accessibilityPanel");
   if (toggleBtn && panel) toggleBtn.onclick = () => panel.classList.toggle("show");
-  const themeToggleBtn = document.getElementById("themeToggleBtn");
-  themeToggleBtn.onclick = () => document.body.classList.toggle("light");
+  document.getElementById("themeToggleBtn").onclick = () => document.body.classList.toggle("light");
   document.getElementById("privacyLink").onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
   document.getElementById("licenseLink").onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
   document.getElementById("lightboxClose").onclick = () => document.getElementById("lightbox").classList.remove("show");
   document.getElementById("lightbox").onclick = (e) => { if (e.target === document.getElementById("lightbox")) document.getElementById("lightbox").classList.remove("show"); };
 
   renderHome();
-  // 每次访问都弹出语言选择窗口
   showLangModal(true);
 </script>
 </body>

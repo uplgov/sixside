@@ -1,1 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>反馈 · 六面警署 | SSPD</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #10161f;
+      --text-primary: #e8edf5;
+      --text-secondary: #9aaebf;
+      --border-color: #1a2538;
+      --card-bg: #10161f;
+      --card-border: #222c38;
+      --btn-bg: #1e2a3a;
+      --accent-red: #cc3333;
+      --accent-green: #2ecc71;
+      --accent-amber: #f39c12;
+      --police-blue: #4a6b8c;
+      --cursor-color: rgba(204, 51, 51, 0.3);
+      --cursor-border: #cc3333;
+    }
+    body.light {
+      --bg-primary: #f4f6f9; --bg-secondary: #ffffff; --text-primary: #1a2634;
+      --text-secondary: #3a4a5e; --border-color: #d0d8e4; --card-bg: #ffffff;
+      --card-border: #dce2ec; --btn-bg: #eef2f7;
+    }
+    body.xp-mode {
+      --bg-primary: #ece9d8; --bg-secondary: #ffffff; --text-primary: #1e1e1e;
+      --text-secondary: #3a3a3a; --border-color: #919b9c; --card-bg: #f5f3e9;
+      --card-border: #c1c7c7; --btn-bg: #e0dfd3; --accent-red: #b33b3b;
+      --accent-green: #3c7840; --accent-amber: #b57e2e; --police-blue: #2a5c8a;
+      font-family: 'Tahoma', 'Segoe UI', sans-serif;
+    }
+    body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
+    body.xp-mode { background: #d4d0c8; }
+    
+    #cursor-highlight {
+      position: fixed; pointer-events: none; width: 50px; height: 50px;
+      border: 2px solid var(--cursor-border); background: var(--cursor-color);
+      border-radius: 50%; transform: translate(-50%, -50%); z-index: 10000; display: none;
+    }
+    #cursor-highlight::before, #cursor-highlight::after { content: ''; position: absolute; background: #fff; }
+    #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
+    .filter-layer { transition: filter 0.2s; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; position: sticky; top: 0; z-index: 1100; }
+    .emergency-number { color: var(--accent-red); font-weight: bold; }
+    .nonemergency-number { color: var(--accent-amber); font-weight: bold; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 70px; z-index: 1000; }
+    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; cursor: pointer; }
+    .nav-brand span { color: var(--police-blue); }
+
+    .keyword-glow { display: inline-block; background: linear-gradient(120deg, #ffffff, #3b82f6, #60a5fa, #3b82f6, #ffffff); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: keywordShine 2.5s ease-in-out infinite; font-weight: bold; }
+    @keyframes keywordShine { 0% { background-position: 0% center; } 30% { background-position: 100% center; text-shadow: 0 0 10px rgba(59,130,246,0.8); } 100% { background-position: 300% center; } }
+    
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(100%) contrast(1.2); transition: filter 0.2s; }
+    .acc-icon-btn:hover { filter: grayscale(50%) contrast(1); }
+    .lang-switch-btn, .tool-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; }
+    .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
+    .acc-panel.show { display: block; }
+    .acc-item { margin-bottom: 15px; }
+    .acc-select { width: 100%; padding: 8px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; }
+
+    .feedback-hub { display: flex; flex-wrap: wrap; gap: 25px; margin: 50px 0; align-items: stretch; }
+    .feedback-card { flex: 1 1 250px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; border-top: 6px solid var(--police-blue); }
+    .feedback-card:hover { transform: translateY(-8px); box-shadow: 0 12px 28px rgba(0,0,0,0.4); border-color: var(--accent-amber); }
+    .feedback-card h3 { margin-bottom: 20px; color: var(--accent-amber); }
+    
+    .leave-btn-container { text-align: right; margin: 20px 0; }
+    .leave-danger-btn { background: var(--accent-red); border: none; color: white; font-weight: bold; padding: 14px 32px; font-size: 1.2rem; border-radius: 48px; cursor: pointer; box-shadow: 0 4px 10px rgba(204,51,51,0.3); transition: 0.2s; border: 2px solid #fff3; }
+    .leave-danger-btn:hover { background: #b12a2a; transform: scale(1.02); }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
+    .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 750px; margin: 0 auto; padding: 30px; border-radius: 16px; }
+    body.xp-mode .modal-content { background: #ece9d8; border: 2px solid #0a2e5c; box-shadow: 5px 5px 0 #808080; }
+    
+    .form-group { margin-bottom: 22px; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; }
+    .btn-action { width: 100%; padding: 14px; margin-top: 15px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; font-weight: bold; }
+    .btn-danger { background: var(--accent-red); color: white; border: none; }
+
+    .xp-loading-screen { text-align: center; padding: 30px; }
+    .xp-loading-screen img { width: 64px; height: 64px; }
+    .xp-error-box { background: #ffffff; border: 3px solid #cc3333; padding: 30px; }
+    .xp-error-box img { float: left; margin-right: 20px; width: 48px; }
+    .xp-advanced { margin-top: 25px; border-top: 1px dashed #aaa; padding-top: 15px; }
+    .xp-advanced summary { cursor: pointer; color: #2a5c8a; font-weight: bold; }
+    .fixed-en { font-family: 'Consolas', monospace; }
+
+    footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 60px; }
+    .toast-notify { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent-green); color: #000; padding: 12px 24px; border-radius: 8px; z-index: 20000; animation: fadeOut 3s forwards; }
+    @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+  </style>
+</head>
+<body>
+<div id="cursor-highlight"></div>
+<div class="emergency-top-bar">
+  <span id="emergencyLabel">紧急情况:</span> <span class="emergency-number">110</span>
+  <span style="margin:0 20px;">|</span>
+  <span id="nonEmergencyLabel">非紧急:</span> <span class="nonemergency-number">009</span>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
+  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
+  <div class="acc-panel" id="accPanel">
+    <div class="acc-item"><label id="contrastLabel">对比度</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="grayscaleLabel">灰度</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="saturateLabel">饱和度</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="crosshairLabel">准星颜色</label><select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()"><option value="rgba(204,51,51,0.3)|#cc3333">红</option><option value="rgba(52,152,219,0.3)|#3498db">蓝</option></select></div>
+    <div class="acc-item"><label><input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> <span id="cursorEnableLabel">启用十字准星</span></label></div>
+    <button class="btn-action" id="resetAccBtn" onclick="resetAcc()">重置</button>
+  </div>
+</nav>
+<div class="filter-layer" id="mainFilter">
+  <div class="container">
+    <header style="text-align:center; padding: 40px 0 10px;">
+      <h1><span class="keyword-glow" id="wordFeedback">反馈·建议·感谢</span></h1>
+      <div style="margin-top:10px; color:var(--text-secondary);" id="headerSub">您的意见帮助我们改善</div>
+    </header>
+
+    <div class="leave-btn-container">
+      <button class="leave-danger-btn" id="leaveDangerBtn">← 离开 (快速退出)</button>
+    </div>
+
+    <div class="feedback-hub">
+      <div class="feedback-card" id="cardWebsiteSuggestion">
+        <h3 id="card1Title">网站建议</h3>
+        <p id="card1Desc">界面、功能、访问性问题</p>
+      </div>
+      <div class="feedback-card" id="cardStationSuggestion">
+        <h3 id="card2Title">警局环境建议</h3>
+        <p id="card2Desc">Sixside任何警察局设施</p>
+      </div>
+      <div class="feedback-card" id="cardComplaintThanks">
+        <h3 id="card3Title">投诉 / 感谢</h3>
+        <p id="card3Desc">对警员或服务的评价</p>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | 技术支持 Wareflame</p></footer>
+
+<div class="modal-overlay" id="langModal"><div class="modal-content"><h2 id="langModalTitle">选择语言</h2><div id="langGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div><button class="btn-action" id="closeLangModal">关闭</button></div></div>
+
+<div class="modal-overlay" id="feedbackWebsiteModal"><div class="modal-content" id="feedbackWebsiteContent"></div></div>
+<div class="modal-overlay" id="feedbackStationModal"><div class="modal-content" id="feedbackStationContent"></div></div>
+<div class="modal-overlay" id="complaintModal"><div class="modal-content"><h2>投诉 / 感谢</h2><p>此功能将在后续版本提供，您可拨打009记录。</p><button class="btn-action" onclick="document.getElementById('complaintModal').style.display='none'">关闭</button></div></div>
+
+<script>
+  (function(){
+    const translations = {
+      'zh-Hans': {
+        emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame',
+        wordFeedback:'反馈·建议·感谢', headerSub:'您的意见帮助我们改善',
+        card1Title:'网站建议', card1Desc:'界面、功能、访问性问题',
+        card2Title:'警局环境建议', card2Desc:'Sixside任何警察局设施',
+        card3Title:'投诉 / 感谢', card3Desc:'对警员或服务的评价',
+        leaveBtn:'← 离开 (快速退出)',
+        websiteTitle:'网站反馈',
+        websiteNotice:'此表单仅用于反馈，而不是关于其他任何犯罪的反馈。如果有人处在危险中或犯罪正在/即将发生，请拨打110。',
+        websiteNotice2:'感谢您抽出时间阅读并反馈。您也可以拨打+875 4 73或者+875 73反馈关于网站的建议。',
+        startFeedback:'进入反馈',
+        stationTitle:'警局环境反馈',
+        stationLocation:'请选择警察局位置',
+        locationOpt1:'Yishan SSPD',
+        locationOpt2:'The Last Hero Point SSPD (2076年关闭)',
+        locationOpt3:'Lava Village SSPD - mobile (自3000年以后从未开放)',
+        categoryLabel:'选择类别 (可多选)',
+        cat1:'空气质量', cat2:'噪音', cat3:'灯光', cat4:'卫生间', cat5:'更衣室或淋浴房',
+        cat6:'交通工具停放处', cat7:'附近的室外', cat8:'建筑外观', cat9:'互联网质量',
+        cat10:'蜂窝移动通信质量', cat11:'防滑措施', cat12:'其他',
+        descriptionLabel:'描述',
+        timeLabel:'发生时间',
+        contactWilling:'是否愿意提供联系方式',
+        surnameWilling:'是否愿意提供姓氏',
+        submitBtn:'提交反馈',
+        cancelBtn:'取消',
+        loadingText:'正在加载……',
+        error401:'很抱歉你被拒绝访问服务器: 401 Unauthorised IP',
+        advanced:'高级',
+        advReason:'Reason: This IP address is inaccessible due to IP abuse. Source: Wikipedia API, last updated: 2023. Please disable your VPN, proxy, or use a different device. You can also contact the administrator of "uplgov.github.io/sixside/police" to have your IP address whitelisted.',
+        fakeToast:'反馈已记录 (模拟)',
+        contrast:'对比度', grayscale:'灰度', saturate:'饱和度', crosshair:'准星颜色',
+        enableCursor:'启用十字准星', reset:'重置', langTitle:'选择语言'
+      },
+      'en': {
+        emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support Wareflame',
+        wordFeedback:'Feedback · Suggestion · Thanks', headerSub:'Your input helps us improve',
+        card1Title:'Website Suggestion', card1Desc:'UI, features, accessibility',
+        card2Title:'Station Environment', card2Desc:'Any Sixside police facility',
+        card3Title:'Complaint / Thanks', card3Desc:'Regarding officers or service',
+        leaveBtn:'← LEAVE (Quick Exit)',
+        websiteTitle:'Website Feedback',
+        websiteNotice:'This form is only for feedback, NOT for reporting crimes. If someone is in danger or a crime is in progress/about to happen, call 110.',
+        websiteNotice2:'Thank you for your time. You can also call +875 4 73 or +875 73 for website suggestions.',
+        startFeedback:'Start Feedback',
+        stationTitle:'Station Environment Feedback',
+        stationLocation:'Select police station location',
+        locationOpt1:'Yishan SSPD',
+        locationOpt2:'The Last Hero Point SSPD (closed 2076)',
+        locationOpt3:'Lava Village SSPD - mobile (never opened since 3000)',
+        categoryLabel:'Select categories (multi-select)',
+        cat1:'Air quality', cat2:'Noise', cat3:'Lighting', cat4:'Restrooms', cat5:'Changing/shower',
+        cat6:'Parking/transport', cat7:'Outdoor vicinity', cat8:'Building appearance', cat9:'Internet quality',
+        cat10:'Cellular signal', cat11:'Anti-slip', cat12:'Other',
+        descriptionLabel:'Description',
+        timeLabel:'Time of occurrence',
+        contactWilling:'Willing to provide contact?',
+        surnameWilling:'Willing to provide surname?',
+        submitBtn:'Submit feedback',
+        cancelBtn:'Cancel',
+        loadingText:'Loading……',
+        error401:'Sorry you have been denied access to the server: 401 Unauthorised IP',
+        advanced:'Advanced',
+        advReason:'Reason: This IP address is inaccessible due to IP abuse. Source: Wikipedia API, last updated: 2023. Please disable your VPN, proxy, or use a different device. You can also contact the administrator of "uplgov.github.io/sixside/police" to have your IP address whitelisted.',
+        fakeToast:'Feedback recorded (simulation)',
+        contrast:'Contrast', grayscale:'Grayscale', saturate:'Saturate', crosshair:'Crosshair Color',
+        enableCursor:'Enable Crosshair', reset:'Reset', langTitle:'Select Language'
+      }
+    };
+    let currentLang = 'zh-Hans';
+    function t(key){ return translations[currentLang]?.[key] || key; }
+
+    function applyLanguageUI(){
+      document.querySelectorAll('[id]').forEach(el=>{ if(translations[currentLang]?.[el.id]) el.innerText = translations[currentLang][el.id]; });
+      document.getElementById('leaveDangerBtn').innerText = t('leaveBtn');
+      document.querySelectorAll('[data-t]').forEach(el=>{ let k=el.getAttribute('data-t'); if(t(k)) el.innerText=t(k); });
+    }
+
+    function showToast(msg, isErr){ let d=document.createElement('div'); d.className='toast-notify'+(isErr?' error':''); d.innerText=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),3000); }
+
+    function buildLangModal(){
+      let grid=document.getElementById('langGrid'); grid.innerHTML='';
+      [{code:'zh-Hans',name:'简体中文'},{code:'en',name:'English'}].forEach(l=>{
+        let btn=document.createElement('div'); btn.style.padding='10px'; btn.style.background='var(--btn-bg)'; btn.style.borderRadius='8px'; btn.style.cursor='pointer';
+        btn.innerText=l.name; btn.onclick=()=>{ currentLang=l.code; applyLanguageUI(); document.getElementById('langModal').style.display='none'; localStorage.setItem('sspd_lang',l.code); };
+        grid.appendChild(btn);
+      });
+    }
+    document.getElementById('langSwitchBtn').onclick=()=>{ buildLangModal(); document.getElementById('langModal').style.display='flex'; };
+    document.getElementById('closeLangModal').onclick=()=>document.getElementById('langModal').style.display='none';
+
+    document.getElementById('leaveDangerBtn').onclick=function(){
+      window.open('https://www.bbc.co.uk/bitesize','_blank');
+      window.location.href='https://www.bing.com/search?q=time+in+nanjing';
+    };
+
+    function toggleAccPanel(){ document.getElementById('accPanel').classList.toggle('show'); }
+    function applyFilters(){ let c=document.getElementById('con-range').value, g=document.getElementById('gray-range').value, s=document.getElementById('sat-range').value; document.getElementById('mainFilter').style.filter=`contrast(${c}) grayscale(${g}) saturate(${s})`; }
+    function resetAcc(){ document.getElementById('con-range').value=1; document.getElementById('gray-range').value=0; document.getElementById('sat-range').value=1; document.getElementById('cursor-cb').checked=false; toggleCursorAssist(false); applyFilters(); }
+    function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; }
+    function updateCursorStyle(){ let sel=document.getElementById('cursor-color-select'); if(sel){ let [bg,border]=sel.value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); } }
+    document.addEventListener('mousemove',(e)=>{ let c=document.getElementById('cursor-highlight'); if(c.style.display==='block'){ c.style.left=e.clientX+'px'; c.style.top=e.clientY+'px'; } });
+
+    function showWebsiteFeedback(){
+      let modal=document.getElementById('feedbackWebsiteModal');
+      let content=document.getElementById('feedbackWebsiteContent');
+      content.innerHTML=`
+        <h2>${t('websiteTitle')}</h2>
+        <p style="margin:15px 0; background:rgba(204,51,51,0.1); padding:12px; border-radius:8px;">⚠️ ${t('websiteNotice')}</p>
+        <p>${t('websiteNotice2')}</p>
+        <button class="btn-action" id="enterFeedbackBtn" style="margin-top:25px;">${t('startFeedback')}</button>
+        <button class="btn-action" onclick="document.getElementById('feedbackWebsiteModal').style.display='none'">${t('cancelBtn')}</button>
+      `;
+      modal.style.display='flex';
+      document.getElementById('enterFeedbackBtn').onclick=()=>{
+        document.body.classList.add('xp-mode'); document.body.classList.remove('light');
+        content.innerHTML = `
+          <div class="xp-loading-screen">
+            <img src="../icons/loading.gif" alt="loading" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2228%22%20stroke%3D%22%232a5c8a%22%20stroke-width%3D%224%22%20fill%3D%22none%22%20stroke-dasharray%3D%22100%2C%20100%22%20stroke-linecap%3D%22round%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2032%2032%22%20to%3D%22360%2032%2032%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fcircle%3E%3C%2Fsvg%3E'">
+            <p>${t('loadingText')}</p>
+          </div>
+        `;
+        let delay = 9000 + Math.floor(Math.random() * 7000);
+        setTimeout(()=>{
+          content.innerHTML = `
+            <div class="xp-error-box">
+              <div style="display:flex; align-items:center; gap:15px;">
+                <img src="../icons/caution.png" alt="!" style="width:48px;" onerror="this.outerHTML='⚠️'">
+                <h3 style="color:#b33b3b;">${t('error401')}</h3>
+              </div>
+              <details class="xp-advanced">
+                <summary>${t('advanced')}</summary>
+                <p style="margin-top:15px; background:#f0f0ea; padding:12px;" class="fixed-en">${t('advReason')}</p>
+              </details>
+              <button class="btn-action" style="margin-top:20px;" onclick="document.getElementById('feedbackWebsiteModal').style.display='none'; document.body.classList.remove('xp-mode');">${t('cancelBtn')}</button>
+            </div>
+          `;
+        }, delay);
+      };
+    }
+
+    function showStationFeedback(){
+      let modal=document.getElementById('feedbackStationModal');
+      let content=document.getElementById('feedbackStationContent');
+      content.innerHTML = `
+        <div class="xp-loading-screen">
+          <img src="../icons/loading.gif" alt="loading" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2228%22%20stroke%3D%22%232a5c8a%22%20stroke-width%3D%224%22%20fill%3D%22none%22%20stroke-dasharray%3D%22100%2C%20100%22%20stroke-linecap%3D%22round%22%3E%3CanimateTransform%20attributeName%3D%22transform%22%20type%3D%22rotate%22%20from%3D%220%2032%2032%22%20to%3D%22360%2032%2032%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%3C%2Fcircle%3E%3C%2Fsvg%3E'">
+          <p>${t('loadingText')}</p>
+        </div>
+      `;
+      modal.style.display='flex';
+      setTimeout(()=>{
+        content.innerHTML = `
+          <h2>${t('stationTitle')}</h2>
+          <div class="form-group"><label>${t('stationLocation')}</label>
+            <select id="stationSelect"><option>${t('locationOpt1')}</option><option>${t('locationOpt2')}</option><option>${t('locationOpt3')}</option></select>
+          </div>
+          <div class="form-group"><label>${t('categoryLabel')}</label>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;" id="categoryCheckboxes"></div>
+          </div>
+          <div class="form-group"><label>${t('descriptionLabel')}</label><textarea rows="3"></textarea></div>
+          <div class="form-group"><label>${t('timeLabel')}</label><input type="datetime-local"></div>
+          <div class="form-group"><label>${t('contactWilling')} <input type="checkbox"></label></div>
+          <div class="form-group"><label>${t('surnameWilling')} <input type="checkbox"></label></div>
+          <button class="btn-action" id="fakeSubmitStation">${t('submitBtn')}</button>
+          <button class="btn-action" onclick="document.getElementById('feedbackStationModal').style.display='none'">${t('cancelBtn')}</button>
+        `;
+        let catDiv=document.getElementById('categoryCheckboxes');
+        ['cat1','cat2','cat3','cat4','cat5','cat6','cat7','cat8','cat9','cat10','cat11','cat12'].forEach(k=>{
+          let label=document.createElement('label'); label.style.display='flex'; label.style.alignItems='center';
+          label.innerHTML=`<input type="checkbox" style="width:auto; margin-right:8px;"> ${t(k)}`; catDiv.appendChild(label);
+        });
+        document.getElementById('fakeSubmitStation').onclick=()=>{ showToast(t('fakeToast')); modal.style.display='none'; };
+      }, 500);
+    }
+
+    document.getElementById('cardWebsiteSuggestion').onclick=showWebsiteFeedback;
+    document.getElementById('cardStationSuggestion').onclick=showStationFeedback;
+    document.getElementById('cardComplaintThanks').onclick=()=>{ document.getElementById('complaintModal').style.display='flex'; };
+
+    let saved=localStorage.getItem('sspd_lang'); if(saved&&translations[saved]) currentLang=saved;
+    applyLanguageUI();
+    window.applyLanguageUI=applyLanguageUI;
+  })();
+</script>
+</body>
+</html>

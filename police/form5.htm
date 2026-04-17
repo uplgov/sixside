@@ -92,8 +92,14 @@
     .feedback-card h3 { margin-bottom: 20px; color: var(--accent-amber); }
     
     .leave-btn-container { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 999; }
-    .leave-danger-btn { background: var(--accent-red); border: none; color: white; font-weight: bold; padding: 8px 12px; font-size: 0.9rem; border-radius: 8px 0 0 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(204,51,51,0.4); transition: 0.2s; border: 1px solid rgba(255,255,255,0.2); writing-mode: horizontal-tb; letter-spacing: 1px; }
-    .leave-danger-btn:hover { background: #b12a2a; padding-right: 16px; }
+    .leave-danger-btn { 
+      background: var(--accent-red); border: none; color: white; font-weight: bold; 
+      padding: 16px 8px; font-size: 1rem; border-radius: 8px 0 0 8px; cursor: pointer; 
+      box-shadow: 0 2px 8px rgba(204,51,51,0.4); transition: 0.2s; 
+      border: 1px solid rgba(255,255,255,0.2); letter-spacing: 4px;
+      writing-mode: vertical-rl; text-orientation: upright;
+    }
+    .leave-danger-btn:hover { background: #b12a2a; padding-right: 12px; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
     .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 750px; margin: 0 auto; padding: 30px; border-radius: 16px; }
@@ -246,7 +252,6 @@
 
 <script>
   (function(){
-    // 完整的14种语言翻译
     const translations = {
       'zh-Hans': { 
         emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', 
@@ -307,7 +312,6 @@
     }
 
     function applyLanguageUI() {
-      // 更新所有带 id 的元素
       const allElements = document.querySelectorAll('[id]');
       allElements.forEach(el => {
         const key = el.id;
@@ -316,7 +320,6 @@
         }
       });
       
-      // 特殊处理的元素
       document.getElementById('leaveDangerBtn').innerText = t('leaveBtn');
       document.getElementById('wordFeedback').innerText = t('wordFeedback');
       document.getElementById('headerSub').innerText = t('headerSub');
@@ -353,7 +356,6 @@
           applyLanguageUI();
           document.getElementById('langModal').style.display = 'none';
           localStorage.setItem('sspd_lang', code);
-          // 如果网站反馈窗口是打开的，刷新其内容
           if (document.getElementById('win95Window').classList.contains('active')) {
             refreshWebsiteFeedbackContent();
           }
@@ -370,7 +372,6 @@
       setTimeout(() => d.remove(), 3000);
     }
 
-    // 事件绑定
     document.getElementById('langSwitchBtn').onclick = () => {
       buildLangModal();
       document.getElementById('langModal').style.display = 'flex';
@@ -381,8 +382,15 @@
     };
     
     document.getElementById('leaveDangerBtn').onclick = () => {
-      window.open('https://www.bbc.co.uk/bitesize', '_blank');
-      window.location.href = 'https://www.bing.com/search?q=time+in+nanjing';
+      const newWin = window.open('https://www.bing.com/search?q=time+in+nanjing', '_blank');
+      const bbcWin = window.open('https://www.bbc.co.uk/bitesize', '_blank');
+      history.pushState(null, '', location.href);
+      window.addEventListener('popstate', function() {
+        history.pushState(null, '', location.href);
+      });
+      setTimeout(() => {
+        location.replace('https://www.bing.com/search?q=time+in+nanjing');
+      }, 100);
     };
 
     function toggleAccPanel() { 
@@ -436,7 +444,6 @@
       });
     });
 
-    // 帮助模式
     let helpModeActive = false;
     const overlay = document.getElementById('helpOverlay');
     const helpBtn = document.getElementById('helpIconBtn');
@@ -482,7 +489,6 @@
     
     overlay.addEventListener('mouseleave', () => { if (helpModeActive) { tooltip.style.display = 'none'; } });
 
-    // 系统菜单
     function setupSystemMenu(logoId, menuId, closeCallback) {
       const logo = document.getElementById(logoId);
       const menu = document.getElementById(menuId);
@@ -496,7 +502,6 @@
     function refreshWebsiteFeedbackContent() {
       const content = document.getElementById('win95Content');
       if (!content) return;
-      // 检查当前是否在初始状态（有 enterFeedbackBtn 按钮）
       const hasEnterBtn = document.getElementById('enterFeedbackBtn');
       if (hasEnterBtn) {
         content.innerHTML = `
@@ -509,7 +514,6 @@
             </div>
           </div>
         `;
-        // 重新绑定事件
         document.getElementById('enterFeedbackBtn').onclick = () => {
           if (win95Timer) clearTimeout(win95Timer);
           content.innerHTML = `<div class="xp-loading-screen"><img src="../icons/loading.gif" alt="loading"><p>${t('loadingText')}</p><button class="win95-btn" id="cancelLoadingBtn">${t('cancelBtn')}</button></div>`;
@@ -639,12 +643,10 @@
     document.getElementById('cardComplaint').onclick = () => { document.getElementById('complaintModal').style.display = 'flex'; };
     document.getElementById('cardThanks').onclick = () => { document.getElementById('thanksModal').style.display = 'flex'; };
 
-    // 初始化语言
     const saved = localStorage.getItem('sspd_lang');
     if (saved && translations[saved]) currentLang = saved;
     applyLanguageUI();
 
-    // 暴露函数到全局
     window.toggleAccPanel = toggleAccPanel;
     window.applyFilters = applyFilters;
     window.resetAcc = resetAcc;

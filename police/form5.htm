@@ -32,21 +32,21 @@
     body.xp-mode {
       --bg-primary: #c0c0c0; --bg-secondary: #c0c0c0; --text-primary: #000000;
       --text-secondary: #000000; --border-color: #808080; --card-bg: #c0c0c0;
-      --card-border: #ffffff #808080 #808080 #ffffff; --btn-bg: #c0c0c0;
+      --card-border: #ffffff #808080 #808080 #808080; --btn-bg: #c0c0c0;
       --accent-red: #b33b3b; --accent-green: #3c7840; --accent-amber: #b57e2e;
       --police-blue: #000080;
       font-family: 'MS Sans Serif', 'Segoe UI', sans-serif;
     }
     body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
-    body.xp-mode { background: #c0c0c0; }
+    body.xp-mode { background: #808080; }
     
     body.xp-mode::before {
       content: '';
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-image: radial-gradient(circle, #404040 1px, transparent 1px);
+      background-image: radial-gradient(circle, #000000 1px, transparent 1px);
       background-size: 4px 4px;
-      opacity: 0.3;
+      opacity: 0.4;
       pointer-events: none;
       z-index: 1;
     }
@@ -54,6 +54,7 @@
     body.xp-mode .win95-window { z-index: 10002; }
     body.xp-mode .modal-overlay { z-index: 10001; }
     body.xp-mode .leave-btn-container { z-index: 999; }
+    body.xp-mode #cursor-highlight { z-index: 10003; }
     
     #cursor-highlight {
       position: fixed; pointer-events: none; width: 50px; height: 50px;
@@ -97,14 +98,20 @@
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
     .modal-content { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 750px; margin: 0 auto; padding: 30px; border-radius: 16px; }
     
-    .win95-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #c0c0c0; z-index: 10002; display: none; }
+    .win95-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #808080; z-index: 10002; display: none; }
     .win95-window.active { display: block; }
     .win95-titlebar { background: #000080; color: white; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-family: 'MS Sans Serif', sans-serif; font-weight: bold; font-size: 14px; }
-    .win95-titlebar button { background: #c0c0c0; border: 2px solid #ffffff #808080 #808080 #ffffff; color: black; width: 24px; height: 24px; font-weight: bold; cursor: pointer; font-family: 'MS Sans Serif'; display: flex; align-items: center; justify-content: center; padding: 0; }
-    .win95-content { padding: 20px; height: calc(100% - 36px); overflow-y: auto; background: #c0c0c0; }
+    .win95-titlebar-left { display: flex; align-items: center; gap: 8px; }
+    .win95-titlebar-logo { width: 20px; height: 20px; cursor: pointer; margin-right: 4px; }
+    .win95-titlebar button { background: #c0c0c0; border: 2px solid #ffffff #808080 #808080 #808080; color: black; width: 24px; height: 24px; font-weight: bold; cursor: pointer; font-family: 'MS Sans Serif'; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .win95-content { padding: 20px; height: calc(100% - 36px); overflow-y: auto; background: #808080; position: relative; }
     .win95-btn { background: #c0c0c0; border: 2px solid #ffffff #808080 #808080 #ffffff; padding: 8px 16px; font-family: 'MS Sans Serif', sans-serif; font-size: 13px; cursor: pointer; color: black; font-weight: normal; border-radius: 0; box-shadow: none; margin: 5px; }
-    .win95-btn:active { border: 2px solid #808080 #ffffff #ffffff #808080; }
+    .win95-btn:active { border: 2px solid #808080 #ffffff #808080 #808080; }
     .win95-input { background: white; border: 2px solid #808080 #ffffff #ffffff #808080; padding: 8px; font-family: 'MS Sans Serif', sans-serif; width: 100%; border-radius: 0; color: black; }
+    
+    .station-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #808080; z-index: 10002; display: none; }
+    .station-window.active { display: block; }
+    
     body.xp-mode .modal-content { background: #c0c0c0; border: 2px solid #000080; box-shadow: none; border-radius: 0; }
     
     .form-group { margin-bottom: 22px; }
@@ -120,6 +127,22 @@
     .xp-advanced { margin-top: 25px; border-top: 1px dashed #000; padding-top: 15px; }
     .xp-advanced summary { cursor: pointer; color: #000080; font-weight: bold; }
     .fixed-en { font-family: 'Consolas', monospace; }
+    
+    .phone-link { cursor: help; text-decoration: underline; text-decoration-style: dotted; }
+    .phone-link:hover { background: #ff0; color: #000; }
+    
+    .help-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10003; display: none; }
+    .help-overlay.active { display: block; }
+    .help-icon-btn { position: fixed; bottom: 20px; right: 20px; width: 48px; height: 48px; cursor: pointer; z-index: 10004; background: #c0c0c0; border: 2px solid #ffffff #808080 #808080 #ffffff; padding: 4px; }
+    .help-icon-btn img { width: 100%; height: 100%; }
+    .help-icon-btn:active { border: 2px solid #808080 #ffffff #ffffff #808080; }
+    
+    .tooltip-popup { position: absolute; background: #ffffcc; border: 2px solid #000080; padding: 8px 12px; font-family: 'MS Sans Serif', sans-serif; font-size: 12px; color: #000; max-width: 250px; z-index: 10005; box-shadow: 4px 4px 0 rgba(0,0,0,0.2); display: none; pointer-events: none; }
+    
+    .system-menu { position: absolute; top: 100%; left: 0; background: #c0c0c0; border: 2px solid #ffffff #808080 #808080 #808080; padding: 4px 0; min-width: 120px; z-index: 10006; display: none; font-family: 'MS Sans Serif', sans-serif; font-size: 13px; }
+    .system-menu-item { padding: 4px 16px; color: #808080; cursor: default; }
+    .system-menu-item.active { color: #000; cursor: pointer; }
+    .system-menu-item.active:hover { background: #000080; color: white; }
 
     footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 60px; }
     .toast-notify { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent-green); color: #000; padding: 12px 24px; border-radius: 8px; z-index: 20000; animation: fadeOut 3s forwards; }
@@ -180,17 +203,46 @@
 <footer><p id="footerText">© 2025-2026 六面警察局 | 技术支持 Wareflame</p></footer>
 
 <div class="modal-overlay" id="langModal"><div class="modal-content"><h2 id="langModalTitle">选择语言</h2><div id="langGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div><button class="btn-action" id="closeLangModal">关闭</button></div></div>
-<div class="modal-overlay" id="feedbackStationModal"><div class="modal-content" id="feedbackStationContent"></div></div>
 <div class="modal-overlay" id="complaintModal"><div class="modal-content"><h2 id="complaintTitle">投诉</h2><p id="complaintText">此功能将在后续版本提供，您可拨打009记录。</p><button class="btn-action" id="complaintCloseBtn" onclick="document.getElementById('complaintModal').style.display='none'">关闭</button></div></div>
 <div class="modal-overlay" id="thanksModal"><div class="modal-content"><h2 id="thanksTitle">感谢</h2><p id="thanksText">此功能将在后续版本提供，您可拨打009记录。</p><button class="btn-action" id="thanksCloseBtn" onclick="document.getElementById('thanksModal').style.display='none'">关闭</button></div></div>
 
 <div class="win95-window" id="win95Window">
   <div class="win95-titlebar">
-    <span id="win95Title">网站反馈</span>
+    <div class="win95-titlebar-left">
+      <img src="../icons/batchfilelogo.png" alt="logo" class="win95-titlebar-logo" id="win95Logo" onerror="this.style.display='none'">
+      <span id="win95Title">网站反馈</span>
+    </div>
     <button id="win95CloseBtn">✕</button>
   </div>
   <div class="win95-content" id="win95Content"></div>
+  <div class="system-menu" id="win95SystemMenu">
+    <div class="system-menu-item">最小化</div>
+    <div class="system-menu-item">移动</div>
+    <div class="system-menu-item active" id="win95MenuClose">关闭</div>
+  </div>
 </div>
+
+<div class="station-window" id="stationWindow">
+  <div class="win95-titlebar">
+    <div class="win95-titlebar-left">
+      <img src="../icons/batchfilelogo.png" alt="logo" class="win95-titlebar-logo" id="stationLogo" onerror="this.style.display='none'">
+      <span id="stationTitle">警局环境反馈</span>
+    </div>
+    <button id="stationCloseBtn">✕</button>
+  </div>
+  <div class="win95-content" id="stationContent"></div>
+  <div class="system-menu" id="stationSystemMenu">
+    <div class="system-menu-item">最小化</div>
+    <div class="system-menu-item">移动</div>
+    <div class="system-menu-item active" id="stationMenuClose">关闭</div>
+  </div>
+</div>
+
+<div class="help-overlay" id="helpOverlay"></div>
+<div class="help-icon-btn" id="helpIconBtn" style="display: none;">
+  <img src="../icons/questionmark.png" alt="?">
+</div>
+<div class="tooltip-popup" id="helpTooltip"></div>
 
 <script>
   (function(){
@@ -212,16 +264,17 @@
         advReason:'Reason: This IP address is inaccessible due to IP abuse. Source: Wikipedia API, last updated: 2023. Please disable your VPN, proxy, or use a different device. You can also contact the administrator of "uplgov.github.io/sixside/police" to have your IP address whitelisted.', 
         fakeToast:'反馈已记录', contrast:'对比度', grayscale:'灰度', saturate:'饱和度', crosshair:'准星颜色', enableCursor:'启用十字准星', 
         reset:'重置', langTitle:'选择语言', close:'关闭', exitConfirm:'确定要退出吗？', complaintTitle:'投诉', complaintText:'此功能将在后续版本提供，您可拨打009记录。',
-        thanksTitle:'感谢', thanksText:'此功能将在后续版本提供，您可拨打009记录。'
+        thanksTitle:'感谢', thanksText:'此功能将在后续版本提供，您可拨打009记录。',
+        tooltipSSPD:'这是SSPD的电话', tooltipUPL:'这是UPL国家警察管理所的电话。您也可以使用这个电话转接到任何地方警察局。', tooltipCloseHelp:'关闭提示'
       },
       'en': { 
         emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', footer:'© 2025-2026 SIXSIDE POLICE DEPARTMENT', 
         wordFeedback:'Feedback · Suggestion · Thanks', headerSub:'Had a good experience with our force? A bad one? Here you can tell us what we\'re doing well, and what we need to improve. Say thanks, make a complaint, or just share your thoughts and ideas. Choose from the options below to get started.', 
         card1Title:'Website Suggestion', card1Desc:'UI, features, accessibility', card2Title:'Station Environment', card2Desc:'Any Sixside police facility', 
         card3Title:'Complaint', card3Desc:'Dissatisfaction with officers/service', card4Title:'Thanks', card4Desc:'Praise for officers or service', 
-        leaveBtn:'LEAVE', websiteTitle:'Website Feedback', websiteNotice:'This form is only for feedback, NOT for reporting crimes.', 
-        websiteNotice2:'Thank you for your time. You can also call +875 4 73.', startFeedback:'Start Feedback', stationTitle:'Station Environment Feedback', 
-        stationLocation:'Select police station location', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD (closed 2076)', 
+        leaveBtn:'LEAVE', websiteTitle:'Website Feedback', websiteNotice:'This form is only for feedback, NOT for reporting crimes. If someone is in danger or a crime is in progress/about to happen, call 110.', 
+        websiteNotice2:'Thank you for your time. You can also call +875 4 73 or +875 73 for website suggestions.', startFeedback:'Start Feedback', 
+        stationTitle:'Station Environment Feedback', stationLocation:'Select police station location', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD (closed 2076)', 
         locationOpt3:'Lava Village SSPD - mobile', categoryLabel:'Select categories', cat1:'Air quality', cat2:'Noise', cat3:'Lighting', cat4:'Restrooms', 
         cat5:'Changing/shower', cat6:'Parking/transport', cat7:'Outdoor vicinity', cat8:'Building appearance', cat9:'Internet', cat10:'Cellular', 
         cat11:'Anti-slip', cat12:'Other', descriptionLabel:'Description', timeLabel:'Time', contactWilling:'Provide contact?', surnameWilling:'Provide surname?', 
@@ -230,137 +283,263 @@
         advReason:'Reason: This IP address is inaccessible due to IP abuse. Source: Wikipedia API, last updated: 2023. Please disable your VPN, proxy, or use a different device. You can also contact the administrator of "uplgov.github.io/sixside/police" to have your IP address whitelisted.', 
         fakeToast:'Feedback recorded', contrast:'Contrast', grayscale:'Grayscale', saturate:'Saturate', crosshair:'Crosshair', enableCursor:'Enable Crosshair', 
         reset:'Reset', langTitle:'Select Language', close:'Close', exitConfirm:'Are you sure you want to exit?', complaintTitle:'Complaint', complaintText:'This feature will be available in a future version. You can call 009 to record.',
-        thanksTitle:'Thanks', thanksText:'This feature will be available in a future version. You can call 009 to record.'
+        thanksTitle:'Thanks', thanksText:'This feature will be available in a future version. You can call 009 to record.',
+        tooltipSSPD:'This is the SSPD phone number', tooltipUPL:'This is the UPL National Police Administration phone number. You can also use this number to be transferred to any local police station.', tooltipCloseHelp:'Close help'
       },
-      'es': { emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE', wordFeedback:'Feedback · Sugerencia · Gracias', headerSub:'¿Tuvo una buena experiencia con nuestra fuerza? ¿Una mala? Aquí puede decirnos qué hacemos bien y qué debemos mejorar. Diga gracias, presente una queja o comparta sus ideas.', card1Title:'Sugerencia web', card1Desc:'Interfaz, funciones, accesibilidad', card2Title:'Entorno de comisaría', card2Desc:'Cualquier instalación policial', card3Title:'Queja', card3Desc:'Insatisfacción con oficiales/servicio', card4Title:'Gracias', card4Desc:'Elogio para oficiales o servicio', leaveBtn:'SALIR', websiteTitle:'Feedback web', websiteNotice:'Solo para feedback, NO para delitos.', startFeedback:'Iniciar', stationTitle:'Feedback entorno', stationLocation:'Seleccione ubicación', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD (cerrado 2076)', locationOpt3:'Lava Village SSPD - móvil', categoryLabel:'Categorías', cat1:'Aire', cat2:'Ruido', cat3:'Luz', cat4:'Baños', cat5:'Vestuarios', cat6:'Estacionamiento', cat7:'Exterior', cat8:'Aspecto', cat9:'Internet', cat10:'Móvil', cat11:'Antideslizante', cat12:'Otro', descriptionLabel:'Descripción', timeLabel:'Hora', contactWilling:'¿Contacto?', surnameWilling:'¿Apellido?', contactPlaceholder:'Ingrese contacto', surnamePlaceholder:'Ingrese apellido', submitBtn:'Enviar', cancelBtn:'Cancelar', loadingText:'Cargando……', error401:'Acceso denegado: 401 IP no autorizada', advanced:'Avanzado', fakeToast:'Feedback registrado', contrast:'Contraste', grayscale:'Escala grises', saturate:'Saturación', crosshair:'Mira', enableCursor:'Activar mira', reset:'Restablecer', langTitle:'Idioma', close:'Cerrar', exitConfirm:'¿Seguro que quiere salir?', complaintTitle:'Queja', complaintText:'Próximamente.', thanksTitle:'Gracias', thanksText:'Próximamente.' },
-      'de': { emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', footer:'© 2025-2026 POLIZEI SIXSIDE', wordFeedback:'Feedback · Vorschlag · Dank', headerSub:'Gute Erfahrung? Schlechte? Sagen Sie uns, was gut läuft und was besser werden muss.', card1Title:'Website-Vorschlag', card2Title:'Wachen-Umgebung', card3Title:'Beschwerde', card4Title:'Dank', leaveBtn:'VERLASSEN', websiteTitle:'Website-Feedback', startFeedback:'Starten', stationTitle:'Umgebungsfeedback', stationLocation:'Standort', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Kategorien', cat1:'Luft', cat2:'Lärm', cat3:'Licht', cat4:'WC', cat5:'Umkleide', cat6:'Parken', cat7:'Außen', cat8:'Gebäude', cat9:'Internet', cat10:'Mobilfunk', cat11:'Rutschfest', cat12:'Sonstiges', descriptionLabel:'Beschreibung', timeLabel:'Zeit', contactWilling:'Kontakt?', surnameWilling:'Name?', contactPlaceholder:'Kontakt', surnamePlaceholder:'Name', submitBtn:'Senden', cancelBtn:'Abbrechen', loadingText:'Lädt……', error401:'Zugriff verweigert: 401', advanced:'Erweitert', fakeToast:'Feedback gespeichert', contrast:'Kontrast', grayscale:'Graustufen', saturate:'Sättigung', crosshair:'Fadenkreuz', enableCursor:'Aktivieren', reset:'Reset', langTitle:'Sprache', close:'Schließen', exitConfirm:'Wirklich beenden?' },
-      'pt': { emergencyLabel:'EMERGÊNCIA:', nonEmergencyLabel:'NÃO EMERGÊNCIA:', footer:'© 2025-2026 POLÍCIA SIXSIDE', wordFeedback:'Feedback · Sugestão · Agradecimento', headerSub:'Boa experiência? Ruim? Diga-nos o que fazemos bem e o que precisa melhorar.', card1Title:'Sugestão site', card2Title:'Ambiente delegacia', card3Title:'Reclamação', card4Title:'Agradecimento', leaveBtn:'SAIR', websiteTitle:'Feedback site', startFeedback:'Iniciar', stationTitle:'Feedback ambiente', stationLocation:'Local', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Categorias', cat1:'Ar', cat2:'Ruído', cat3:'Luz', cat4:'Banheiros', cat5:'Vestiários', cat6:'Estacionamento', cat7:'Externo', cat8:'Aparência', cat9:'Internet', cat10:'Celular', cat11:'Antiderrapante', cat12:'Outro', descriptionLabel:'Descrição', timeLabel:'Hora', contactWilling:'Contato?', surnameWilling:'Sobrenome?', contactPlaceholder:'Contato', surnamePlaceholder:'Sobrenome', submitBtn:'Enviar', cancelBtn:'Cancelar', loadingText:'Carregando……', error401:'Acesso negado: 401', advanced:'Avançado', fakeToast:'Feedback registrado', contrast:'Contraste', grayscale:'Escala cinza', saturate:'Saturação', crosshair:'Mira', enableCursor:'Ativar mira', reset:'Redefinir', langTitle:'Idioma', close:'Fechar', exitConfirm:'Sair?' },
-      'zh-Hant': { emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', footer:'© 2025-2026 六面警察局', wordFeedback:'回饋·建議·感謝', headerSub:'您對我們部隊有過愉快的體驗嗎？一個壞的？在這裡，您可以告訴我們我們做得好的地方，以及我們需要改進的地方。', card1Title:'網站建議', card2Title:'警局環境建議', card3Title:'投訴', card4Title:'感謝', leaveBtn:'離開', websiteTitle:'網站回饋', startFeedback:'進入回饋', stationTitle:'警局環境回饋', stationLocation:'請選擇警察局位置', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD (2076年關閉)', locationOpt3:'Lava Village SSPD - mobile', categoryLabel:'選擇類別', cat1:'空氣品質', cat2:'噪音', cat3:'燈光', cat4:'衛生間', cat5:'更衣室', cat6:'交通工具停放處', cat7:'附近室外', cat8:'建築外觀', cat9:'網路品質', cat10:'蜂窩通訊', cat11:'防滑措施', cat12:'其他', descriptionLabel:'描述', timeLabel:'發生時間', contactWilling:'是否提供聯繫方式', surnameWilling:'是否提供姓氏', contactPlaceholder:'請輸入聯繫方式', surnamePlaceholder:'請輸入姓氏', submitBtn:'提交回饋', cancelBtn:'取消', loadingText:'載入中……', error401:'抱歉，您被拒絕訪問伺服器：401 未授權 IP', advanced:'進階', fakeToast:'回饋已記錄', contrast:'對比度', grayscale:'灰階', saturate:'飽和度', crosshair:'準星顏色', enableCursor:'啟用十字準星', reset:'重設', langTitle:'選擇語言', close:'關閉', exitConfirm:'確定要退出嗎？', complaintTitle:'投訴', complaintText:'後續版本提供', thanksTitle:'感謝', thanksText:'後續版本提供' },
-      'fr': { emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', footer:'© 2025-2026 POLICE SIXSIDE', wordFeedback:'Avis · Suggestion · Remerciements', headerSub:'Bonne expérience ? Mauvaise ? Dites-nous ce qui va bien et ce qui doit être amélioré.', card1Title:'Suggestion site', card2Title:'Environnement poste', card3Title:'Plainte', card4Title:'Remerciement', leaveBtn:'QUITTER', websiteTitle:'Avis site', startFeedback:'Démarrer', stationTitle:'Avis environnement', stationLocation:'Lieu', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Catégories', cat1:'Air', cat2:'Bruit', cat3:'Lumière', cat4:'Toilettes', cat5:'Vestiaires', cat6:'Parking', cat7:'Extérieur', cat8:'Aspect', cat9:'Internet', cat10:'Mobile', cat11:'Antidérapant', cat12:'Autre', descriptionLabel:'Description', timeLabel:'Heure', contactWilling:'Contact ?', surnameWilling:'Nom ?', contactPlaceholder:'Contact', surnamePlaceholder:'Nom', submitBtn:'Envoyer', cancelBtn:'Annuler', loadingText:'Chargement……', error401:'Accès refusé : 401', advanced:'Avancé', fakeToast:'Avis enregistré', contrast:'Contraste', grayscale:'Niveaux de gris', saturate:'Saturation', crosshair:'Viseur', enableCursor:'Activer viseur', reset:'Réinitialiser', langTitle:'Langue', close:'Fermer', exitConfirm:'Quitter ?' },
-      'lzh': { emergencyLabel:'警急:', nonEmergencyLabel:'常事:', footer:'© 2025-2026 六面警署', wordFeedback:'議·諫·謝', headerSub:'君於吾部有愉否？有惡否？可告吾等善處與需改之處。', card1Title:'網站之諫', card2Title:'警署之境', card3Title:'訴', card4Title:'謝', leaveBtn:'去', websiteTitle:'網站回饋', startFeedback:'始回饋', stationTitle:'警署境況', stationLocation:'擇警署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'擇類', cat1:'氣', cat2:'聲', cat3:'光', cat4:'溷', cat5:'更衣', cat6:'停駐', cat7:'室外', cat8:'築觀', cat9:'網', cat10:'訊', cat11:'防滑', cat12:'他', descriptionLabel:'述', timeLabel:'時', contactWilling:'留繫方否', surnameWilling:'留氏否', contactPlaceholder:'繫方', surnamePlaceholder:'氏', submitBtn:'呈', cancelBtn:'止', loadingText:'載中……', error401:'拒訪：401', advanced:'高級', fakeToast:'已錄', contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星', enableCursor:'啟準星', reset:'復原', langTitle:'擇語', close:'閉', exitConfirm:'確去否？' },
-      'ru': { emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', footer:'© 2025-2026 ПОЛИЦИЯ СИКСАЙД', wordFeedback:'Отзыв · Предложение · Благодарность', headerSub:'Хороший опыт? Плохой? Расскажите, что у нас хорошо, а что нужно улучшить.', card1Title:'Сайт', card2Title:'Участок', card3Title:'Жалоба', card4Title:'Благодарность', leaveBtn:'ВЫЙТИ', websiteTitle:'Отзыв о сайте', startFeedback:'Начать', stationTitle:'Отзыв об участке', stationLocation:'Участок', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Категории', cat1:'Воздух', cat2:'Шум', cat3:'Свет', cat4:'Туалеты', cat5:'Раздевалки', cat6:'Парковка', cat7:'Территория', cat8:'Вид', cat9:'Интернет', cat10:'Связь', cat11:'Покрытие', cat12:'Другое', descriptionLabel:'Описание', timeLabel:'Время', contactWilling:'Контакты?', surnameWilling:'Фамилия?', contactPlaceholder:'Контакты', surnamePlaceholder:'Фамилия', submitBtn:'Отправить', cancelBtn:'Отмена', loadingText:'Загрузка……', error401:'Доступ запрещен: 401', advanced:'Подробно', fakeToast:'Записано', contrast:'Контраст', grayscale:'Оттенки', saturate:'Насыщ.', crosshair:'Прицел', enableCursor:'Вкл. прицел', reset:'Сброс', langTitle:'Язык', close:'Закрыть', exitConfirm:'Выйти?' },
-      'ja': { emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', footer:'© 2025-2026 シックスサイド警察', wordFeedback:'意見・提案・感謝', headerSub:'良い経験？悪い経験？改善点をお聞かせください。', card1Title:'サイト提案', card2Title:'警察署環境', card3Title:'苦情', card4Title:'感謝', leaveBtn:'退出', websiteTitle:'サイト意見', startFeedback:'開始', stationTitle:'警察署環境意見', stationLocation:'警察署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'分類', cat1:'空気', cat2:'騒音', cat3:'照明', cat4:'トイレ', cat5:'更衣室', cat6:'駐車', cat7:'屋外', cat8:'外観', cat9:'ネット', cat10:'携帯', cat11:'滑り止め', cat12:'他', descriptionLabel:'説明', timeLabel:'時間', contactWilling:'連絡先', surnameWilling:'姓', contactPlaceholder:'連絡先', surnamePlaceholder:'姓', submitBtn:'送信', cancelBtn:'取消', loadingText:'読込中……', error401:'アクセス拒否: 401', advanced:'詳細', fakeToast:'記録済', contrast:'ｺﾝﾄﾗｽﾄ', grayscale:'ｸﾞﾚｰ', saturate:'彩度', crosshair:'照準', enableCursor:'照準有効', reset:'ﾘｾｯﾄ', langTitle:'言語', close:'閉', exitConfirm:'終了しますか？' },
-      'ko': { emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', footer:'© 2025-2026 식스사이드 경찰', wordFeedback:'피드백 · 제안 · 감사', headerSub:'좋은 경험? 나쁜 경험? 개선점을 알려주세요.', card1Title:'웹사이트 제안', card2Title:'경찰서 환경', card3Title:'불만', card4Title:'감사', leaveBtn:'나가기', websiteTitle:'웹사이트 피드백', startFeedback:'시작', stationTitle:'경찰서 환경 피드백', stationLocation:'경찰서', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'분류', cat1:'공기', cat2:'소음', cat3:'조명', cat4:'화장실', cat5:'탈의실', cat6:'주차', cat7:'외부', cat8:'외관', cat9:'인터넷', cat10:'통신', cat11:'미끄럼방지', cat12:'기타', descriptionLabel:'설명', timeLabel:'시간', contactWilling:'연락처', surnameWilling:'성', contactPlaceholder:'연락처', surnamePlaceholder:'성', submitBtn:'제출', cancelBtn:'취소', loadingText:'로딩 중……', error401:'접근 거부: 401', advanced:'고급', fakeToast:'기록됨', contrast:'대비', grayscale:'흑백', saturate:'채도', crosshair:'조준선', enableCursor:'조준선 켜기', reset:'초기화', langTitle:'언어', close:'닫기', exitConfirm:'나가시겠습니까?' },
-      'hi': { emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपात:', footer:'© 2025-2026 सिक्ससाइड पुलिस', wordFeedback:'प्रतिक्रिया · सुझाव · धन्यवाद', headerSub:'अच्छा अनुभव? बुरा? हमें बताएं कि क्या सुधार करें।', card1Title:'वेबसाइट सुझाव', card2Title:'थाना वातावरण', card3Title:'शिकायत', card4Title:'धन्यवाद', leaveBtn:'छोड़ें', websiteTitle:'वेबसाइट प्रतिक्रिया', startFeedback:'शुरू करें', stationTitle:'थाना वातावरण', stationLocation:'थाना', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'श्रेणियाँ', cat1:'हवा', cat2:'शोर', cat3:'रोशनी', cat4:'शौचालय', cat5:'चेंजिंग', cat6:'पार्किंग', cat7:'बाहरी', cat8:'इमारत', cat9:'इंटरनेट', cat10:'मोबाइल', cat11:'फिसलन', cat12:'अन्य', descriptionLabel:'विवरण', timeLabel:'समय', contactWilling:'संपर्क', surnameWilling:'उपनाम', contactPlaceholder:'संपर्क', surnamePlaceholder:'उपनाम', submitBtn:'जमा करें', cancelBtn:'रद्द करें', loadingText:'लोड हो रहा है……', error401:'पहुंच अस्वीकृत: 401', advanced:'उन्नत', fakeToast:'दर्ज किया गया', contrast:'कंट्रास्ट', grayscale:'ग्रेस्केल', saturate:'संतृप्ति', crosshair:'क्रॉसहेयर', enableCursor:'सक्षम करें', reset:'रीसेट', langTitle:'भाषा', close:'बंद करें', exitConfirm:'बाहर निकलें?' },
-      'zh-Classical': { emergencyLabel:'警急:', nonEmergencyLabel:'常事:', footer:'© 2025-2026 六面警署', wordFeedback:'議·諫·謝', headerSub:'君於吾部有愉否？有惡否？可告吾等善處與需改之處。', card1Title:'網站之諫', card2Title:'警署之境', card3Title:'訴', card4Title:'謝', leaveBtn:'去', websiteTitle:'網站回饋', startFeedback:'始回饋', stationTitle:'警署境況', stationLocation:'擇警署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'擇類', cat1:'氣', cat2:'聲', cat3:'光', cat4:'溷', cat5:'更衣', cat6:'停駐', cat7:'室外', cat8:'築觀', cat9:'網', cat10:'訊', cat11:'防滑', cat12:'他', descriptionLabel:'述', timeLabel:'時', contactWilling:'留繫方否', surnameWilling:'留氏否', contactPlaceholder:'繫方', surnamePlaceholder:'氏', submitBtn:'呈', cancelBtn:'止', loadingText:'載中……', error401:'拒訪：401', advanced:'高級', fakeToast:'已錄', contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星', enableCursor:'啟準星', reset:'復原', langTitle:'擇語', close:'閉', exitConfirm:'確去否？' },
-      'mn': { emergencyLabel:'ЯАРАЛТАЙ:', nonEmergencyLabel:'ЯАРАЛТГҮЙ:', footer:'© 2025-2026 СИКСАЙД ЦАГДАА', wordFeedback:'Санал · Зөвлөгөө · Талархал', headerSub:'Таалагдсан уу? Таалагдаагүй юу? Сайжруулах зүйлээ хэлээрэй.', card1Title:'Вэб санал', card2Title:'Цагдаагийн орчин', card3Title:'Гомдол', card4Title:'Талархал', leaveBtn:'ГАРАХ', websiteTitle:'Вэб санал', startFeedback:'Эхлэх', stationTitle:'Орчны санал', stationLocation:'Байршил', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Ангилал', cat1:'Агаар', cat2:'Дуу', cat3:'Гэрэл', cat4:'Ариун цэвэр', cat5:'Хувцас', cat6:'Зогсоол', cat7:'Гадаа', cat8:'Барилга', cat9:'Интернет', cat10:'Үүрэн', cat11:'Халтиргаа', cat12:'Бусад', descriptionLabel:'Тайлбар', timeLabel:'Цаг', contactWilling:'Холбоо', surnameWilling:'Овог', contactPlaceholder:'Холбоо', surnamePlaceholder:'Овог', submitBtn:'Илгээх', cancelBtn:'Цуцлах', loadingText:'Ачаалж……', error401:'Хандах эрхгүй: 401', advanced:'Нэмэлт', fakeToast:'Бүртгэгдлээ', contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан', crosshair:'Хараа', enableCursor:'Идэвхжүүлэх', reset:'Дахин тохир.', langTitle:'Хэл', close:'Хаах', exitConfirm:'Гарах уу?' }
+      'es': { emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE', wordFeedback:'Feedback · Sugerencia · Gracias', headerSub:'¿Tuvo una buena experiencia con nuestra fuerza? ¿Una mala? Aquí puede decirnos qué hacemos bien y qué debemos mejorar.', card1Title:'Sugerencia web', card1Desc:'Interfaz, funciones, accesibilidad', card2Title:'Entorno de comisaría', card3Title:'Queja', card4Title:'Gracias', leaveBtn:'SALIR', websiteTitle:'Feedback web', websiteNotice:'Solo para feedback, NO para delitos. Si alguien está en peligro, llame al 110.', websiteNotice2:'Gracias por su tiempo. También puede llamar al +875 4 73 o +875 73.', startFeedback:'Iniciar', stationTitle:'Feedback entorno', stationLocation:'Seleccione ubicación', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Categorías', cat1:'Aire', cat2:'Ruido', cat3:'Luz', cat4:'Baños', cat5:'Vestuarios', cat6:'Estacionamiento', cat7:'Exterior', cat8:'Aspecto', cat9:'Internet', cat10:'Móvil', cat11:'Antideslizante', cat12:'Otro', descriptionLabel:'Descripción', timeLabel:'Hora', contactWilling:'¿Contacto?', surnameWilling:'¿Apellido?', contactPlaceholder:'Ingrese contacto', surnamePlaceholder:'Ingrese apellido', submitBtn:'Enviar', cancelBtn:'Cancelar', loadingText:'Cargando……', error401:'Acceso denegado: 401', advanced:'Avanzado', fakeToast:'Feedback registrado', contrast:'Contraste', grayscale:'Escala grises', saturate:'Saturación', crosshair:'Mira', enableCursor:'Activar mira', reset:'Restablecer', langTitle:'Idioma', close:'Cerrar', exitConfirm:'¿Seguro que quiere salir?', complaintTitle:'Queja', complaintText:'Próximamente.', thanksTitle:'Gracias', thanksText:'Próximamente.', tooltipSSPD:'Teléfono SSPD', tooltipUPL:'Teléfono UPL', tooltipCloseHelp:'Cerrar ayuda' },
+      'de': { emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', footer:'© 2025-2026 POLIZEI SIXSIDE', wordFeedback:'Feedback · Vorschlag · Dank', headerSub:'Gute Erfahrung? Schlechte? Sagen Sie uns, was gut läuft und was besser werden muss.', card1Title:'Website-Vorschlag', card2Title:'Wachen-Umgebung', card3Title:'Beschwerde', card4Title:'Dank', leaveBtn:'VERLASSEN', websiteTitle:'Website-Feedback', websiteNotice:'Nur für Feedback, NICHT für Straftaten. Bei Gefahr 110 wählen.', websiteNotice2:'Danke für Ihre Zeit. Sie können auch +875 4 73 oder +875 73 anrufen.', startFeedback:'Starten', stationTitle:'Umgebungsfeedback', stationLocation:'Standort', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Kategorien', cat1:'Luft', cat2:'Lärm', cat3:'Licht', cat4:'WC', cat5:'Umkleide', cat6:'Parken', cat7:'Außen', cat8:'Gebäude', cat9:'Internet', cat10:'Mobilfunk', cat11:'Rutschfest', cat12:'Sonstiges', descriptionLabel:'Beschreibung', timeLabel:'Zeit', contactWilling:'Kontakt?', surnameWilling:'Name?', contactPlaceholder:'Kontakt', surnamePlaceholder:'Name', submitBtn:'Senden', cancelBtn:'Abbrechen', loadingText:'Lädt……', error401:'Zugriff verweigert: 401', advanced:'Erweitert', fakeToast:'Feedback gespeichert', contrast:'Kontrast', grayscale:'Graustufen', saturate:'Sättigung', crosshair:'Fadenkreuz', enableCursor:'Aktivieren', reset:'Reset', langTitle:'Sprache', close:'Schließen', exitConfirm:'Wirklich beenden?', complaintTitle:'Beschwerde', thanksTitle:'Dank', tooltipSSPD:'SSPD Telefon', tooltipCloseHelp:'Hilfe schließen' },
+      'pt': { emergencyLabel:'EMERGÊNCIA:', nonEmergencyLabel:'NÃO EMERGÊNCIA:', footer:'© 2025-2026 POLÍCIA SIXSIDE', wordFeedback:'Feedback · Sugestão · Agradecimento', headerSub:'Boa experiência? Ruim? Diga-nos o que fazemos bem e o que precisa melhorar.', card1Title:'Sugestão site', card2Title:'Ambiente delegacia', card3Title:'Reclamação', card4Title:'Agradecimento', leaveBtn:'SAIR', websiteTitle:'Feedback site', websiteNotice:'Apenas para feedback, NÃO para crimes. Em perigo, ligue 110.', websiteNotice2:'Obrigado pelo seu tempo. Também pode ligar +875 4 73 ou +875 73.', startFeedback:'Iniciar', stationTitle:'Feedback ambiente', stationLocation:'Local', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Categorias', cat1:'Ar', cat2:'Ruído', cat3:'Luz', cat4:'Banheiros', cat5:'Vestiários', cat6:'Estacionamento', cat7:'Externo', cat8:'Aparência', cat9:'Internet', cat10:'Celular', cat11:'Antiderrapante', cat12:'Outro', descriptionLabel:'Descrição', timeLabel:'Hora', contactWilling:'Contato?', surnameWilling:'Sobrenome?', contactPlaceholder:'Contato', surnamePlaceholder:'Sobrenome', submitBtn:'Enviar', cancelBtn:'Cancelar', loadingText:'Carregando……', error401:'Acesso negado: 401', advanced:'Avançado', fakeToast:'Feedback registrado', contrast:'Contraste', grayscale:'Escala cinza', saturate:'Saturação', crosshair:'Mira', enableCursor:'Ativar mira', reset:'Redefinir', langTitle:'Idioma', close:'Fechar', exitConfirm:'Sair?', complaintTitle:'Reclamação', thanksTitle:'Agradecimento', tooltipSSPD:'Telefone SSPD', tooltipCloseHelp:'Fechar ajuda' },
+      'zh-Hant': { emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', footer:'© 2025-2026 六面警察局', wordFeedback:'回饋·建議·感謝', headerSub:'您對我們部隊有過愉快的體驗嗎？一個壞的？在這裡，您可以告訴我們我們做得好的地方，以及我們需要改進的地方。', card1Title:'網站建議', card2Title:'警局環境建議', card3Title:'投訴', card4Title:'感謝', leaveBtn:'離開', websiteTitle:'網站回饋', websiteNotice:'此表單僅用於回饋，而非犯罪回報。有人身處危險請撥110。', websiteNotice2:'感謝您抽空回饋。您也可撥打+875 4 73或+875 73。', startFeedback:'進入回饋', stationTitle:'警局環境回饋', stationLocation:'請選擇警察局位置', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'選擇類別', cat1:'空氣', cat2:'噪音', cat3:'燈光', cat4:'衛生間', cat5:'更衣室', cat6:'停車', cat7:'室外', cat8:'外觀', cat9:'網路', cat10:'通訊', cat11:'防滑', cat12:'其他', descriptionLabel:'描述', timeLabel:'時間', contactWilling:'提供聯繫方式', surnameWilling:'提供姓氏', contactPlaceholder:'聯繫方式', surnamePlaceholder:'姓氏', submitBtn:'提交', cancelBtn:'取消', loadingText:'載入中……', error401:'拒絕訪問: 401', advanced:'進階', fakeToast:'已記錄', contrast:'對比', grayscale:'灰階', saturate:'飽和', crosshair:'準星', enableCursor:'啟用準星', reset:'重設', langTitle:'語言', close:'關閉', exitConfirm:'確定退出？', complaintTitle:'投訴', thanksTitle:'感謝', tooltipSSPD:'SSPD電話', tooltipCloseHelp:'關閉提示' },
+      'fr': { emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', footer:'© 2025-2026 POLICE SIXSIDE', wordFeedback:'Avis · Suggestion · Remerciements', headerSub:'Bonne expérience ? Mauvaise ? Dites-nous ce qui va bien et ce qui doit être amélioré.', card1Title:'Suggestion site', card2Title:'Environnement poste', card3Title:'Plainte', card4Title:'Remerciement', leaveBtn:'QUITTER', websiteTitle:'Avis site', websiteNotice:'Uniquement pour avis, PAS pour les crimes. En danger, appelez le 110.', websiteNotice2:'Merci de votre temps. Vous pouvez aussi appeler le +875 4 73 ou +875 73.', startFeedback:'Démarrer', stationTitle:'Avis environnement', stationLocation:'Lieu', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Catégories', cat1:'Air', cat2:'Bruit', cat3:'Lumière', cat4:'Toilettes', cat5:'Vestiaires', cat6:'Parking', cat7:'Extérieur', cat8:'Aspect', cat9:'Internet', cat10:'Mobile', cat11:'Antidérapant', cat12:'Autre', descriptionLabel:'Description', timeLabel:'Heure', contactWilling:'Contact ?', surnameWilling:'Nom ?', contactPlaceholder:'Contact', surnamePlaceholder:'Nom', submitBtn:'Envoyer', cancelBtn:'Annuler', loadingText:'Chargement……', error401:'Accès refusé : 401', advanced:'Avancé', fakeToast:'Avis enregistré', contrast:'Contraste', grayscale:'Niveaux de gris', saturate:'Saturation', crosshair:'Viseur', enableCursor:'Activer viseur', reset:'Réinitialiser', langTitle:'Langue', close:'Fermer', exitConfirm:'Quitter ?', complaintTitle:'Plainte', thanksTitle:'Remerciement', tooltipSSPD:'Téléphone SSPD', tooltipCloseHelp:'Fermer aide' },
+      'lzh': { emergencyLabel:'警急:', nonEmergencyLabel:'常事:', footer:'© 2025-2026 六面警署', wordFeedback:'議·諫·謝', headerSub:'君於吾部有愉否？有惡否？可告吾等善處與需改之處。', card1Title:'網站之諫', card2Title:'警署之境', card3Title:'訴', card4Title:'謝', leaveBtn:'去', websiteTitle:'網站回饋', websiteNotice:'此表僅用於回饋，非報罪。若人處險境，撥110。', websiteNotice2:'謝君費時。亦可撥+875 4 73或+875 73。', startFeedback:'始回饋', stationTitle:'警署境況', stationLocation:'擇警署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'擇類', cat1:'氣', cat2:'聲', cat3:'光', cat4:'溷', cat5:'更衣', cat6:'停駐', cat7:'室外', cat8:'築觀', cat9:'網', cat10:'訊', cat11:'防滑', cat12:'他', descriptionLabel:'述', timeLabel:'時', contactWilling:'留繫方否', surnameWilling:'留氏否', contactPlaceholder:'繫方', surnamePlaceholder:'氏', submitBtn:'呈', cancelBtn:'止', loadingText:'載中……', error401:'拒訪：401', advanced:'高級', fakeToast:'已錄', contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星', enableCursor:'啟準星', reset:'復原', langTitle:'擇語', close:'閉', exitConfirm:'確去否？', complaintTitle:'訴', thanksTitle:'謝', tooltipSSPD:'SSPD之電', tooltipCloseHelp:'閉示' },
+      'ru': { emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', footer:'© 2025-2026 ПОЛИЦИЯ СИКСАЙД', wordFeedback:'Отзыв · Предложение · Благодарность', headerSub:'Хороший опыт? Плохой? Расскажите, что у нас хорошо, а что нужно улучшить.', card1Title:'Сайт', card2Title:'Участок', card3Title:'Жалоба', card4Title:'Благодарность', leaveBtn:'ВЫЙТИ', websiteTitle:'Отзыв о сайте', websiteNotice:'Только для отзывов, НЕ для преступлений. При опасности звоните 110.', websiteNotice2:'Спасибо за уделенное время. Вы также можете позвонить +875 4 73 или +875 73.', startFeedback:'Начать', stationTitle:'Отзыв об участке', stationLocation:'Участок', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Категории', cat1:'Воздух', cat2:'Шум', cat3:'Свет', cat4:'Туалеты', cat5:'Раздевалки', cat6:'Парковка', cat7:'Территория', cat8:'Вид', cat9:'Интернет', cat10:'Связь', cat11:'Покрытие', cat12:'Другое', descriptionLabel:'Описание', timeLabel:'Время', contactWilling:'Контакты?', surnameWilling:'Фамилия?', contactPlaceholder:'Контакты', surnamePlaceholder:'Фамилия', submitBtn:'Отправить', cancelBtn:'Отмена', loadingText:'Загрузка……', error401:'Доступ запрещен: 401', advanced:'Подробно', fakeToast:'Записано', contrast:'Контраст', grayscale:'Оттенки', saturate:'Насыщ.', crosshair:'Прицел', enableCursor:'Вкл. прицел', reset:'Сброс', langTitle:'Язык', close:'Закрыть', exitConfirm:'Выйти?', complaintTitle:'Жалоба', thanksTitle:'Благодарность', tooltipSSPD:'Телефон SSPD', tooltipCloseHelp:'Закрыть' },
+      'ja': { emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', footer:'© 2025-2026 シックスサイド警察', wordFeedback:'意見・提案・感謝', headerSub:'良い経験？悪い経験？改善点をお聞かせください。', card1Title:'サイト提案', card2Title:'警察署環境', card3Title:'苦情', card4Title:'感謝', leaveBtn:'退出', websiteTitle:'サイト意見', websiteNotice:'犯罪報告ではありません。危険な場合は110番。', websiteNotice2:'お時間ありがとうございます。+875 4 73 または +875 73 にもお電話いただけます。', startFeedback:'開始', stationTitle:'警察署環境意見', stationLocation:'警察署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'分類', cat1:'空気', cat2:'騒音', cat3:'照明', cat4:'トイレ', cat5:'更衣室', cat6:'駐車', cat7:'屋外', cat8:'外観', cat9:'ネット', cat10:'携帯', cat11:'滑り止め', cat12:'他', descriptionLabel:'説明', timeLabel:'時間', contactWilling:'連絡先', surnameWilling:'姓', contactPlaceholder:'連絡先', surnamePlaceholder:'姓', submitBtn:'送信', cancelBtn:'取消', loadingText:'読込中……', error401:'アクセス拒否: 401', advanced:'詳細', fakeToast:'記録済', contrast:'ｺﾝﾄﾗｽﾄ', grayscale:'ｸﾞﾚｰ', saturate:'彩度', crosshair:'照準', enableCursor:'照準有効', reset:'ﾘｾｯﾄ', langTitle:'言語', close:'閉', exitConfirm:'終了しますか？', complaintTitle:'苦情', thanksTitle:'感謝', tooltipSSPD:'SSPD電話', tooltipCloseHelp:'ヘルプを閉じる' },
+      'ko': { emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', footer:'© 2025-2026 식스사이드 경찰', wordFeedback:'피드백 · 제안 · 감사', headerSub:'좋은 경험? 나쁜 경험? 개선점을 알려주세요.', card1Title:'웹사이트 제안', card2Title:'경찰서 환경', card3Title:'불만', card4Title:'감사', leaveBtn:'나가기', websiteTitle:'웹사이트 피드백', websiteNotice:'범죄 신고가 아닙니다. 위험 시 110에 전화하세요.', websiteNotice2:'시간 내주셔서 감사합니다. +875 4 73 또는 +875 73으로 전화하실 수도 있습니다.', startFeedback:'시작', stationTitle:'경찰서 환경 피드백', stationLocation:'경찰서', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'분류', cat1:'공기', cat2:'소음', cat3:'조명', cat4:'화장실', cat5:'탈의실', cat6:'주차', cat7:'외부', cat8:'외관', cat9:'인터넷', cat10:'통신', cat11:'미끄럼방지', cat12:'기타', descriptionLabel:'설명', timeLabel:'시간', contactWilling:'연락처', surnameWilling:'성', contactPlaceholder:'연락처', surnamePlaceholder:'성', submitBtn:'제출', cancelBtn:'취소', loadingText:'로딩 중……', error401:'접근 거부: 401', advanced:'고급', fakeToast:'기록됨', contrast:'대비', grayscale:'흑백', saturate:'채도', crosshair:'조준선', enableCursor:'조준선 켜기', reset:'초기화', langTitle:'언어', close:'닫기', exitConfirm:'나가시겠습니까?', complaintTitle:'불만', thanksTitle:'감사', tooltipSSPD:'SSPD 전화', tooltipCloseHelp:'도움말 닫기' },
+      'hi': { emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपात:', footer:'© 2025-2026 सिक्ससाइड पुलिस', wordFeedback:'प्रतिक्रिया · सुझाव · धन्यवाद', headerSub:'अच्छा अनुभव? बुरा? हमें बताएं कि क्या सुधार करें।', card1Title:'वेबसाइट सुझाव', card2Title:'थाना वातावरण', card3Title:'शिकायत', card4Title:'धन्यवाद', leaveBtn:'छोड़ें', websiteTitle:'वेबसाइट प्रतिक्रिया', websiteNotice:'केवल प्रतिक्रिया के लिए, अपराध के लिए नहीं। खतरे में 110 पर कॉल करें।', websiteNotice2:'आपके समय के लिए धन्यवाद। आप +875 4 73 या +875 73 पर भी कॉल कर सकते हैं।', startFeedback:'शुरू करें', stationTitle:'थाना वातावरण', stationLocation:'थाना', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'श्रेणियाँ', cat1:'हवा', cat2:'शोर', cat3:'रोशनी', cat4:'शौचालय', cat5:'चेंजिंग', cat6:'पार्किंग', cat7:'बाहरी', cat8:'इमारत', cat9:'इंटरनेट', cat10:'मोबाइल', cat11:'फिसलन', cat12:'अन्य', descriptionLabel:'विवरण', timeLabel:'समय', contactWilling:'संपर्क', surnameWilling:'उपनाम', contactPlaceholder:'संपर्क', surnamePlaceholder:'उपनाम', submitBtn:'जमा करें', cancelBtn:'रद्द करें', loadingText:'लोड हो रहा है……', error401:'पहुंच अस्वीकृत: 401', advanced:'उन्नत', fakeToast:'दर्ज किया गया', contrast:'कंट्रास्ट', grayscale:'ग्रेस्केल', saturate:'संतृप्ति', crosshair:'क्रॉसहेयर', enableCursor:'सक्षम करें', reset:'रीसेट', langTitle:'भाषा', close:'बंद करें', exitConfirm:'बाहर निकलें?', complaintTitle:'शिकायत', thanksTitle:'धन्यवाद', tooltipSSPD:'SSPD फोन', tooltipCloseHelp:'सहायता बंद करें' },
+      'zh-Classical': { emergencyLabel:'警急:', nonEmergencyLabel:'常事:', footer:'© 2025-2026 六面警署', wordFeedback:'議·諫·謝', headerSub:'君於吾部有愉否？有惡否？可告吾等善處與需改之處。', card1Title:'網站之諫', card2Title:'警署之境', card3Title:'訴', card4Title:'謝', leaveBtn:'去', websiteTitle:'網站回饋', websiteNotice:'此表僅用於回饋，非報罪。若人處險境，撥110。', websiteNotice2:'謝君費時。亦可撥+875 4 73或+875 73。', startFeedback:'始回饋', stationTitle:'警署境況', stationLocation:'擇警署', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'擇類', cat1:'氣', cat2:'聲', cat3:'光', cat4:'溷', cat5:'更衣', cat6:'停駐', cat7:'室外', cat8:'築觀', cat9:'網', cat10:'訊', cat11:'防滑', cat12:'他', descriptionLabel:'述', timeLabel:'時', contactWilling:'留繫方否', surnameWilling:'留氏否', contactPlaceholder:'繫方', surnamePlaceholder:'氏', submitBtn:'呈', cancelBtn:'止', loadingText:'載中……', error401:'拒訪：401', advanced:'高級', fakeToast:'已錄', contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星', enableCursor:'啟準星', reset:'復原', langTitle:'擇語', close:'閉', exitConfirm:'確去否？', complaintTitle:'訴', thanksTitle:'謝', tooltipSSPD:'SSPD之電', tooltipCloseHelp:'閉示' },
+      'mn': { emergencyLabel:'ЯАРАЛТАЙ:', nonEmergencyLabel:'ЯАРАЛТГҮЙ:', footer:'© 2025-2026 СИКСАЙД ЦАГДАА', wordFeedback:'Санал · Зөвлөгөө · Талархал', headerSub:'Таалагдсан уу? Таалагдаагүй юу? Сайжруулах зүйлээ хэлээрэй.', card1Title:'Вэб санал', card2Title:'Цагдаагийн орчин', card3Title:'Гомдол', card4Title:'Талархал', leaveBtn:'ГАРАХ', websiteTitle:'Вэб санал', websiteNotice:'Зөвхөн санал хүсэлтэд, гэмт хэрэгт БИШ. Аюултай үед 110 руу залга.', websiteNotice2:'Цаг гаргасанд баярлалаа. +875 4 73 эсвэл +875 73 руу залгаж болно.', startFeedback:'Эхлэх', stationTitle:'Орчны санал', stationLocation:'Байршил', locationOpt1:'Yishan SSPD', locationOpt2:'The Last Hero Point SSPD', locationOpt3:'Lava Village SSPD', categoryLabel:'Ангилал', cat1:'Агаар', cat2:'Дуу', cat3:'Гэрэл', cat4:'Ариун цэвэр', cat5:'Хувцас', cat6:'Зогсоол', cat7:'Гадаа', cat8:'Барилга', cat9:'Интернет', cat10:'Үүрэн', cat11:'Халтиргаа', cat12:'Бусад', descriptionLabel:'Тайлбар', timeLabel:'Цаг', contactWilling:'Холбоо', surnameWilling:'Овог', contactPlaceholder:'Холбоо', surnamePlaceholder:'Овог', submitBtn:'Илгээх', cancelBtn:'Цуцлах', loadingText:'Ачаалж……', error401:'Хандах эрхгүй: 401', advanced:'Нэмэлт', fakeToast:'Бүртгэгдлээ', contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан', crosshair:'Хараа', enableCursor:'Идэвхжүүлэх', reset:'Дахин тохир.', langTitle:'Хэл', close:'Хаах', exitConfirm:'Гарах уу?', complaintTitle:'Гомдол', thanksTitle:'Талархал', tooltipSSPD:'SSPD утас', tooltipCloseHelp:'Тусламж хаах' }
     };
     
     let currentLang = 'zh-Hans';
-    function t(key){ return translations[currentLang]?.[key] || translations['en'][key] || key; }
+    
+    function t(key) { 
+      return translations[currentLang]?.[key] || translations['en'][key] || key; 
+    }
 
-    function applyLanguageUI(){
-      // 更新所有带id的元素
-      document.querySelectorAll('[id]').forEach(el => {
-        if (translations[currentLang] && translations[currentLang][el.id]) {
-          el.innerText = translations[currentLang][el.id];
+    function applyLanguageUI() {
+      // 更新所有带 id 的元素
+      const allElements = document.querySelectorAll('[id]');
+      allElements.forEach(el => {
+        const key = el.id;
+        if (translations[currentLang] && translations[currentLang][key] && key !== 'langGrid' && key !== 'win95Content' && key !== 'stationContent' && key !== 'helpTooltip') {
+          el.innerText = translations[currentLang][key];
         }
       });
-      // 特殊处理一些动态元素
+      
+      // 特殊处理的元素
       document.getElementById('leaveDangerBtn').innerText = t('leaveBtn');
       document.getElementById('wordFeedback').innerText = t('wordFeedback');
       document.getElementById('headerSub').innerText = t('headerSub');
       document.getElementById('langModalTitle').innerText = t('langTitle');
       document.getElementById('closeLangModal').innerText = t('close');
-      document.getElementById('contrastLabel').innerText = t('contrast');
-      document.getElementById('grayscaleLabel').innerText = t('grayscale');
-      document.getElementById('saturateLabel').innerText = t('saturate');
-      document.getElementById('crosshairLabel').innerText = t('crosshair');
-      document.getElementById('cursorEnableLabel').innerText = t('enableCursor');
-      document.getElementById('resetAccBtn').innerText = t('reset');
-      document.getElementById('win95Title').innerText = t('websiteTitle');
+      document.getElementById('complaintTitle').innerText = t('complaintTitle');
+      document.getElementById('complaintText').innerText = t('complaintText');
+      document.getElementById('complaintCloseBtn').innerText = t('close');
+      document.getElementById('thanksTitle').innerText = t('thanksTitle');
+      document.getElementById('thanksText').innerText = t('thanksText');
+      document.getElementById('thanksCloseBtn').innerText = t('close');
     }
 
-    function buildLangModal(){
-      let grid = document.getElementById('langGrid'); 
+    function buildLangModal() {
+      const grid = document.getElementById('langGrid');
       grid.innerHTML = '';
-      let langs = [
-        {code:'en', name:'English (UK)'}, {code:'zh-Hans', name:'简体白话'}, {code:'es', name:'Español'}, 
-        {code:'de', name:'Deutsch'}, {code:'pt', name:'Português'}, {code:'zh-Hant', name:'正體官話'}, 
-        {code:'fr', name:'Français'}, {code:'lzh', name:'简体文言'}, {code:'ru', name:'Русский'}, 
-        {code:'mn', name:'Монгол'}, {code:'ja', name:'日本語'}, {code:'ko', name:'한국어'}, 
-        {code:'hi', name:'हिन्दी'}, {code:'zh-Classical', name:'華夏文言'}
-      ];
-      langs.forEach(l => {
-        let btn = document.createElement('div'); 
-        btn.style.padding = '10px'; 
-        btn.style.background = 'var(--btn-bg)'; 
-        btn.style.borderRadius = '8px'; 
+      
+      const languageNames = {
+        'en': 'English (UK)', 'zh-Hans': '简体白话', 'es': 'Español', 'de': 'Deutsch',
+        'pt': 'Português', 'zh-Hant': '正體官話', 'fr': 'Français', 'lzh': '简体文言',
+        'ru': 'Русский', 'mn': 'Монгол', 'ja': '日本語', 'ko': '한국어',
+        'hi': 'हिन्दी', 'zh-Classical': '華夏文言'
+      };
+      
+      Object.keys(languageNames).forEach(code => {
+        const btn = document.createElement('div');
+        btn.style.padding = '10px';
+        btn.style.background = 'var(--btn-bg)';
+        btn.style.borderRadius = '8px';
         btn.style.cursor = 'pointer';
-        btn.innerText = l.name; 
-        btn.onclick = () => { 
-          currentLang = l.code; 
-          applyLanguageUI(); 
-          document.getElementById('langModal').style.display = 'none'; 
-          localStorage.setItem('sspd_lang', l.code);
+        btn.innerText = languageNames[code];
+        btn.onclick = () => {
+          currentLang = code;
+          applyLanguageUI();
+          document.getElementById('langModal').style.display = 'none';
+          localStorage.setItem('sspd_lang', code);
+          // 如果网站反馈窗口是打开的，刷新其内容
+          if (document.getElementById('win95Window').classList.contains('active')) {
+            refreshWebsiteFeedbackContent();
+          }
         };
         grid.appendChild(btn);
       });
     }
 
-    function showToast(msg){ 
-      let d = document.createElement('div'); 
-      d.className = 'toast-notify'; 
-      d.innerText = msg; 
-      document.body.appendChild(d); 
-      setTimeout(() => d.remove(), 3000); 
+    function showToast(msg) {
+      const d = document.createElement('div');
+      d.className = 'toast-notify';
+      d.innerText = msg;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 3000);
     }
 
-    document.getElementById('langSwitchBtn').onclick = () => { 
-      buildLangModal(); 
-      document.getElementById('langModal').style.display = 'flex'; 
+    // 事件绑定
+    document.getElementById('langSwitchBtn').onclick = () => {
+      buildLangModal();
+      document.getElementById('langModal').style.display = 'flex';
     };
-    document.getElementById('closeLangModal').onclick = () => document.getElementById('langModal').style.display = 'none';
-    document.getElementById('leaveDangerBtn').onclick = () => { 
-      window.open('https://www.bbc.co.uk/bitesize', '_blank'); 
-      window.location.href = 'https://www.bing.com/search?q=time+in+nanjing'; 
+    
+    document.getElementById('closeLangModal').onclick = () => {
+      document.getElementById('langModal').style.display = 'none';
+    };
+    
+    document.getElementById('leaveDangerBtn').onclick = () => {
+      window.open('https://www.bbc.co.uk/bitesize', '_blank');
+      window.location.href = 'https://www.bing.com/search?q=time+in+nanjing';
     };
 
-    function toggleAccPanel(){ document.getElementById('accPanel').classList.toggle('show'); }
-    function applyFilters(){ 
-      let c = document.getElementById('con-range').value, 
-          g = document.getElementById('gray-range').value, 
-          s = document.getElementById('sat-range').value; 
-      document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`; 
+    function toggleAccPanel() { 
+      document.getElementById('accPanel').classList.toggle('show'); 
     }
-    function resetAcc(){ 
-      document.getElementById('con-range').value = 1; 
-      document.getElementById('gray-range').value = 0; 
-      document.getElementById('sat-range').value = 1; 
-      document.getElementById('cursor-cb').checked = false; 
-      toggleCursorAssist(false); 
-      applyFilters(); 
+    
+    function applyFilters() {
+      const c = document.getElementById('con-range').value;
+      const g = document.getElementById('gray-range').value;
+      const s = document.getElementById('sat-range').value;
+      document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
     }
-    function toggleCursorAssist(on){ 
-      let h = document.getElementById('cursor-highlight'); 
-      h.style.display = on ? 'block' : 'none'; 
-      document.body.style.cursor = on ? 'none' : 'default'; 
+    
+    function resetAcc() {
+      document.getElementById('con-range').value = 1;
+      document.getElementById('gray-range').value = 0;
+      document.getElementById('sat-range').value = 1;
+      document.getElementById('cursor-cb').checked = false;
+      toggleCursorAssist(false);
+      applyFilters();
     }
-    function updateCursorStyle(){ 
-      let sel = document.getElementById('cursor-color-select'); 
-      if (sel) { 
-        let [bg, border] = sel.value.split('|'); 
-        document.documentElement.style.setProperty('--cursor-color', bg); 
-        document.documentElement.style.setProperty('--cursor-border', border); 
-      } 
+
+    let cursorEnabled = false;
+    function toggleCursorAssist(on) {
+      cursorEnabled = on;
+      const h = document.getElementById('cursor-highlight');
+      h.style.display = on ? 'block' : 'none';
+      document.body.style.cursor = on ? 'none' : 'default';
     }
-    document.addEventListener('mousemove', (e) => { 
-      let c = document.getElementById('cursor-highlight'); 
-      if (c.style.display === 'block') { 
-        c.style.left = e.clientX + 'px'; 
-        c.style.top = e.clientY + 'px'; 
-      } 
+    
+    function updateCursorStyle() {
+      const sel = document.getElementById('cursor-color-select');
+      if (sel) {
+        const [bg, border] = sel.value.split('|');
+        document.documentElement.style.setProperty('--cursor-color', bg);
+        document.documentElement.style.setProperty('--cursor-border', border);
+      }
+    }
+
+    let rafId = null;
+    document.addEventListener('mousemove', (e) => {
+      if (!cursorEnabled) return;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const c = document.getElementById('cursor-highlight');
+        if (c) {
+          c.style.left = e.clientX + 'px';
+          c.style.top = e.clientY + 'px';
+        }
+        rafId = null;
+      });
     });
 
+    // 帮助模式
+    let helpModeActive = false;
+    const overlay = document.getElementById('helpOverlay');
+    const helpBtn = document.getElementById('helpIconBtn');
+    const tooltip = document.getElementById('helpTooltip');
+    
+    function enableHelpMode() {
+      helpModeActive = true;
+      overlay.classList.add('active');
+      document.body.style.cursor = 'not-allowed';
+    }
+    
+    function disableHelpMode() {
+      helpModeActive = false;
+      overlay.classList.remove('active');
+      tooltip.style.display = 'none';
+      document.body.style.cursor = cursorEnabled ? 'none' : 'default';
+    }
+    
+    helpBtn.onclick = () => {
+      if (helpModeActive) { disableHelpMode(); } else { enableHelpMode(); }
+    };
+    
+    overlay.addEventListener('mousemove', (e) => {
+      if (!helpModeActive) return;
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      const isPhone1 = target && target.id === 'phone873473';
+      const isPhone2 = target && target.id === 'phone87373';
+      const isHelpBtn = target && (target.id === 'helpIconBtn' || target.closest('#helpIconBtn'));
+      
+      if (isPhone1 || isPhone2 || isHelpBtn) {
+        document.body.style.cursor = 'help';
+        tooltip.style.display = 'block';
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY + 15) + 'px';
+        if (isPhone1) tooltip.innerText = t('tooltipSSPD');
+        else if (isPhone2) tooltip.innerText = t('tooltipUPL');
+        else if (isHelpBtn) tooltip.innerText = t('tooltipCloseHelp');
+      } else {
+        document.body.style.cursor = 'not-allowed';
+        tooltip.style.display = 'none';
+      }
+    });
+    
+    overlay.addEventListener('mouseleave', () => { if (helpModeActive) { tooltip.style.display = 'none'; } });
+
+    // 系统菜单
+    function setupSystemMenu(logoId, menuId, closeCallback) {
+      const logo = document.getElementById(logoId);
+      const menu = document.getElementById(menuId);
+      logo.onclick = (e) => { e.stopPropagation(); menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; };
+      document.addEventListener('click', () => { menu.style.display = 'none'; });
+      menu.querySelector('.active').onclick = () => { closeCallback(); menu.style.display = 'none'; };
+    }
+
     let win95Timer = null;
-    function showWebsiteFeedback(){
-      let win = document.getElementById('win95Window');
-      let content = document.getElementById('win95Content');
+    
+    function refreshWebsiteFeedbackContent() {
+      const content = document.getElementById('win95Content');
+      if (!content) return;
+      // 检查当前是否在初始状态（有 enterFeedbackBtn 按钮）
+      const hasEnterBtn = document.getElementById('enterFeedbackBtn');
+      if (hasEnterBtn) {
+        content.innerHTML = `
+          <div style="max-width:600px; margin:0 auto;">
+            <p style="margin:15px 0; background:#ff0; color:#000; padding:12px; border:2px solid #808080 #ffffff #ffffff #808080; font-weight:bold;"><img src="../icons/caution.png" style="width:20px; height:20px; vertical-align:middle; margin-right:8px;" onerror="this.style.display='none'">${t('websiteNotice')}</p>
+            <p>${t('websiteNotice2').replace('+875 4 73', '<span class="phone-link" id="phone873473">+875 4 73</span>').replace('+875 73', '<span class="phone-link" id="phone87373">+875 73</span>')}</p>
+            <div style="text-align:center; margin-top:30px;">
+              <button class="win95-btn" id="enterFeedbackBtn">${t('startFeedback')}</button>
+              <button class="win95-btn" id="cancelFeedbackBtn">${t('cancelBtn')}</button>
+            </div>
+          </div>
+        `;
+        // 重新绑定事件
+        document.getElementById('enterFeedbackBtn').onclick = () => {
+          if (win95Timer) clearTimeout(win95Timer);
+          content.innerHTML = `<div class="xp-loading-screen"><img src="../icons/loading.gif" alt="loading"><p>${t('loadingText')}</p><button class="win95-btn" id="cancelLoadingBtn">${t('cancelBtn')}</button></div>`;
+          document.getElementById('cancelLoadingBtn').onclick = () => {
+            if (win95Timer) clearTimeout(win95Timer);
+            document.getElementById('win95Window').classList.remove('active');
+            helpBtn.style.display = 'none';
+            disableHelpMode();
+          };
+          win95Timer = setTimeout(() => {
+            content.innerHTML = `<div class="xp-error-box"><div style="display:flex; align-items:center; gap:15px;"><img src="../icons/caution.png" alt="caution" style="width:48px; height:48px;"><h3 style="color:#b33b3b;">${t('error401')}</h3></div><details class="xp-advanced"><summary>${t('advanced')}</summary><p class="fixed-en">${t('advReason')}</p></details><div style="text-align:center; margin-top:20px;"><button class="win95-btn" onclick="document.getElementById('win95Window').classList.remove('active'); document.getElementById('helpIconBtn').style.display='none'; disableHelpMode();">${t('cancelBtn')}</button></div></div>`;
+          }, 9000 + Math.random() * 7000);
+        };
+        document.getElementById('cancelFeedbackBtn').onclick = () => { 
+          document.getElementById('win95Window').classList.remove('active'); 
+          helpBtn.style.display = 'none'; 
+          disableHelpMode(); 
+        };
+      }
+    }
+    
+    function showWebsiteFeedback() {
+      const win = document.getElementById('win95Window');
+      const content = document.getElementById('win95Content');
       document.getElementById('win95Title').innerText = t('websiteTitle');
+      helpBtn.style.display = 'block';
       content.innerHTML = `
         <div style="max-width:600px; margin:0 auto;">
-          <p style="margin:15px 0; background:#c0c0c0; padding:12px; border:2px solid #808080 #ffffff #ffffff #808080;"><img src="../icons/caution.png" style="width:20px; height:20px; vertical-align:middle; margin-right:8px;" onerror="this.style.display='none'">${t('websiteNotice')}</p>
-          <p>${t('websiteNotice2')}</p>
+          <p style="margin:15px 0; background:#ff0; color:#000; padding:12px; border:2px solid #808080 #ffffff #ffffff #808080; font-weight:bold;"><img src="../icons/caution.png" style="width:20px; height:20px; vertical-align:middle; margin-right:8px;" onerror="this.style.display='none'">${t('websiteNotice')}</p>
+          <p>${t('websiteNotice2').replace('+875 4 73', '<span class="phone-link" id="phone873473">+875 4 73</span>').replace('+875 73', '<span class="phone-link" id="phone87373">+875 73</span>')}</p>
           <div style="text-align:center; margin-top:30px;">
             <button class="win95-btn" id="enterFeedbackBtn">${t('startFeedback')}</button>
             <button class="win95-btn" id="cancelFeedbackBtn">${t('cancelBtn')}</button>
@@ -371,41 +550,89 @@
       document.getElementById('enterFeedbackBtn').onclick = () => {
         if (win95Timer) clearTimeout(win95Timer);
         content.innerHTML = `<div class="xp-loading-screen"><img src="../icons/loading.gif" alt="loading"><p>${t('loadingText')}</p><button class="win95-btn" id="cancelLoadingBtn">${t('cancelBtn')}</button></div>`;
-        document.getElementById('cancelLoadingBtn').onclick = () => { if(win95Timer) clearTimeout(win95Timer); win.classList.remove('active'); };
+        document.getElementById('cancelLoadingBtn').onclick = () => {
+          if (win95Timer) clearTimeout(win95Timer);
+          win.classList.remove('active');
+          helpBtn.style.display = 'none';
+          disableHelpMode();
+        };
         win95Timer = setTimeout(() => {
-          content.innerHTML = `<div class="xp-error-box"><div style="display:flex; align-items:center; gap:15px;"><img src="../icons/caution.png" alt="caution" style="width:48px; height:48px;"><h3 style="color:#b33b3b;">${t('error401')}</h3></div><details class="xp-advanced"><summary>${t('advanced')}</summary><p class="fixed-en">${t('advReason')}</p></details><div style="text-align:center; margin-top:20px;"><button class="win95-btn" onclick="document.getElementById('win95Window').classList.remove('active')">${t('cancelBtn')}</button></div></div>`;
-        }, 9000+Math.random()*7000);
+          content.innerHTML = `<div class="xp-error-box"><div style="display:flex; align-items:center; gap:15px;"><img src="../icons/caution.png" alt="caution" style="width:48px; height:48px;"><h3 style="color:#b33b3b;">${t('error401')}</h3></div><details class="xp-advanced"><summary>${t('advanced')}</summary><p class="fixed-en">${t('advReason')}</p></details><div style="text-align:center; margin-top:20px;"><button class="win95-btn" onclick="document.getElementById('win95Window').classList.remove('active'); document.getElementById('helpIconBtn').style.display='none'; disableHelpMode();">${t('cancelBtn')}</button></div></div>`;
+        }, 9000 + Math.random() * 7000);
       };
-      document.getElementById('cancelFeedbackBtn').onclick = () => win.classList.remove('active');
+      document.getElementById('cancelFeedbackBtn').onclick = () => { 
+        win.classList.remove('active'); 
+        helpBtn.style.display = 'none'; 
+        disableHelpMode(); 
+      };
     }
 
-    document.getElementById('win95CloseBtn').onclick = () => {
-      if (confirm(t('exitConfirm'))) { 
-        if(win95Timer) clearTimeout(win95Timer); 
-        document.getElementById('win95Window').classList.remove('active'); 
-      }
+    function closeWebsiteWindow() { 
+      if (win95Timer) clearTimeout(win95Timer); 
+      document.getElementById('win95Window').classList.remove('active'); 
+      helpBtn.style.display = 'none'; 
+      disableHelpMode(); 
+    }
+    
+    document.getElementById('win95CloseBtn').onclick = () => { 
+      if (confirm(t('exitConfirm'))) closeWebsiteWindow(); 
     };
+    
+    setupSystemMenu('win95Logo', 'win95SystemMenu', () => { 
+      if (confirm(t('exitConfirm'))) closeWebsiteWindow(); 
+    });
 
-    function showStationFeedback(){
-      let modal = document.getElementById('feedbackStationModal');
-      let content = document.getElementById('feedbackStationContent');
-      content.innerHTML = `<div class="xp-loading-screen"><img src="../icons/loading.gif" alt="loading"><p>${t('loadingText')}</p></div>`;
-      modal.style.display = 'flex';
-      setTimeout(() => {
+    let stationTimer = null;
+    function showStationFeedback() {
+      const win = document.getElementById('stationWindow');
+      const content = document.getElementById('stationContent');
+      document.getElementById('stationTitle').innerText = t('stationTitle');
+      helpBtn.style.display = 'block';
+      content.innerHTML = `<div class="xp-loading-screen"><img src="../icons/loading.gif" alt="loading"><p>${t('loadingText')}</p><button class="win95-btn" id="cancelStationLoadingBtn">${t('cancelBtn')}</button></div>`;
+      win.classList.add('active');
+      document.getElementById('cancelStationLoadingBtn').onclick = () => {
+        if (stationTimer) clearTimeout(stationTimer);
+        win.classList.remove('active');
+        helpBtn.style.display = 'none';
+        disableHelpMode();
+      };
+      stationTimer = setTimeout(() => {
         content.innerHTML = `
-          <h2>${t('stationTitle')}</h2>
-          <div class="form-group"><label>${t('stationLocation')}</label><select class="win95-input">${[t('locationOpt1'),t('locationOpt2'),t('locationOpt3')].map(o=>`<option>${o}</option>`).join('')}</select></div>
-          <div class="form-group"><label>${t('categoryLabel')}</label><div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">${Array.from({length:12},(_,i)=>`<label><input type="checkbox"> ${t('cat'+(i+1))}</label>`).join('')}</div></div>
-          <div class="form-group"><label>${t('descriptionLabel')}</label><textarea rows="3" class="win95-input"></textarea></div>
-          <div class="form-group"><label>${t('timeLabel')}</label><input type="datetime-local" class="win95-input"></div>
-          <div class="form-group"><label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"> ${t('contactWilling')}</label><input type="text" class="win95-input" placeholder="${t('contactPlaceholder')}" style="margin-top:8px;"></div>
-          <div class="form-group"><label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"> ${t('surnameWilling')}</label><input type="text" class="win95-input" placeholder="${t('surnamePlaceholder')}" style="margin-top:8px;"></div>
-          <button class="win95-btn" id="fakeSubmit" style="width:100%;">${t('submitBtn')}</button>
-          <button class="win95-btn" onclick="document.getElementById('feedbackStationModal').style.display='none'" style="width:100%; margin-top:10px;">${t('cancelBtn')}</button>
+          <div style="max-width:700px; margin:0 auto;">
+            <h2 style="margin-bottom:20px;">${t('stationTitle')}</h2>
+            <div class="form-group"><label>${t('stationLocation')}</label><select class="win95-input">${[t('locationOpt1'), t('locationOpt2'), t('locationOpt3')].map(o => `<option>${o}</option>`).join('')}</select></div>
+            <div class="form-group"><label>${t('categoryLabel')}</label><div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">${Array.from({ length: 12 }, (_, i) => `<label><input type="checkbox"> ${t('cat' + (i + 1))}</label>`).join('')}</div></div>
+            <div class="form-group"><label>${t('descriptionLabel')}</label><textarea rows="3" class="win95-input"></textarea></div>
+            <div class="form-group"><label>${t('timeLabel')}</label><input type="datetime-local" class="win95-input"></div>
+            <div class="form-group"><label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"> ${t('contactWilling')}</label><input type="text" class="win95-input" placeholder="${t('contactPlaceholder')}" style="margin-top:8px;"></div>
+            <div class="form-group"><label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"> ${t('surnameWilling')}</label><input type="text" class="win95-input" placeholder="${t('surnamePlaceholder')}" style="margin-top:8px;"></div>
+            <button class="win95-btn" id="fakeSubmit" style="width:100%;">${t('submitBtn')}</button>
+            <button class="win95-btn" onclick="document.getElementById('stationWindow').classList.remove('active'); document.getElementById('helpIconBtn').style.display='none'; disableHelpMode();" style="width:100%; margin-top:10px;">${t('cancelBtn')}</button>
+          </div>
         `;
-        document.getElementById('fakeSubmit').onclick = () => { showToast(t('fakeToast')); modal.style.display = 'none'; };
+        document.getElementById('fakeSubmit').onclick = () => {
+          showToast(t('fakeToast'));
+          win.classList.remove('active');
+          helpBtn.style.display = 'none';
+          disableHelpMode();
+        };
       }, 600);
     }
+
+    function closeStationWindow() { 
+      if (stationTimer) clearTimeout(stationTimer); 
+      document.getElementById('stationWindow').classList.remove('active'); 
+      helpBtn.style.display = 'none'; 
+      disableHelpMode(); 
+    }
+    
+    document.getElementById('stationCloseBtn').onclick = () => { 
+      if (confirm(t('exitConfirm'))) closeStationWindow(); 
+    };
+    
+    setupSystemMenu('stationLogo', 'stationSystemMenu', () => { 
+      if (confirm(t('exitConfirm'))) closeStationWindow(); 
+    });
 
     document.getElementById('cardWebsiteSuggestion').onclick = showWebsiteFeedback;
     document.getElementById('cardStationSuggestion').onclick = showStationFeedback;
@@ -413,10 +640,10 @@
     document.getElementById('cardThanks').onclick = () => { document.getElementById('thanksModal').style.display = 'flex'; };
 
     // 初始化语言
-    let saved = localStorage.getItem('sspd_lang'); 
+    const saved = localStorage.getItem('sspd_lang');
     if (saved && translations[saved]) currentLang = saved;
     applyLanguageUI();
-    
+
     // 暴露函数到全局
     window.toggleAccPanel = toggleAccPanel;
     window.applyFilters = applyFilters;

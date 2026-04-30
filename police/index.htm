@@ -2,8 +2,12 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sixside GOV Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Sixside Police| SSPD</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- hCaptcha -->
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -11,1055 +15,1830 @@
       --bg-secondary: #10161f;
       --text-primary: #e8edf5;
       --text-secondary: #9aaebf;
-      --border-color: #1f2a36;
+      --border-color: #1a2538;
       --card-bg: #10161f;
       --card-border: #222c38;
       --btn-bg: #1e2a3a;
-      --accent: #5f7f9e;
-      --sec-bg: #071220;
-      --sec-border: #1a3a5c;
-      --sec-text: #7aabcc;
-      --sec-icon: #4a8ab0;
-      --quick-card: #0f1c2a;
-      --quick-border: #1e3248;
+      --accent-red: #cc3333;
+      --accent-green: #2ecc71;
+      --accent-amber: #f39c12;
+      --police-blue: #4a6b8c;
+      --cursor-color: rgba(204, 51, 51, 0.3);
+      --cursor-border: #cc3333;
     }
     body.light {
-      --bg-primary: #f4f6f9;
-      --bg-secondary: #ffffff;
-      --text-primary: #1a2634;
-      --text-secondary: #3a4a5e;
-      --border-color: #d0d8e4;
-      --card-bg: #ffffff;
-      --card-border: #dce2ec;
-      --btn-bg: #eef2f7;
-      --sec-bg: #e8f4fd;
-      --sec-border: #b8d8f0;
-      --sec-text: #2a5f80;
-      --sec-icon: #3a7fa8;
-      --quick-card: #f0f6ff;
-      --quick-border: #c8dff0;
+      --bg-primary: #f4f6f9; --bg-secondary: #ffffff; --text-primary: #1a2634;
+      --text-secondary: #3a4a5e; --border-color: #d0d8e4; --card-bg: #ffffff;
+      --card-border: #dce2ec; --btn-bg: #eef2f7;
     }
-    body {
-      font-family: 'Georgia', 'Times New Roman', Times, serif;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.5;
-      transition: background 0.2s, color 0.2s;
+    body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
+    
+    #cursor-highlight {
+      position: fixed; pointer-events: none; width: 50px; height: 50px;
+      border: 2px solid var(--cursor-border); background: var(--cursor-color);
+      border-radius: 50%; transform: translate(-50%, -50%); z-index: 10000; display: none;
     }
+    #cursor-highlight::before, #cursor-highlight::after {
+      content: ''; position: absolute; background: #fff;
+    }
+    #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-    /* ========== SECURITY BANNER ========== */
-    #securityBanner {
-      background: var(--sec-bg);
-      border-bottom: 1px solid var(--sec-border);
-    }
-    #securityFull {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, padding 0.45s ease;
-      padding: 0 2rem;
-    }
-    #securityFull.open {
-      max-height: 180px;
-      opacity: 1;
-      padding: 14px 2rem;
-    }
-    #securityFull-inner {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    #closeBannerBtn {
-      flex-shrink: 0;
-      margin-top: 2px;
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      background: #cc3333;
-      border: none; cursor: pointer;
-      position: relative;
-      transition: background 0.18s;
-    }
-    #closeBannerBtn::before, #closeBannerBtn::after {
-      content: '';
-      position: absolute;
-      width: 7px; height: 1.5px;
-      background: transparent;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      transition: background 0.18s;
-    }
-    #closeBannerBtn::after { transform: translate(-50%, -50%) rotate(-45deg); }
-    #closeBannerBtn:hover { background: #888; }
-    #closeBannerBtn:hover::before, #closeBannerBtn:hover::after { background: #fff; }
-    .security-body { flex: 1; }
-    .security-body h3 {
-      font-size: 0.82rem;
-      font-weight: bold;
-      color: var(--sec-text);
-      margin-bottom: 10px;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.02em;
-    }
-    .security-items {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .security-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.75rem;
-      color: var(--sec-text);
-    }
-    .security-item img {
-      width: 16px; height: 16px;
-      object-fit: contain;
-      opacity: 0.85;
-      filter: hue-rotate(180deg) brightness(1.2);
-    }
-    body.light .security-item img { filter: none; opacity: 0.7; }
-    .security-item span { opacity: 0.9; }
-
-    #securityCollapsed {
-      padding: 7px 2rem;
-      font-size: 0.72rem;
-      color: var(--sec-text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.2s;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.01em;
-    }
-    #securityCollapsed:hover { opacity: 0.7; }
-    #securityCollapsed::before {
-      content: '›';
-      font-size: 0.9rem;
-      transition: transform 0.2s;
-    }
-    #securityCollapsed:hover::before { transform: translateX(2px); }
-    /* ========== END SECURITY BANNER ========== */
-
+    .filter-layer { transition: filter 0.2s; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-    .top-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.9rem 2rem;
-      border-bottom: 1px solid var(--border-color);
+
+    .emergency-top-bar { background: #000; color: #fff; border-bottom: 2px solid var(--accent-red); padding: 12px; font-family: monospace; text-align: center; position: sticky; top: 0; z-index: 1100; }
+    .report-btn { background: var(--accent-red); color: white; border: none; padding: 5px 15px; cursor: pointer; animation: alert-flash-slow 2s infinite; font-weight: bold; margin-left: 10px; }
+    @keyframes alert-flash-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .emergency-number { color: var(--accent-red); font-weight: bold; }
+    .nonemergency-number { color: var(--accent-amber); font-weight: bold; }
+
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 70px; z-index: 1000; }
+    .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; position: relative; cursor: pointer; }
+    .nav-brand span { color: var(--police-blue); cursor: pointer; }
+    .popup-menu { position: absolute; top: 100%; left: 0; margin-top: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; min-width: 180px; z-index: 1001; }
+    .popup-menu-item { padding: 12px 20px; color: var(--text-primary); display: block; cursor: pointer; border-bottom: 1px solid var(--border-color); text-decoration: none; }
+    .popup-menu-item:hover { background: var(--btn-bg); color: var(--accent-red); }
+    
+    .keyword-glow { display: inline-block; background: linear-gradient(120deg, #ffffff, #3b82f6, #60a5fa, #3b82f6, #ffffff); background-size: 300% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: keywordShine 2.5s ease-in-out infinite; font-weight: bold; }
+    @keyframes keywordShine { 0% { background-position: 0% center; } 30% { background-position: 100% center; text-shadow: 0 0 10px rgba(59,130,246,0.8); } 100% { background-position: 300% center; } }
+    
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(100%) contrast(1.2); transition: filter 0.2s; }
+    .acc-icon-btn:hover { filter: grayscale(50%) contrast(1); }
+    
+    .lang-switch-btn, .tool-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; }
+    .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
+    .acc-panel.show { display: block; }
+    .acc-item { margin-bottom: 15px; }
+    .acc-item label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-secondary); }
+    .acc-select { width: 100%; padding: 8px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; }
+    .stats-container { display: grid; grid-template-columns: 1fr 1px 1fr; max-width: 800px; margin: -30px auto 50px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 30px; border-radius: 12px; }
+    .stat-val { font-size: 2.2rem; font-family: monospace; }
+    .trend-down { display: inline-block; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 12px solid var(--accent-green); margin-left: 10px; }
+    .trend-down.orange { border-top-color: var(--accent-amber); }
+    
+    .stat-label-container {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dashed var(--text-secondary);
+    }
+    .stat-label-container:hover .stat-tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    .stat-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      padding: 12px 16px;
       background: var(--bg-secondary);
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .nav-left { display: flex; align-items: center; gap: 0.5rem; }
-    .home-button {
-      font-size: 1.15rem; font-weight: bold;
-      background: none; border: none;
-      color: var(--text-primary); cursor: pointer;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.03em;
-      transition: color 0.15s;
-    }
-    .home-button:hover { color: var(--accent); }
-    .nav-divider { color: var(--text-secondary); }
-    .current-location { color: var(--text-secondary); font-size: 0.9rem; }
-    .toolbar { display: flex; gap: 0.6rem; align-items: center; }
-    .btn-square {
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      border-radius: 4px; padding: 0.3rem 0.9rem;
-      cursor: pointer; color: var(--text-primary);
-      font-size: 0.82rem; font-family: 'Georgia', serif;
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .btn-square:hover { border-color: var(--accent); background: var(--card-bg); }
-    .accessibility-wrapper { position: relative; }
-    .accessibility-toggle {
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      border-radius: 30px; padding: 0.2rem 0.6rem;
-      cursor: pointer; font-size: 1.2rem;
-      filter: grayscale(1) brightness(0.9);
-    }
-    .accessibility-panel {
-      position: absolute; top: 40px; right: 0; width: 320px;
-      background: var(--bg-secondary); border: 1px solid var(--border-color);
-      border-radius: 12px; padding: 1.2rem; z-index: 900;
-      opacity: 0; visibility: hidden; transform: translateY(-8px);
-      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
-    }
-    .accessibility-panel.show { opacity: 1; visibility: visible; transform: translateY(0); }
-    .accessibility-panel h4 { font-size: 1.1rem; margin-bottom: 1rem; text-align: center; }
-    .accessibility-panel label { display: block; font-size: 0.85rem; margin: 0.8rem 0 0.3rem; }
-    .accessibility-panel input[type=range] { width: 100%; margin: 0.2rem 0; cursor: pointer; }
-    .accessibility-panel select {
-      width: 100%; padding: 0.3rem; margin: 0.2rem 0;
-      background: var(--btn-bg); color: var(--text-primary);
-      border: 1px solid var(--border-color); border-radius: 4px;
-    }
-    .accessibility-panel button {
-      width: 100%; margin-top: 1rem; padding: 0.4rem;
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      border-radius: 4px; cursor: pointer; color: var(--text-primary);
-    }
-
-    /* ========== HERO ========== */
-    .hero {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 2.5rem 0 1.5rem; gap: 2rem; flex-wrap: wrap;
-    }
-    .hero-text h1 { font-size: 3.5rem; letter-spacing: -0.01em; }
-    .hero-text p { font-style: italic; color: var(--text-secondary); margin-top: 0.3rem; font-size: 1.05rem; }
-    .logo-large { max-width: 200px; height: auto; opacity: 0.92; }
-
-    /* ========== QUICK SERVICES ========== */
-    .quick-services {
-      margin: 0.5rem 0 2rem;
-      padding: 1.5rem;
-      background: var(--quick-card);
-      border: 1px solid var(--quick-border);
-      border-radius: 14px;
-    }
-    .quick-services-title {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-      font-family: 'Georgia', serif;
-    }
-    .quick-services-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .quick-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      background: var(--btn-bg);
       border: 1px solid var(--border-color);
       border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       color: var(--text-primary);
-      text-decoration: none;
       font-size: 0.85rem;
-      font-family: 'Georgia', serif;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s, color 0.2s;
-      white-space: nowrap;
+      line-height: 1.5;
+      width: 280px;
+      max-width: 80vw;
+      text-align: left;
+      font-weight: normal;
+      z-index: 100;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      pointer-events: none;
+      white-space: normal;
     }
-    .quick-btn:hover {
-      border-color: var(--accent);
-      background: var(--card-bg);
-      color: var(--text-primary);
-      transform: translateY(-2px);
+    .stat-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px;
+      border-style: solid;
+      border-color: var(--bg-secondary) transparent transparent transparent;
     }
-    .quick-btn-icon {
-      width: 18px; height: 18px;
-      opacity: 0.7;
-      font-style: normal;
-      font-size: 1rem;
+    .stat-tooltip::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 9px;
+      border-style: solid;
+      border-color: var(--border-color) transparent transparent transparent;
+      margin-top: 1px;
     }
-    /* ========== END QUICK SERVICES ========== */
 
-    .section-title {
-      font-size: 1.7rem;
-      border-left: 4px solid var(--accent);
-      padding-left: 1rem;
-      margin: 2.2rem 0 1rem;
-      letter-spacing: -0.01em;
+    .motto-carousel {
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0 40px;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--police-blue);
     }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; margin: 1.2rem 0; }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 1.2rem; cursor: pointer;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-      position: relative;
+    .motto-text { text-align: center; font-weight: 500; letter-spacing: 1px; }
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(5px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-5px); }
     }
-    .card::before {
-      content: ''; position: absolute;
-      left: 0; top: 12px; bottom: 12px;
-      width: 3px; border-radius: 0 2px 2px 0;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-    .card:hover::before { opacity: 1; }
-    .card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
-    .card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; }
-    .view-all-btn {
-      display: inline-block; margin: 0.5rem 0 1rem;
-      padding: 0.5rem 1.4rem;
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      border-radius: 30px; cursor: pointer;
-      font-size: 0.85rem; font-family: 'Georgia', serif;
-      color: var(--text-primary);
-      transition: border-color 0.15s, transform 0.15s;
-    }
-    .view-all-btn:hover { border-color: var(--accent); transform: translateX(3px); }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
-      z-index: 1100; display: flex; align-items: center; justify-content: center;
-    }
-    .all-depts-modal, .lang-modal {
-      background: var(--bg-secondary); border-radius: 16px;
-      max-width: 700px; width: 85%; max-height: 80vh;
-      overflow-y: auto; padding: 1.5rem;
-      border: 1px solid var(--border-color);
-    }
-    .lang-modal { max-width: 400px; text-align: center; }
-    .lang-option {
-      position: relative; display: block; width: 100%;
-      margin: 0.5rem 0; padding: 0.5rem;
-      background: var(--btn-bg); border: 1px solid var(--border-color);
-      border-radius: 8px; cursor: pointer; color: var(--text-primary);
-      transition: border-color 0.15s;
-    }
-    .lang-option:hover { border-color: var(--accent); }
-    .lang-welcome {
-      position: absolute; left: 50%; top: -28px; transform: translateX(-50%);
-      background: var(--card-border); padding: 2px 8px;
-      border-radius: 20px; font-size: 0.7rem; white-space: nowrap;
-      opacity: 0; transition: opacity 0.2s; pointer-events: none;
-    }
-    .lang-option:hover .lang-welcome { opacity: 1; }
+    .fade-motto { animation: fadeInOut 4s ease-in-out forwards; }
 
-    /* ========== FOOTER ========== */
-    .footer {
-      margin-top: 3rem;
-      padding: 2rem 0 1.5rem;
-      border-top: 1px solid var(--border-color);
-    }
-    .footer-grid {
+    .service-buttons-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 20px;
+      margin: 40px 0;
     }
-    .footer-block h4 {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-secondary);
-      margin-bottom: 0.6rem;
-    }
-    .footer-block p, .footer-block a {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      display: block;
-      text-decoration: none;
-    }
-    .footer-block a:hover { color: var(--text-primary); }
-    .footer-donate-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
-      background: transparent;
-      border: 1px solid var(--accent);
-      border-radius: 20px;
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-family: 'Georgia', serif;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.15s, color 0.15s;
-    }
-    .footer-donate-btn:hover { background: var(--accent); color: #fff; }
-    .footer-divider {
-      border: none; border-top: 1px solid var(--border-color);
-      margin: 0 0 1rem;
-    }
-    .footer-bottom {
-      text-align: center;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
-    }
-    .footer-bottom a { color: var(--text-secondary); text-decoration: none; }
-    .footer-bottom a:hover { color: var(--text-primary); }
-    /* ========== END FOOTER ========== */
 
-    .detail-section {
-      margin: 2rem 0; padding: 1.5rem;
-      background: var(--card-bg); border-radius: 12px;
-      border: 1px solid var(--card-border);
+    .service-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--police-blue);
+      border-radius: 12px;
+      padding: 25px 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .back-home { display: inline-block; margin-bottom: 1rem; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; transition: color 0.15s; }
-    .back-home:hover { color: var(--text-primary); }
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    th, td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; font-size: 0.88rem; }
-    th { background: var(--btn-bg); }
-    .highlight-cursor { cursor: none; }
-    .gallery-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
-    .gallery-detail-item { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.2s; }
-    .gallery-detail-item:hover { transform: translateY(-4px); border-color: var(--accent); }
-    .gallery-detail-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
-    .gallery-detail-caption { padding: 0.8rem; font-size: 0.85rem; text-align: center; color: var(--text-secondary); }
-    .gallery-license { font-size: 0.75rem; text-align: center; margin-top: 1rem; padding: 0.8rem; background: var(--btn-bg); border-radius: 8px; color: var(--text-secondary); }
-    .gallery-license a { color: var(--text-secondary); }
-    .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.2s; }
-    .lightbox.show { visibility: visible; opacity: 1; }
-    .lightbox img { max-width: 90%; max-height: 80%; object-fit: contain; }
-    .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; background: none; border: none; }
-    .lightbox-download { position: absolute; bottom: 30px; right: 30px; background: var(--btn-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 16px; color: white; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--police-blue) 0%, var(--police-blue) 33%, var(--accent-red) 33%, var(--accent-red) 66%, #e8edf5 66%, #e8edf5 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--police-blue), var(--accent-red));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 12px 0 0 12px;
+    }
+    .service-card:hover {
+      transform: translateY(-6px);
+      border-left-color: var(--accent-red);
+      border-color: var(--police-blue);
+      box-shadow:
+        0 12px 28px rgba(74, 107, 140, 0.45),
+        0 4px 10px rgba(204, 51, 51, 0.25),
+        inset 0 0 0 1px rgba(74, 107, 140, 0.2);
+      background: linear-gradient(160deg, rgba(74,107,140,0.18) 0%, rgba(204,51,51,0.10) 100%);
+    }
+    .service-card:hover::before {
+      opacity: 1;
+    }
+    .service-card:hover::after {
+      opacity: 1;
+    }
+    .service-card h3 {
+      font-size: 1.3rem;
+      color: var(--accent-amber);
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .service-card:hover h3 {
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(74, 107, 140, 0.9), 0 0 20px rgba(204, 51, 51, 0.4);
+    }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
+    .report-modal, .lost-modal, .lang-modal, .captcha-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    
+    .time-check-modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 12px;
+    }
+    .time-check-content h2 {
+      color: var(--accent-amber);
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+    .time-check-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+      font-size: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 20px;
+      margin-bottom: 25px;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .time-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .time-value {
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .user-time-section {
+      background: rgba(204, 51, 51, 0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .user-time-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .user-time-label {
+      color: var(--accent-red);
+      font-weight: bold;
+    }
+    .user-time-value {
+      font-family: monospace;
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      font-weight: bold;
+    }
+    .warning-text {
+      color: var(--accent-red);
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+      padding: 10px;
+      background: rgba(204, 51, 51, 0.1);
+      border-radius: 6px;
+    }
+    .time-check-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--police-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .time-check-btn:hover {
+      background: var(--accent-amber);
+      transform: translateY(-2px);
+    }
+    .time-check-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .loading-text {
+      text-align: center;
+      color: var(--accent-amber);
+      margin-top: 15px;
+      font-style: italic;
+    }
+    
+    #map { height: 240px; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; }
+    .btn-action { width: 100%; padding: 12px; margin-top: 12px; cursor: pointer; background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
+    .btn-danger { background: var(--accent-red); color: white; border: none; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; }
+    .locate-btn { background: var(--police-blue); margin-bottom: 10px; }
+    .lost-grid { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+    .lost-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; cursor: pointer; transition: 0.2s; }
+    .lost-card:hover { border-color: var(--accent-amber); transform: translateY(-2px); }
+    .lost-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+    .lost-name { font-size: 1.4rem; font-weight: bold; color: var(--accent-amber); }
+    .lost-date { color: var(--text-secondary); font-size: 0.85rem; }
+    .db-notice { text-align: center; margin-top: 30px; padding: 12px; background: rgba(74,107,140,0.2); border-radius: 8px; font-size: 0.9rem; border: 1px dashed var(--police-blue); }
+    footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+    
+    #dispatchRoot { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .dispatch-card { background: var(--bg-primary); border-left: 4px solid var(--accent-red); padding: 12px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 20px; position: relative; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .num-anim-110 { background: linear-gradient(120deg, #cc3333 0%, #cc3333 40%, #3498db 50%, #cc3333 60%, #cc3333 100%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; animation: sweep 1.2s linear infinite; font-size: 1.8rem; font-weight: bold; font-family: monospace; }
+    @keyframes sweep { to { background-position: 200% center; } }
+    .count-tag { position: absolute; bottom: -8px; right: -8px; background: #fff; color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.7rem; border: 2px solid #000; }
+    .queue-msg { font-weight: bold; }
+    .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+    .lang-option { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .lang-option:hover { background: var(--police-blue); transform: translateY(-2px); }
+    .direct-call-hint { background: rgba(204,51,51,0.15); border: 1px solid var(--accent-red); border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--accent-red); }
+    .error-msg { color: var(--accent-red); font-size: 0.8rem; margin-top: 5px; }
+    
+    .service-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 15px 0;
+    }
+    .service-option-btn {
+      padding: 10px 20px;
+      background: var(--btn-bg);
+      border: 2px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .service-option-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-amber);
+    }
+    .service-option-btn.selected {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+      color: white;
+    }
+    
+    .h-captcha {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
+    }
+    
+    .toast-notify {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent-green);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 20000;
+      animation: fadeOut 3s ease-in-out forwards;
+    }
+    .toast-notify.error {
+      background: var(--accent-red);
+      color: white;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      70% { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
+    }
   </style>
 </head>
 <body>
+<div id="cursor-highlight"></div>
+<div id="dispatchRoot"></div>
+<div class="emergency-top-bar">
+  <span id="emergencyLabel">EMERGENCY:</span> <span class="emergency-number">110</span> <button class="report-btn" id="emergencyBtn">REPORT EMERGENCY</button>
+  <span style="margin:0 20px;">|</span>
+  <span id="nonEmergencyLabel">NON-EMERGENCY:</span> <span class="nonemergency-number">009</span>
+  <div style="font-size:0.75rem; color:#aaa; margin-top:6px;" id="callNote"></div>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
+  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
+  <div class="acc-panel" id="accPanel">
+    <div class="acc-item"><label id="contrastLabel">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="grayscaleLabel">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="saturateLabel">Saturate</label><input type="range" id="sat-range" min="0" max="3" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label id="crosshairLabel">Crosshair Color</label><select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()"><option value="rgba(204,51,51,0.3)|#cc3333">Red</option><option value="rgba(52,152,219,0.3)|#3498db">Blue</option><option value="rgba(50,205,50,0.3)|#32cd32">Lime</option><option value="rgba(255,255,0,0.3)|#ffff00">Yellow</option></select></div>
+    <div class="acc-item"><label><input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> <span id="cursorEnableLabel">Enable Crosshair Assist</span></label></div>
+    <button class="btn-action" id="resetAccBtn" onclick="resetAcc()">Reset</button>
+  </div>
+</nav>
+<div class="filter-layer" id="mainFilter">
+  <div class="container"><header style="text-align:center; padding: 60px 0 20px;"><h1><span class="keyword-glow" id="wordJustice">JUSTICE</span>, <span class="keyword-glow" id="wordProfessionalism">PROFESSIONALISM</span>, <span class="keyword-glow" id="wordProtection">PROTECTION</span>.</h1>
+  <div class="motto-carousel" id="mottoCarousel"><div class="motto-text" id="currentMotto">Serving the citizens of Sixside since 1989.</div></div>
+  <div class="stats-container">
+    <div>
+      <span class="stat-val" id="respTimeVal">17m 04s</span>
+      <div><span class="trend-down"></span> <span id="respTrend">6s VS 2024</span></div>
+      <span class="stat-label-container">
+        <span id="respLabel">2025 AVG RESPONSE TIME</span>
+        <span class="stat-tooltip" id="respTooltip"></span>
+      </span>
+    </div>
+    <div style="background:var(--border-color);"></div>
+    <div>
+      <span class="stat-val" id="clearRateVal">98.2%</span>
+      <div><span class="trend-down orange"></span> <span id="clearTrend">0.6% lower VS 2024</span></div>
+      <span class="stat-label-container">
+        <span id="clearLabel">2025 AVG CLEARANCE RATE</span>
+        <span class="stat-tooltip" id="clearTooltip"></span>
+      </span>
+    </div>
+  </div>
+  </header></div>
+  
+  <div class="container" style="margin-bottom: 40px;">
+    <div class="service-buttons-grid" id="serviceButtonsGrid"></div>
+  </div>
+</div>
+<footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
 
-<!-- ========== SECURITY BANNER ========== -->
-<div id="securityBanner">
-  <div id="securityFull">
-    <div id="securityFull-inner">
-      <button id="closeBannerBtn" title="Close"></button>
-      <div class="security-body">
-        <h3 id="securityTitle">您怎么知道这个网站是安全的？</h3>
-        <div class="security-items">
-          <div class="security-item">
-            <img src="Government.png" alt="Official domain" id="securityImgGov">
-            <span id="securityDomain">uplgov 是 UPL 政府官方且唯一的域名</span>
-          </div>
-          <div class="security-item">
-            <img src="Lock.png" alt="Secure connection" id="securityImgLock">
-            <span id="securityHttps">https 代表您的连接已加密且安全</span>
-          </div>
+<!-- 时间校验弹窗 -->
+<div class="modal-overlay" id="timeCheckModal">
+  <div class="time-check-modal">
+    <div class="time-check-content">
+      <h2 id="timeCheckTitle">你的时间不准</h2>
+      <div class="time-check-subtitle" id="timeCheckSubtitle">您的时钟不准。现在时间是：</div>
+      
+      <div class="time-grid" id="timeGrid">
+        <div class="time-row"><span class="time-label" id="utcTimeLabel">UTC 时间</span><span class="time-value" id="utcTimeValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="localTimeLabel">本地时间</span><span class="time-value" id="localTimeValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="buddhistYearLabel">佛历</span><span class="time-value" id="buddhistYearValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="lunarYearLabel">农历</span><span class="time-value" id="lunarYearValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="unixTimestampLabel">Unix 时间戳</span><span class="time-value" id="unixTimestampValue">--</span></div>
+        <div class="time-row"><span class="time-label" id="julianDayLabel">儒略日 (JD)</span><span class="time-value" id="julianDayValue">--</span></div>
+      </div>
+      
+      <div class="user-time-section">
+        <div class="user-time-row">
+          <span class="user-time-label" id="yourTimeLabel">这是你的时间（错误）：</span>
+          <span class="user-time-value" id="userTimeValue">--</span>
         </div>
       </div>
+      
+      <div class="warning-text" id="timeWarning">您的时间不准可能导致某些功能不可用。</div>
+      
+      <button class="time-check-btn" id="continueBtn">继续访问网站</button>
+      <div class="loading-text" id="loadingText" style="display: none;">重新加载连接...</div>
     </div>
-  </div>
-  <div id="securityCollapsed">
-    <span id="securityCollapsedText">了解为什么此网页是安全的</span>
-  </div>
-</div>
-<!-- ========== END SECURITY BANNER ========== -->
-
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="home-button" id="homeBtn">Sixside</button>
-    <span class="nav-divider">|</span>
-    <span class="current-location" id="currentLocation">Home</span>
-  </div>
-  <div class="toolbar">
-    <div class="accessibility-wrapper">
-      <div class="accessibility-toggle" id="accessibilityToggle">♿</div>
-      <div class="accessibility-panel" id="accessibilityPanel">
-        <h4 id="accessTitle">辅助功能</h4>
-        <label id="contrastLabel">对比度 <span id="contrastVal">1.0</span></label>
-        <input type="range" id="contrastSlider" min="0.5" max="2" step="0.01" value="1">
-        <label id="grayscaleLabel">灰度 <span id="grayscaleVal">0</span></label>
-        <input type="range" id="grayscaleSlider" min="0" max="1" step="0.01" value="0">
-        <label id="saturateLabel">饱和度 <span id="saturateVal">1.0</span></label>
-        <input type="range" id="saturateSlider" min="0" max="2" step="0.01" value="1">
-        <label id="cursorColorLabel">鼠标高亮颜色</label>
-        <select id="cursorColorSelect">
-          <option value="red" id="cursorRed">红色</option>
-          <option value="yellow" id="cursorYellow">黄色</option>
-        </select>
-        <label><input type="checkbox" id="cursorCheckbox"> <span id="cursorEnableLabel">开启鼠标高亮</span></label>
-        <button id="resetAccessibilityBtn" class="btn-square">恢复默认</button>
-      </div>
-    </div>
-    <button class="btn-square" id="themeToggleBtn">Dark/Light</button>
-    <button class="btn-square" id="langReopenBtn">Language</button>
   </div>
 </div>
 
-<div class="container" id="mainContent">
-  <div id="homeView">
-    <div class="hero">
-      <div class="hero-text">
-        <h1 id="mainTitle">Sixside</h1>
-        <p id="mainSubtitle" style="font-style: italic;">The Enduring Spirit of the Mountains</p>
-      </div>
-      <img src="SixsideLogo.png" alt="Sixside Logo" class="logo-large" id="logoImg">
+<div class="modal-overlay" id="reportModal"><div class="report-modal">
+  <div class="direct-call-hint" id="directCallHint"></div>
+  <h2 id="modalHead">Emergency Report</h2>
+  
+  <div class="form-group">
+    <label id="serviceLabel"></label>
+    <div class="service-btn-group" id="serviceBtnGroup">
+      <button class="service-option-btn" data-service="police" id="servicePoliceBtn">Police</button>
+      <button class="service-option-btn" data-service="rescue" id="serviceRescueBtn">Rescue</button>
+      <button class="service-option-btn" data-service="fire" id="serviceFireBtn">Fire</button>
+      <button class="service-option-btn" data-service="medical" id="serviceMedicalBtn">Medical</button>
     </div>
-
-    <!-- ========== QUICK SERVICES ========== -->
-    <div class="quick-services" id="quickServicesSection">
-      <div class="quick-services-title" id="quickServicesTitle">Quick Services</div>
-      <div class="quick-services-row" id="quickServicesRow"></div>
-    </div>
-    <!-- ========== END QUICK SERVICES ========== -->
-
-    <div class="section-title" id="aboutTitle">About Sixside</div>
-    <div class="card-grid" id="aboutGrid"></div>
-
-    <div class="section-title" id="govTitle">Government & Agencies</div>
-    <div class="card-grid" id="featuredDepts"></div>
-    <div class="view-all-btn" id="viewAllBtn">View All Departments</div>
-
-    <div class="section-title" id="otherTitle">Other Offices</div>
-    <div class="card-grid" id="otherOfficesGrid"></div>
+    <div id="serviceWarning" class="error-msg"></div>
   </div>
-  <div id="detailView" style="display: none;"></div>
-</div>
+  
+  <div class="form-group"><label id="locationLabel"></label><button class="btn-action locate-btn" id="locateBtn"></button><input type="text" id="latlngInput" placeholder="Latitude, Longitude" readonly style="background:#1e2a3a;"><div id="locationError" class="error-msg"></div></div>
+  <div id="map" style="height:200px;"></div>
+  <div class="form-group"><label id="visibleLabel"></label><div class="checkbox-group" id="visibilityGroup"><label><input type="radio" name="visibility" value="yes"> <span id="optYes"></span></label><label><input type="radio" name="visibility" value="no"> <span id="optNo"></span></label></div></div>
+  <div class="form-group"><label id="contactLabel"></label><input type="text" id="contactInput" placeholder="Phone / Email"></div>
+  <div class="form-group"><label id="commentLabel"></label><textarea id="commentInput" rows="3" placeholder=""></textarea></div>
+  
+  <div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54" id="reportCaptcha"></div>
+  <div id="captchaError" class="error-msg" style="text-align:center; margin-top:5px;"></div>
+  
+  <button class="btn-action btn-danger" id="submitSosBtn"></button><button class="btn-action" id="cancelModalBtn"></button>
+</div></div>
 
-<!-- ========== FOOTER ========== -->
-<footer class="footer container">
-  <div class="footer-grid">
-    <div class="footer-block">
-      <h4 id="footerSupportLabel">Support Sixside</h4>
-      <a href="#" class="footer-donate-btn" id="donateBtn">
-        ♡ <span id="donateText">Donate to the Sixside Government</span>
-      </a>
-    </div>
-    <div class="footer-block">
-      <h4 id="footerContactLabel">Contact</h4>
-      <p id="contactPhone">+875 4 4683766368</p>
-    </div>
-    <div class="footer-block">
-      <h4 id="footerMediaLabel">Media Partnerships</h4>
-      <p id="mediaPhone">+875 4 4683766368 63</p>
-    </div>
-    <div class="footer-block">
-      <h4 id="footerLinksLabel">Links</h4>
-      <a href="https://uplgov.github.io/national-portal/" target="_blank" id="nationalLink">UPL National Portal</a>
-      <a href="#" id="privacyLink">Privacy</a>
-      <a href="#" id="licenseLink">Licence</a>
-    </div>
-  </div>
-  <hr class="footer-divider">
-  <div class="footer-bottom">
-    <p id="copyrightLine">© Sixside Provincial Government</p>
-    <p id="techSupportLine">Technical support and maintenance provided by Wareflame</p>
-  </div>
-</footer>
-<!-- ========== END FOOTER ========== -->
+<div class="modal-overlay" id="lostDetailModal"><div class="lost-modal"><h2 id="lostDetailTitle"></h2><div id="lostDetailContent" class="detail-content"></div><button class="btn-action" id="closeLostDetail">Close</button></div></div>
 
-<div id="lightbox" class="lightbox">
-  <button class="lightbox-close" id="lightboxClose">×</button>
-  <img id="lightboxImg" src="" alt="">
-  <a id="lightboxDownload" class="lightbox-download" download>Download</a>
-</div>
+<div class="modal-overlay" id="langModal"><div class="lang-modal"><h2 id="langModalTitle">Select Language</h2><div id="langGrid" class="lang-grid"></div><button class="btn-action" id="closeLangModal">Close</button></div></div>
+
+<div class="modal-overlay" id="captchaModal"><div class="captcha-modal">
+  <h2 id="captchaModalTitle">Verification Required</h2>
+  <p id="captchaModalText" style="text-align:center; margin-bottom:20px;">Please complete the verification below to continue.</p>
+  <div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54" id="lostCaptcha"></div>
+  <div id="lostCaptchaError" class="error-msg" style="text-align:center; margin-top:10px;"></div>
+  <button class="btn-action" id="confirmCaptchaBtn">Confirm</button>
+  <button class="btn-action" id="cancelCaptchaBtn">Cancel</button>
+</div></div>
 
 <script>
-  // ===== Gallery images =====
-  const galleryImages = [
-    { file:"Landscape1.png", nameEn:"Cherry Blossoms Looking Far", nameZhSimple:"樱花树下向远望", nameZhClassical:"櫻花樹下向遠望", nameZhTraditional:"櫻花樹下向遠望", nameZhHuaxia:"櫻花遠眺", nameEs:"Cerezos mirando a lo lejos", namePt:"Cerejeiras olhando ao longe", nameDe:"Kirschblüten in die Ferne blickend", nameFr:"Cerisiers regardant au loin", nameRu:"Цветущая сакура вдалеке", nameMn:"Алс харсан интоорын цэцэг" },
-    { file:"Landscape2.png", nameEn:"Inland Bay Rapid Underground Waterway", nameZhSimple:"内水湾快捷地下水道", nameZhClassical:"內水灣快捷地下水道", nameZhTraditional:"內水灣快捷地下水道", nameZhHuaxia:"內灣快水道", nameEs:"Canal subterráneo rápido de la bahía interior", namePt:"Canal subterrâneo rápido da baía interior", nameDe:"Schneller unterirdischer Wasserweg der Innenbucht", nameFr:"Voie navigable souterraine rapide de la baie intérieure", nameRu:"Быстрый подземный водный путь внутренней бухты", nameMn:"Дотоод булангийн хурдан газар доорх усан зам" },
-    { file:"Landscape3.png", nameEn:"Last Hero Point Overlook", nameZhSimple:"英雄角俯瞰", nameZhClassical:"英雄角俯瞰", nameZhTraditional:"英雄角俯瞰", nameZhHuaxia:"英傑角俯瞰", nameEs:"Mirador del Último Héroe", namePt:"Mirante do Último Herói", nameDe:"Blick vom Letzten Heldenpunkt", nameFr:"Point de vue du Dernier Héros", nameRu:"Обзор Последней точки героя", nameMn:"Сүүлчийн баатрын цэгийн харагдац" }
-  ];
-
-  // ===== Department data (unchanged) =====
-  const allDepts = [
-    { id:"governor", nameEn:"Governor's Office", head:"Amina Okonkwo", descEn:"Executive leadership.", nameZhSimple:"省长办公室", nameZhClassical:"省長辦公室", nameZhTraditional:"省長辦公室", nameZhHuaxia:"省長之署", nameEs:"Oficina del Gobernador", namePt:"Gabinete do Governador", nameDe:"Büro des Gouverneurs", nameFr:"Cabinet du Gouverneur", nameRu:"Канцелярия губернатора", nameMn:"Засаг даргын тамгын газар", descZhSimple:"行政领导", descZhClassical:"行政治理", descZhTraditional:"行政領導", descZhHuaxia:"行政治理", descEs:"Liderazgo ejecutivo", descPt:"Liderança executiva", descDe:"Exekutivführung", descFr:"Direction exécutive", descRu:"Руководство", descMn:"Гүйцэтгэх удирдлага" },
-    { id:"pd", nameEn:"Sixside PD", head:"Marius van der Berg", descEn:"Public safety, patrol.", nameZhSimple:"六面警察局", nameZhClassical:"六面警察局", nameZhTraditional:"六面警察局", nameZhHuaxia:"六面警察署", nameEs:"Policía de Sixside", namePt:"Polícia de Sixside", nameDe:"Polizei Sixside", nameFr:"Police de Sixside", nameRu:"Полиция Sixside", nameMn:"Sixside цагдаа", descZhSimple:"公共安全、巡逻", descZhClassical:"治安、巡邏", descZhTraditional:"公共安全、巡邏", descZhHuaxia:"治安巡邏", descEs:"Seguridad pública, patrullaje", descPt:"Segurança pública, patrulha", descDe:"Öffentliche Sicherheit", descFr:"Sécurité publique, patrouille", descRu:"Общественная безопасность", descMn:"Олон нийтийн аюулгүй байдал" },
-    { id:"pser", nameEn:"Public Safety & Emergency", head:"Mei Lin", descEn:"Fire, rescue, ambulance.", nameZhSimple:"公共安全与应急", nameZhClassical:"公共安全與應急", nameZhTraditional:"公共安全與應急", nameZhHuaxia:"公安應急署", nameEs:"Seguridad Pública y Emergencias", namePt:"Segurança Pública e Emergência", nameDe:"Öffentliche Sicherheit und Notfall", nameFr:"Sécurité publique et urgences", nameRu:"Общественная безопасность и чрезвычайные ситуации", nameMn:"Олон нийтийн аюулгүй байдал ба онцгой байдал", descZhSimple:"消防、救援、救护", descZhClassical:"消防、救援、救護", descZhTraditional:"消防、救援、救護", descZhHuaxia:"消防救護", descEs:"Bomberos, rescate, ambulancia", descPt:"Bombeiros, resgate, ambulância", descDe:"Feuerwehr, Rettung", descFr:"Incendie, secours, ambulance", descRu:"Пожарная охрана, спасение", descMn:"Гал, аврах, түргэн тусламж" },
-    { id:"hes", nameEn:"HESS Office", head:"Fatima Al-Hassan", descEn:"Health, Education, Social Care and Support.", nameZhSimple:"健康、教育、社会关怀和社会支持部", nameZhClassical:"健康、教育、社會關懷和社會支持部", nameZhTraditional:"健康、教育、社會關懷和社會支持部", nameZhHuaxia:"康教社安部", nameEs:"Oficina de Salud, Educación, Asistencia Social", namePt:"Gabinete da Saúde, Educação, Apoio Social", nameDe:"Amt für Gesundheit, Bildung, Soziales", nameFr:"Bureau de la Santé, de l'Éducation et du Soutien Social", nameRu:"Управление здравоохранения, образования и социальной поддержки", nameMn:"Эрүүл мэнд, боловсрол, нийгмийн халамжийн газар", descZhSimple:"健康、教育、社会关怀和社会支持", descZhClassical:"健康、教育、社會關懷和社會支持", descZhTraditional:"健康、教育、社會關懷和社會支持", descZhHuaxia:"康教社安", descEs:"Salud, Educación, Asistencia Social", descPt:"Saúde, Educação, Apoio Social", descDe:"Gesundheit, Bildung, Soziales", descFr:"Santé, Éducation, Soutien social", descRu:"Здравоохранение, образование, социальная поддержка", descMn:"Эрүүл мэнд, боловсрол, нийгмийн халамж" },
-    { id:"maffa", nameEn:"MAFFA", head:"Kenji Tanaka", descEn:"Mining, Agriculture, Forestry, Fisheries.", nameZhSimple:"矿农林渔管理局", nameZhClassical:"礦農林漁管理局", nameZhTraditional:"礦農林漁管理局", nameZhHuaxia:"礦農林漁署", nameEs:"Administración de Minería, Agricultura, Silvicultura, Pesca", namePt:"Administração de Mineração, Agricultura, Florestas, Pescas", nameDe:"Verwaltung für Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei", nameFr:"Administration des mines, de l'agriculture, des forêts et de la pêche", nameRu:"Управление горнодобывающей промышленности, сельского хозяйства, лесного хозяйства и рыболовства", nameMn:"Уул уурхай, хөдөө аж ахуй, ой, загасны захиргаа", descZhSimple:"矿业、农业、林业、渔业", descZhClassical:"礦業、農業、林業、漁業", descZhTraditional:"礦業、農業、林業、漁業", descZhHuaxia:"礦農林漁", descEs:"Minería, Agricultura, Silvicultura, Pesca", descPt:"Mineração, Agricultura, Florestas, Pescas", descDe:"Bergbau, Landwirtschaft, Forstwirtschaft, Fischerei", descFr:"Mines, agriculture, forêts, pêche", descRu:"Горнодобывающая промышленность, сельское хозяйство, лесное хозяйство, рыболовство", descMn:"Уул уурхай, хөдөө аж ахуй, ой, загас" },
-    { id:"sra", nameEn:"Sixside Revenue Authority", head:"Carlos Fernández", descEn:"Taxation, fiscal policy.", nameZhSimple:"六面财政收入署", nameZhClassical:"六面財政收入署", nameZhTraditional:"六面財政收入署", nameZhHuaxia:"六面財政署", nameEs:"Autoridad Fiscal de Sixside", namePt:"Autoridade Fiscal de Sixside", nameDe:"Steuerbehörde Sixside", nameFr:"Autorité fiscale de Sixside", nameRu:"Налоговое управление Sixside", nameMn:"Sixside татварын газар", descZhSimple:"税收、财政政策", descZhClassical:"稅收、財政政策", descZhTraditional:"稅收、財政政策", descZhHuaxia:"稅財政", descEs:"Impuestos, política fiscal", descPt:"Impostos, política fiscal", descDe:"Steuern, Finanzpolitik", descFr:"Impôts, politique fiscale", descRu:"Налоги, фискальная политика", descMn:"Татвар, санхүүгийн бодлого" },
-    { id:"hl", nameEn:"HL Trust", head:"Eleanor Ashworth", descEn:"Heritage, hiking routes.", nameZhSimple:"遗产与土地信托", nameZhClassical:"遺產與土地信託", nameZhTraditional:"遺產與土地信託", nameZhHuaxia:"遺產信託", nameEs:"Fideicomiso de Patrimonio y Tierras", namePt:"Fideicomisso de Património e Terras", nameDe:"Stiftung für Kulturerbe und Land", nameFr:"Fiducie du patrimoine et des terres", nameRu:"Трастовый фонд наследия и земель", nameMn:"Өв ба газрын итгэл", descZhSimple:"遗产、徒步路线", descZhClassical:"遺產、徒步路線", descZhTraditional:"遺產、徒步路線", descZhHuaxia:"遺產步道", descEs:"Patrimonio, rutas de senderismo", descPt:"Património, rotas de caminhada", descDe:"Kulturerbe, Wanderwege", descFr:"Patrimoine, sentiers de randonnée", descRu:"Наследие, туристические маршруты", descMn:"Өв, явган аялалын зам" }
-  ];
-
-  const otherOffices = [
-    { nameEn:"Provincial Council", head:"Janusz Kowalski", descEn:"Legislature, budget.", nameZhSimple:"省议会", nameZhClassical:"省議會", nameZhTraditional:"省議會", nameZhHuaxia:"省議會", nameEs:"Consejo Provincial", namePt:"Conselho Provincial", nameDe:"Provinzrat", nameFr:"Conseil provincial", nameRu:"Провинциальный совет", nameMn:"Мужийн зөвлөл", descZhSimple:"立法、预算", descZhClassical:"立法、預算", descZhTraditional:"立法、預算", descZhHuaxia:"立法預算", descEs:"Legislatura, presupuesto", descPt:"Legislatura, orçamento", descDe:"Legislative, Haushalt", descFr:"Législature, budget", descRu:"Законодательство, бюджет", descMn:"Хууль тогтоомж, төсөв" },
-    { nameEn:"Justice Office", head:"Priya Patel", descEn:"Legal affairs.", nameZhSimple:"司法办公室", nameZhClassical:"司法辦公室", nameZhTraditional:"司法辦公室", nameZhHuaxia:"司法署", nameEs:"Oficina de Justicia", namePt:"Gabinete da Justiça", nameDe:"Justizamt", nameFr:"Cabinet de la Justice", nameRu:"Юридическое управление", nameMn:"Хуулийн газар", descZhSimple:"法律事务", descZhClassical:"法律事務", descZhTraditional:"法律事務", descZhHuaxia:"律法事", descEs:"Asuntos legales", descPt:"Assuntos legais", descDe:"Rechtliche Angelegenheiten", descFr:"Affaires juridiques", descRu:"Юридические вопросы", descMn:"Хуулийн асуудал" },
-    { nameEn:"Land & Housing", head:"Solveig Haugen", descEn:"Land registry, housing.", nameZhSimple:"土地与住房办公室", nameZhClassical:"土地與住房辦公室", nameZhTraditional:"土地與住房辦公室", nameZhHuaxia:"地宅署", nameEs:"Oficina de Tierras y Vivienda", namePt:"Gabinete de Terras e Habitação", nameDe:"Amt für Land und Wohnungswesen", nameFr:"Bureau des terres et du logement", nameRu:"Управление земельных ресурсов и жилья", nameMn:"Газар, орон сууцны газар", descZhSimple:"土地登记、住房", descZhClassical:"土地登記、住房", descZhTraditional:"土地登記、住房", descZhHuaxia:"地契宅", descEs:"Registro de tierras, vivienda", descPt:"Registo de terras, habitação", descDe:"Grundbuch, Wohnungswesen", descFr:"Registre foncier, logement", descRu:"Земельный кадастр, жильё", descMn:"Газрын бүртгэл, орон сууц" },
-    { nameEn:"Transport & Infrastructure", head:"Wei Chen", descEn:"Roads, public toilets.", nameZhSimple:"交通与基础设施管理局", nameZhClassical:"交通與基礎設施管理局", nameZhTraditional:"交通與基礎設施管理局", nameZhHuaxia:"交通基建署", nameEs:"Administración de Transporte e Infraestructura", namePt:"Administração de Transportes e Infraestrutura", nameDe:"Verwaltung für Verkehr und Infrastruktur", nameFr:"Administration des transports et des infrastructures", nameRu:"Управление транспорта и инфраструктуры", nameMn:"Тээвэр, дэд бүтцийн газар", descZhSimple:"道路、公共厕所", descZhClassical:"道路、公共廁所", descZhTraditional:"道路、公共廁所", descZhHuaxia:"道公廁", descEs:"Carreteras, baños públicos", descPt:"Estradas, sanitários públicos", descDe:"Straßen, öffentliche Toiletten", descFr:"Routes, toilettes publiques", descRu:"Дороги, общественные туалеты", descMn:"Зам, нийтийн жорлон" }
-  ];
-
-  const featuredIds = ["governor", "pd", "hes"];
-
-  // ===== Language data (all original + NEW keys) =====
-  const langOrder = ["en","es","pt","de","zh-simple","zh-classical","zh-traditional","zh-huaxia","fr","ru","mn"];
-  const langData = {
-    en: { name:"English", welcome:"Welcome", code:"en",
-      mainTitle:"Sixside", mainSubtitle:"The Enduring Spirit of the Mountains",
-      aboutTitle:"About Sixside", historyTitle:"History", historyText:"Generations have lived in harmony with this land.",
-      geographyTitle:"Geography", geographyText:"Mountains, bamboo, vines, streams.",
-      populationTitle:"Population", populationText:"People walk hidden paths, preserve ancient ways.",
-      galleryCardTitle:"Gallery", galleryDetailTitle:"Gallery",
-      galleryLicenseText:"© Sixside Provincial Government · These images are licensed under CC BY 4.0. You may use them for commercial purposes, provided you give appropriate credit to 'Sixside Provincial Government'.",
-      govTitle:"Government & Agencies", otherTitle:"Other Offices",
-      viewAllBtn:"View All Departments", copyrightLine:"© Sixside Provincial Government",
-      techSupportLine:"Technical support and maintenance provided by Wareflame",
-      nationalLink:"UPL National Portal", privacyText:"Privacy: No data collected.", licenseText:"All rights reserved.",
-      themeToggle:"Dark/Light", langToggle:"Language",
-      accessTitle:"Accessibility", contrastLabel:"Contrast", grayscaleLabel:"Grayscale", saturateLabel:"Saturation",
-      cursorColorLabel:"Cursor Highlight Colour", cursorRed:"Red", cursorYellow:"Yellow", cursorEnableLabel:"Enable Cursor Highlight",
-      resetBtn:"Reset Default",
-      securityTitle:"How do you know this website is safe?",
-      securityDomain:"uplgov is the official and only domain of the UPL Government",
-      securityHttps:"https means your connection is encrypted and secure",
-      securityCollapsed:"Learn why this page is safe",
-      quickServicesTitle:"Quick Services",
-      quickJobs:"Jobs & Apprenticeships", quickDemocracy:"Democratic Sixside", quickLibrary:"Sixside Library",
-      footerSupportLabel:"Support Sixside", donateText:"Donate to the Sixside Government",
-      footerContactLabel:"Contact", footerMediaLabel:"Media Partnerships", footerLinksLabel:"Links" },
-    es: { name:"Español", welcome:"Hola", code:"es",
-      mainTitle:"Sixside", mainSubtitle:"El espíritu eterno de las montañas",
-      aboutTitle:"Sobre Sixside", historyTitle:"Historia", historyText:"Generaciones han vivido en armonía con esta tierra.",
-      geographyTitle:"Geografía", geographyText:"Montañas, bambú, vides, arroyos.",
-      populationTitle:"Población", populationText:"La gente camina por senderos ocultos.",
-      galleryCardTitle:"Galería", galleryDetailTitle:"Galería",
-      galleryLicenseText:"© Gobierno Provincial de Sixside · Estas imágenes están bajo licencia CC BY 4.0.",
-      govTitle:"Gobierno y Agencias", otherTitle:"Otras Oficinas",
-      viewAllBtn:"Ver todos los departamentos", copyrightLine:"© Gobierno Provincial de Sixside",
-      techSupportLine:"Soporte técnico y mantenimiento proporcionados por Wareflame",
-      nationalLink:"Portal Nacional UPL", privacyText:"Privacidad: No se recopilan datos.", licenseText:"Todos los derechos reservados.",
-      themeToggle:"Oscuro/Claro", langToggle:"Idioma",
-      accessTitle:"Accesibilidad", contrastLabel:"Contraste", grayscaleLabel:"Escala de grises", saturateLabel:"Saturación",
-      cursorColorLabel:"Color del cursor", cursorRed:"Rojo", cursorYellow:"Amarillo", cursorEnableLabel:"Activar resaltado del cursor",
-      resetBtn:"Restaurar predeterminado",
-      securityTitle:"¿Cómo sabe que este sitio web es seguro?",
-      securityDomain:"uplgov es el dominio oficial y único del Gobierno UPL",
-      securityHttps:"https significa que su conexión está cifrada y segura",
-      securityCollapsed:"Aprenda por qué esta página es segura",
-      quickServicesTitle:"Servicios Rápidos",
-      quickJobs:"Empleo y Aprendizaje", quickDemocracy:"Sixside Democrático", quickLibrary:"Biblioteca de Sixside",
-      footerSupportLabel:"Apoyar a Sixside", donateText:"Donar al Gobierno de Sixside",
-      footerContactLabel:"Contacto", footerMediaLabel:"Medios de comunicación", footerLinksLabel:"Enlaces" },
-    pt: { name:"Português", welcome:"Olá", code:"pt",
-      mainTitle:"Sixside", mainSubtitle:"O espírito eterno das montanhas",
-      aboutTitle:"Sobre Sixside", historyTitle:"História", historyText:"Gerações viveram em harmonia com esta terra.",
-      geographyTitle:"Geografia", geographyText:"Montanhas, bambu, vinhas, riachos.",
-      populationTitle:"População", populationText:"As pessoas andam por caminhos escondidos.",
-      galleryCardTitle:"Galeria", galleryDetailTitle:"Galeria",
-      galleryLicenseText:"© Governo Provincial de Sixside · Estas imagens estão licenciadas sob CC BY 4.0.",
-      govTitle:"Governo e Agências", otherTitle:"Outros Escritórios",
-      viewAllBtn:"Ver todos os departamentos", copyrightLine:"© Governo Provincial de Sixside",
-      techSupportLine:"Suporte técnico e manutenção fornecidos por Wareflame",
-      nationalLink:"Portal Nacional UPL", privacyText:"Privacidade: nenhum dado coletado.", licenseText:"Todos os direitos reservados.",
-      themeToggle:"Escuro/Claro", langToggle:"Idioma",
-      accessTitle:"Acessibilidade", contrastLabel:"Contraste", grayscaleLabel:"Escala de cinza", saturateLabel:"Saturação",
-      cursorColorLabel:"Cor do cursor", cursorRed:"Vermelho", cursorYellow:"Amarelo", cursorEnableLabel:"Ativar destaque do cursor",
-      resetBtn:"Restaurar padrão",
-      securityTitle:"Como sabe que este website é seguro?",
-      securityDomain:"uplgov é o domínio oficial e único do Governo UPL",
-      securityHttps:"https significa que a sua ligação está encriptada e segura",
-      securityCollapsed:"Saiba por que esta página é segura",
-      quickServicesTitle:"Serviços Rápidos",
-      quickJobs:"Empregos e Estágios", quickDemocracy:"Sixside Democrático", quickLibrary:"Biblioteca de Sixside",
-      footerSupportLabel:"Apoie Sixside", donateText:"Doe ao Governo de Sixside",
-      footerContactLabel:"Contato", footerMediaLabel:"Parcerias de Mídia", footerLinksLabel:"Links" },
-    de: { name:"Deutsch", welcome:"Hallo", code:"de",
-      mainTitle:"Sixside", mainSubtitle:"Der ewige Geist der Berge",
-      aboutTitle:"Über Sixside", historyTitle:"Geschichte", historyText:"Generationen lebten im Einklang mit diesem Land.",
-      geographyTitle:"Geografie", geographyText:"Berge, Bambus, Reben, Bäche.",
-      populationTitle:"Bevölkerung", populationText:"Menschen gehen verborgene Pfade.",
-      galleryCardTitle:"Galerie", galleryDetailTitle:"Galerie",
-      galleryLicenseText:"© Sixside Provinzregierung · Diese Bilder sind unter CC BY 4.0 lizenziert.",
-      govTitle:"Regierung & Behörden", otherTitle:"Andere Ämter",
-      viewAllBtn:"Alle Abteilungen anzeigen", copyrightLine:"© Sixside Provinzregierung",
-      techSupportLine:"Technische Unterstützung und Wartung durch Wareflame",
-      nationalLink:"UPL Nationalportal", privacyText:"Datenschutz: Keine Datenerhebung.", licenseText:"Alle Rechte vorbehalten.",
-      themeToggle:"Dunkel/Hell", langToggle:"Sprache",
-      accessTitle:"Barrierefreiheit", contrastLabel:"Kontrast", grayscaleLabel:"Graustufen", saturateLabel:"Sättigung",
-      cursorColorLabel:"Cursorfarbe", cursorRed:"Rot", cursorYellow:"Gelb", cursorEnableLabel:"Cursor hervorheben",
-      resetBtn:"Standard wiederherstellen",
-      securityTitle:"Wie wissen Sie, dass diese Website sicher ist?",
-      securityDomain:"uplgov ist die offizielle und einzige Domain der UPL-Regierung",
-      securityHttps:"https bedeutet, dass Ihre Verbindung verschlüsselt und sicher ist",
-      securityCollapsed:"Erfahren Sie, warum diese Seite sicher ist",
-      quickServicesTitle:"Schnelldienste",
-      quickJobs:"Jobs & Ausbildung", quickDemocracy:"Demokratisches Sixside", quickLibrary:"Sixside Bibliothek",
-      footerSupportLabel:"Sixside unterstützen", donateText:"Spenden an die Sixside-Regierung",
-      footerContactLabel:"Kontakt", footerMediaLabel:"Medienpartnerschaften", footerLinksLabel:"Links" },
-    "zh-simple": { name:"简体白话", welcome:"你好", code:"zh-simple", useZh:true,
-      mainTitle:"Sixside", mainSubtitle:"山魂永驻",
-      aboutTitle:"关于 Sixside", historyTitle:"历史", historyText:"世代与这片土地和谐共生。",
-      geographyTitle:"地理", geographyText:"群山、竹林、藤蔓、清溪。",
-      populationTitle:"人口", populationText:"人民行走于隐秘小径，守护古老方式。",
-      galleryCardTitle:"画廊", galleryDetailTitle:"画廊",
-      galleryLicenseText:"© Sixside 省政府 · 这些图片采用 CC BY 4.0 许可。",
-      govTitle:"政府部门", otherTitle:"其他机构",
-      viewAllBtn:"查看全部部门", copyrightLine:"© Sixside 省政府",
-      techSupportLine:"技术支持和维护由 Wareflame 提供",
-      nationalLink:"UPL 国家门户", privacyText:"隐私政策：不收集个人数据。", licenseText:"保留所有权利。",
-      themeToggle:"深色/浅色", langToggle:"语言",
-      accessTitle:"辅助功能", contrastLabel:"对比度", grayscaleLabel:"灰度", saturateLabel:"饱和度",
-      cursorColorLabel:"鼠标高亮颜色", cursorRed:"红色", cursorYellow:"黄色", cursorEnableLabel:"开启鼠标高亮",
-      resetBtn:"恢复默认",
-      securityTitle:"您怎么知道这个网站是安全的？",
-      securityDomain:"uplgov 是 UPL 政府官方且唯一的域名",
-      securityHttps:"https 代表您的连接已加密且安全",
-      securityCollapsed:"了解为什么此网页是安全的",
-      quickServicesTitle:"快捷服务",
-      quickJobs:"找工作和学徒", quickDemocracy:"民主 Sixside", quickLibrary:"Sixside 图书馆",
-      footerSupportLabel:"支持 Sixside", donateText:"向 Sixside 政府捐款",
-      footerContactLabel:"联系电话", footerMediaLabel:"媒体合作", footerLinksLabel:"链接" },
-    "zh-classical": { name:"简体文言", welcome:"汝安", code:"zh-classical", useZh:true,
-      mainTitle:"Sixside", mainSubtitle:"山魂永驻",
-      aboutTitle:"六面志", historyTitle:"史", historyText:"世代与此土相谐。",
-      geographyTitle:"地", geographyText:"群山、竹、藤、溪。",
-      populationTitle:"民", populationText:"民行隐径，守古法。",
-      galleryCardTitle:"畫苑", galleryDetailTitle:"畫苑",
-      galleryLicenseText:"© 六面省政府 · 此圖依 CC BY 4.0 許可。",
-      govTitle:"官府", otherTitle:"他署",
-      viewAllBtn:"悉览诸部", copyrightLine:"© 六面省政府",
-      techSupportLine:"技护由 Wareflame 供之",
-      nationalLink:"UPL 国门", privacyText:"隐策：不敛民息。", licenseText:"悉权保留。",
-      themeToggle:"深浅", langToggle:"语",
-      accessTitle:"辅功", contrastLabel:"对比", grayscaleLabel:"灰阶", saturateLabel:"饱和",
-      cursorColorLabel:"鼠色", cursorRed:"赤", cursorYellow:"黄", cursorEnableLabel:"启鼠标",
-      resetBtn:"复原",
-      securityTitle:"汝何知此站安全？",
-      securityDomain:"uplgov 乃 UPL 政府官方唯一域名",
-      securityHttps:"https 代汝之连接安全加密",
-      securityCollapsed:"知此页安全之由",
-      quickServicesTitle:"速服",
-      quickJobs:"求职学徒", quickDemocracy:"民主六面", quickLibrary:"六面图书",
-      footerSupportLabel:"助六面", donateText:"捐于六面省政府",
-      footerContactLabel:"电话", footerMediaLabel:"媒合", footerLinksLabel:"链" },
-    "zh-traditional": { name:"正體官話", welcome:"你好", code:"zh-traditional", useZh:true,
-      mainTitle:"Sixside", mainSubtitle:"山魂永駐",
-      aboutTitle:"關於 Sixside", historyTitle:"歷史", historyText:"世代與這片土地和諧共生。",
-      geographyTitle:"地理", geographyText:"群山、竹林、藤蔓、清溪。",
-      populationTitle:"人口", populationText:"人民行走於隱秘小徑，守護古老方式。",
-      galleryCardTitle:"畫廊", galleryDetailTitle:"畫廊",
-      galleryLicenseText:"© Sixside 省政府 · 這些圖片採用 CC BY 4.0 許可。",
-      govTitle:"政府部門", otherTitle:"其他機構",
-      viewAllBtn:"查看全部部門", copyrightLine:"© Sixside 省政府",
-      techSupportLine:"技術支持和維護由 Wareflame 提供",
-      nationalLink:"UPL 國家門戶", privacyText:"隱私政策：不收集個人數據。", licenseText:"保留所有權利。",
-      themeToggle:"深色/淺色", langToggle:"語言",
-      accessTitle:"輔助功能", contrastLabel:"對比度", grayscaleLabel:"灰度", saturateLabel:"飽和度",
-      cursorColorLabel:"鼠標高亮顏色", cursorRed:"紅色", cursorYellow:"黃色", cursorEnableLabel:"開啟鼠標高亮",
-      resetBtn:"恢復默認",
-      securityTitle:"您怎麼知道這個網站是安全的？",
-      securityDomain:"uplgov 是 UPL 政府官方且唯一的域名",
-      securityHttps:"https 代表您的連接已加密且安全",
-      securityCollapsed:"了解為什麼此網頁是安全的",
-      quickServicesTitle:"快捷服務",
-      quickJobs:"找工作和學徒", quickDemocracy:"民主 Sixside", quickLibrary:"Sixside 圖書館",
-      footerSupportLabel:"支持 Sixside", donateText:"向 Sixside 政府捐款",
-      footerContactLabel:"聯絡電話", footerMediaLabel:"媒體合作", footerLinksLabel:"連結" },
-    "zh-huaxia": { name:"華夏文言", welcome:"汝安", code:"zh-huaxia", useZh:true,
-      mainTitle:"Sixside", mainSubtitle:"山魂永駐",
-      aboutTitle:"六面志", historyTitle:"史", historyText:"世代與此土相諧。",
-      geographyTitle:"地", geographyText:"群山、竹、藤、溪。",
-      populationTitle:"民", populationText:"民行隱徑，守古法。",
-      galleryCardTitle:"畫苑", galleryDetailTitle:"畫苑",
-      galleryLicenseText:"© 六面省政府 · 此圖依 CC BY 4.0 許可。",
-      govTitle:"官府", otherTitle:"他署",
-      viewAllBtn:"悉覽諸部", copyrightLine:"© 六面省政府",
-      techSupportLine:"技護由 Wareflame 供之",
-      nationalLink:"UPL 國門", privacyText:"隱策：不斂民息。", licenseText:"悉權保留。",
-      themeToggle:"深淺", langToggle:"語",
-      accessTitle:"輔功", contrastLabel:"對比", grayscaleLabel:"灰階", saturateLabel:"飽和",
-      cursorColorLabel:"鼠色", cursorRed:"赤", cursorYellow:"黃", cursorEnableLabel:"啟鼠標",
-      resetBtn:"復原",
-      securityTitle:"汝何知此站安全？",
-      securityDomain:"uplgov 乃 UPL 政府官方唯一域名",
-      securityHttps:"https 代汝之連接安全加密",
-      securityCollapsed:"知此頁安全之由",
-      quickServicesTitle:"速服",
-      quickJobs:"求職學徒", quickDemocracy:"民主六面", quickLibrary:"六面圖書館",
-      footerSupportLabel:"助六面", donateText:"捐於六面省政府",
-      footerContactLabel:"電話", footerMediaLabel:"媒合", footerLinksLabel:"鏈" },
-    fr: { name:"Français", welcome:"Bonjour", code:"fr",
-      mainTitle:"Sixside", mainSubtitle:"L'esprit éternel des montagnes",
-      aboutTitle:"À propos de Sixside", historyTitle:"Histoire", historyText:"Des générations ont vécu en harmonie avec cette terre.",
-      geographyTitle:"Géographie", geographyText:"Montagnes, bambou, vignes, ruisseaux.",
-      populationTitle:"Population", populationText:"Les gens marchent sur des sentiers cachés.",
-      galleryCardTitle:"Galerie", galleryDetailTitle:"Galerie",
-      galleryLicenseText:"© Gouvernement provincial de Sixside · Ces images sont sous licence CC BY 4.0.",
-      govTitle:"Gouvernement et Agences", otherTitle:"Autres Bureaux",
-      viewAllBtn:"Voir tous les départements", copyrightLine:"© Gouvernement provincial de Sixside",
-      techSupportLine:"Soutien technique et maintenance fournis par Wareflame",
-      nationalLink:"Portail national UPL", privacyText:"Confidentialité : aucune donnée collectée.", licenseText:"Tous droits réservés.",
-      themeToggle:"Sombre/Clair", langToggle:"Langue",
-      accessTitle:"Accessibilité", contrastLabel:"Contraste", grayscaleLabel:"Niveaux de gris", saturateLabel:"Saturation",
-      cursorColorLabel:"Couleur du curseur", cursorRed:"Rouge", cursorYellow:"Jaune", cursorEnableLabel:"Activer la surbrillance du curseur",
-      resetBtn:"Rétablir les paramètres par défaut",
-      securityTitle:"Comment savez-vous que ce site est sécurisé ?",
-      securityDomain:"uplgov est le domaine officiel et unique du Gouvernement UPL",
-      securityHttps:"https signifie que votre connexion est chiffrée et sécurisée",
-      securityCollapsed:"Découvrez pourquoi cette page est sécurisée",
-      quickServicesTitle:"Services Rapides",
-      quickJobs:"Emploi & Apprentissage", quickDemocracy:"Sixside Démocratique", quickLibrary:"Bibliothèque de Sixside",
-      footerSupportLabel:"Soutenir Sixside", donateText:"Faire un don au Gouvernement de Sixside",
-      footerContactLabel:"Contact", footerMediaLabel:"Partenariats médias", footerLinksLabel:"Liens" },
-    ru: { name:"Русский", welcome:"Здравствуйте", code:"ru",
-      mainTitle:"Sixside", mainSubtitle:"Вечный дух гор",
-      aboutTitle:"О Sixside", historyTitle:"История", historyText:"Поколения жили в гармонии с этой землёй.",
-      geographyTitle:"География", geographyText:"Горы, бамбук, ручьи.",
-      populationTitle:"Население", populationText:"Люди ходят скрытыми тропами.",
-      galleryCardTitle:"Галерея", galleryDetailTitle:"Галерея",
-      galleryLicenseText:"© Правительство Sixside · Эти изображения лицензированы по CC BY 4.0.",
-      govTitle:"Правительство", otherTitle:"Другие офисы",
-      viewAllBtn:"Показать все отделы", copyrightLine:"© Правительство Sixside",
-      techSupportLine:"Техническая поддержка и обслуживание предоставлены Wareflame",
-      nationalLink:"Национальный портал UPL", privacyText:"Конфиденциальность: данные не собираются.", licenseText:"Все права защищены.",
-      themeToggle:"Тёмный/Светлый", langToggle:"Язык",
-      accessTitle:"Специальные возможности", contrastLabel:"Контраст", grayscaleLabel:"Ч/б", saturateLabel:"Насыщенность",
-      cursorColorLabel:"Цвет курсора", cursorRed:"Красный", cursorYellow:"Жёлтый", cursorEnableLabel:"Включить подсветку курсора",
-      resetBtn:"Сбросить",
-      securityTitle:"Как вы знаете, что этот сайт безопасен?",
-      securityDomain:"uplgov — официальный и единственный домен Правительства UPL",
-      securityHttps:"https означает, что ваше соединение зашифровано и безопасно",
-      securityCollapsed:"Узнайте, почему эта страница безопасна",
-      quickServicesTitle:"Быстрые Услуги",
-      quickJobs:"Работа и ученичество", quickDemocracy:"Демократический Sixside", quickLibrary:"Библиотека Sixside",
-      footerSupportLabel:"Поддержать Sixside", donateText:"Пожертвовать правительству Sixside",
-      footerContactLabel:"Контакт", footerMediaLabel:"Медиапартнёрства", footerLinksLabel:"Ссылки" },
-    mn: { name:"Монгол", welcome:"Сайн уу", code:"mn",
-      mainTitle:"Sixside", mainSubtitle:"Уулын мөнхийн сүнс",
-      aboutTitle:"Sixside-ийн тухай", historyTitle:"Түүх", historyText:"Үе үе энэ газартай зохицон амьдарч байсан.",
-      geographyTitle:"Газар зүй", geographyText:"Уулс, хулс, ус, горхи.",
-      populationTitle:"Хүн ам", populationText:"Хүмүүс далд замаар явдаг.",
-      galleryCardTitle:"Галлерей", galleryDetailTitle:"Галлерей",
-      galleryLicenseText:"© Sixside мужийн засгийн газар · Эдгээр зургийг CC BY 4.0 лицензээр ашиглаж болно.",
-      govTitle:"Засгийн газар ба Агентлагууд", otherTitle:"Бусад Албан газар",
-      viewAllBtn:"Бүх хэлтсийг харах", copyrightLine:"© Sixside мужийн засгийн газар",
-      techSupportLine:"Техникийн дэмжлэг, засвар үйлчилгээг Wareflame хангана",
-      nationalLink:"UPL Үндэсний Портал", privacyText:"Нууцлал: Мэдээлэл цуглуулахгүй.", licenseText:"Бүх эрх хуулиар хамгаалагдсан.",
-      themeToggle:"Хар/Цагаан", langToggle:"Хэл",
-      accessTitle:"Хүртээмж", contrastLabel:"Тодосгол", grayscaleLabel:"Саарал", saturateLabel:"Ханасан байдал",
-      cursorColorLabel:"Хулганы өнгө", cursorRed:"Улаан", cursorYellow:"Шар", cursorEnableLabel:"Хулганы тодруулгыг идэвхжүүлэх",
-      resetBtn:"Анхны төлөв",
-      securityTitle:"Энэ вэбсайт аюулгүй гэдгийг та яаж мэдэх вэ?",
-      securityDomain:"uplgov нь UPL засгийн газрын албан ёсны цорын ганц домэйн юм",
-      securityHttps:"https нь таны холболт шифрлэгдсэн, аюулгүй гэсэн үг",
-      securityCollapsed:"Энэ хуудас яагаад аюулгүй болохыг мэдэж авах",
-      quickServicesTitle:"Хурдан Үйлчилгээ",
-      quickJobs:"Ажил ба суралцах боломж", quickDemocracy:"Ардчилсан Sixside", quickLibrary:"Sixside номын сан",
-      footerSupportLabel:"Sixside-г дэмжих", donateText:"Sixside засгийн газарт хандив өргөх",
-      footerContactLabel:"Холбоо барих", footerMediaLabel:"Медиа хамтын ажиллагаа", footerLinksLabel:"Холбоосууд" }
+  // ======================= 格言库 =======================
+  const mottoes = {
+    en: ["Serving the citizens of Sixside since 1989.","Courage, Integrity, Service — Our core values.","Protecting with honour, serving with pride.","Your safety is our sacred duty.","Twenty-four seven, three hundred sixty-five — We stand guard.","Where justice meets compassion.","Every call matters, every life counts."],
+    'zh-Hans': ["自1989年以来为Sixside市民服务。","勇气、正直、服务 — 我们的核心价值观。","以荣誉守护，以自豪服务。","您的安全是我们的神圣职责。","一年365天，一周7天，全天候守护。","正义与同情在此交汇。","每一次求助都重要，每一条生命都珍贵。"],
+    es: ["Sirviendo a los ciudadanos de Sixside desde 1989.","Coraje, Integridad, Servicio — Nuestros valores fundamentales.","Protegiendo con honor, sirviendo con orgullo.","Su seguridad es nuestro sagrado deber.","Veinticuatro siete, trescientos sesenta y cinco — Vigilamos.","Donde la justicia se encuentra con la compasión.","Cada llamada importa, cada vida cuenta."],
+    de: ["Den Bürgern von Sixside seit 1989 dienen.","Mut, Integrität, Dienst — Unsere Kernwerte.","Mit Ehre schützen, mit Stolz dienen.","Ihre Sicherheit ist unsere heilige Pflicht.","Vierundzwanzig sieben, dreihundertfünfundsechzig — Wir halten Wache.","Wo Gerechtigkeit auf Mitgefühl trifft.","Jeder Anruf zählt, jedes Leben zählt."],
+    pt: ["Servindo os cidadãos de Sixside desde 1989.","Coragem, Integridade, Serviço — Nossos valores fundamentais.","Protegendo com honra, servindo com orgulho.","Sua segurança é nosso dever sagrado.","Vinte e quatro sete, trezentos e sessenta e cinco — Vigiamos.","Onde a justiça encontra a compaixão.","Cada chamada importa, cada vida conta."],
+    'zh-Hant': ["自1989年以來為Sixside市民服務。","勇氣、正直、服務 — 我們的核心價值觀。","以榮譽守護，以自豪服務。","您的安全是我們的神聖職責。","一年365天，一週7天，全天候守護。","正義與同情在此交匯。","每一次求助都重要，每一條生命都珍貴。"],
+    fr: ["Au service des citoyens de Sixside depuis 1989.","Courage, Intégrité, Service — Nos valeurs fondamentales.","Protéger avec honneur, servir avec fierté.","Votre sécurité est notre devoir sacré.","Vingt-quatre sept, trois cent soixante-cinq — Nous veillons.","Là où la justice rencontre la compassion.","Chaque appel compte, chaque vie compte."],
+    lzh: ["自一九八九年奉公於六面市民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"],
+    ru: ["На службе граждан Sixside с 1989 года.","Мужество, Честность, Служение — Наши основные ценности.","Защищаем с честью, служим с гордостью.","Ваша безопасность — наш священный долг.","Двадцать четыре семь, триста шестьдесят пять — Мы на страже.","Где справедливость встречает сострадание.","Каждый звонок важен, каждая жизнь имеет значение."],
+    mn: ["1989 оноос хойш Sixside иргэдэд үйлчилж байна.","Эр зориг, Шударга ёс, Үйлчилгээ — Бидний үндсэн үнэт зүйлс.","Нэр төртэй хамгаалах, бахархалтай үйлчлэх.","Таны аюулгүй байдал бол бидний ариун үүрэг.","Долоон хоног, гурван зуун жаран тав — Бид харуулдаа.","Шударга ёс энэрэлтэй нийлдэг газар.","Дуудлага бүр чухал, амь бүр үнэтэй."],
+    ja: ["1989年よりSixside市民に奉仕。","勇気、誠実、奉仕 — 私たちの核となる価値観。","名誉をもって守り、誇りをもって奉仕する。","あなたの安全は私たちの神聖な義務です。","年中無休、24時間体制 — 私たちが見守ります。","正義と思いやりが出会う場所。","すべての通報は重要、すべての命は貴重です。"],
+    ko: ["1989년부터 Sixside 시민을 위해 봉사합니다.","용기, 청렴, 봉사 — 우리의 핵심 가치입니다.","명예롭게 보호하고, 자랑스럽게 봉사합니다.","여러분의 안전이 저희의 신성한 의무입니다.","연중무휴 24시간 — 저희가 지키겠습니다.","정의와 연민이 만나는 곳.","모든 신고는 중요하고, 모든 생명은 소중합니다."],
+    hi: ["1989 से सिक्ससाइड के नागरिकों की सेवा।","साहस, ईमानदारी, सेवा — हमारे मूल मूल्य।","सम्मान के साथ रक्षा करना, गर्व के साथ सेवा करना।","आपकी सुरक्षा हमारा पवित्र कर्तव्य है।","चौबीसों घंटे, साल के 365 दिन — हम पहरा देते हैं।","जहाँ न्याय करुणा से मिलता है।","हर कॉल मायने रखती है, हर जीवन मायने रखता है।"],
+    'zh-Classical': ["自一九八九年奉公於六面之民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"]
   };
 
-  let currentLang = "en";
+  // ======================= 完整14种语言翻译 =======================
+  const translations = {
+    en: { 
+      emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', reportEmerg:'REPORT EMERGENCY', 
+      callNote:'110/009 dialling is free, no SIM needed (cellular coverage required) | 110/009 SMS reporting available',
+      justice:'JUSTICE', professionalism:'PROFESSIONALISM', protection:'PROTECTION', 
+      respTime:'2025 AVG RESPONSE TIME', clearRate:'2025 AVG CLEARANCE RATE',
+      respTooltip:'Specifically refers to the average time interval from when the call taker hangs up the emergency call and the dispatcher completes dispatch, to when the first officer arrives at the scene and confirms the location. Its calculation typically includes call handling time and travel time, but excludes on-scene handling time. This metric is a core KPI measuring police mobility and jurisdictional coverage density; lower values indicate stronger emergency response capability.',
+      clearTooltip:'Within a specific statistical period, the percentage average obtained by dividing the number of cases lawfully closed (solved, referred for prosecution, or otherwise disposed) by the total number of cases filed in the same period. Note that this metric does not directly reflect whether crime occurred; it only measures the processing efficiency of reported cases. In the U.S. Uniform Crime Reporting system, clearance is typically achieved by arrest or exceptional means. It is another core KPI for assessing detective effectiveness and public security management quality.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s VS 2024', clearTrend:'0.6% lower VS 2024', 
+      footer:'© 1989-3019 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame', 
+      modalHead:'Emergency Report', 
+      directCallHint:'For emergencies, please dial 110 directly. No SIM card needed.',
+      serviceLabel:'Select Services (click to select, multiple allowed)',
+      servicePolice:'Police', serviceRescue:'Rescue', serviceFire:'Fire', serviceMedical:'Medical',
+      locationLabel:'Location / Geo-coordinates', 
+      visibleLabel:'Are you in an open/visible area?', optYes:'Yes', optNo:'No', 
+      contactLabel:'Contact (optional)',
+      commentLabel:'Additional Comments', commentPlaceholder:'Please describe your situation in detail...',
+      sosBtn:'IMMEDIATE SOS', cancel:'Cancel', locateBtn:'Get My Location and Pin on Map', 
+      contrast:'Contrast', grayscale:'Grayscale', saturate:'Saturate', crosshair:'Crosshair Color', 
+      enableCursor:'Enable Crosshair Assist', reset:'Reset', langTitle:'Select Language', 
+      emergQueueMsg:'Support en route', selectServiceError:'Please select at least one service', 
+      locationRequiredError:'Please get your location first', 
+      captchaRequiredError:'Please complete the verification',
+      captchaModalTitle:'Verification Required',
+      captchaModalText:'Please complete the verification below to continue.',
+      captchaConfirm:'Confirm',
+      captchaCancel:'Cancel',
+      dbNotice:'UPL National Database | Nationwide synchronized data', lostTitle:'Lost and Found', 
+      btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', 
+      btn5:'Request', btn6:'Complaint, Thanks & Suggestion',
+      btn7:'Public Files', btn8:'Join SSPD', btn9:'To the PD',
+      timeCheckTitle:'Your Clock is Inaccurate',
+      timeCheckSubtitle:'Your clock is inaccurate. The correct time is:',
+      utcTime:'UTC Time',
+      localTime:'Local Time',
+      buddhistYear:'Buddhist Era (BE)',
+      lunarYear:'Lunar Calendar',
+      unixTimestamp:'Unix Timestamp',
+      julianDay:'Julian Day (JD)',
+      yourTime:'Your device time (incorrect):',
+      timeWarning:'Your inaccurate clock may cause some features to be unavailable.',
+      continueBtn:'Continue to Website',
+      reconnecting:'Reconnecting...',
+      folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', 
+      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', 
+      folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
+      chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', 
+      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.' 
+    },
+    'zh-Hans': { 
+      emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', reportEmerg:'报告紧急事件', 
+      callNote:'110/009 拨打无需 SIM 卡且完全免费 (需蜂窝网络覆盖) | 110/009 短信报警可用',
+      justice:'正义', professionalism:'专业精神', protection:'保护', 
+      respTime:'2025年平均响应时间', clearRate:'2025年平均办结率',
+      respTooltip:'具体指从接警员挂断报警电话、调度员完成派单起，至第一名警力抵达现场并确认位置止的时间间隔的平均值。其计算口径通常包含通话处理耗时与路途行驶耗时，但不包含现场处置时间。该指标是衡量警务机动性与辖区管控密度的核心关键绩效指标，数值越低代表应急处突能力越强。',
+      clearTooltip:'在特定统计周期内，警方依法办结（破获、移送起诉或作其他处理）的案件数除以同期立案总数所得的百分比平均值。注意，该指标不直接反映犯罪是否发生，仅衡量已报案件的处理效率。在美国统一犯罪报告体系中，通常以逮捕或例外情形结案作为清除标准。它是评估警局侦查效能与治安管控质量的另一项核心关键绩效指标。',
+      respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%', 
+      footer:'© 2025-2026 六面警察局 | 技术支持 Wareflame', 
+      modalHead:'紧急报告', 
+      directCallHint:'紧急情况请直接拨打110。无需SIM卡。',
+      serviceLabel:'选择支援类型 (点击选择，可多选)',
+      servicePolice:'警察', serviceRescue:'救援', serviceFire:'火警', serviceMedical:'医疗',
+      locationLabel:'位置 / 经纬度', 
+      visibleLabel:'您在户外或警员可见区域吗？', optYes:'是', optNo:'否', 
+      contactLabel:'联系方式 (选填)',
+      commentLabel:'补充说明', commentPlaceholder:'请详细描述您的情况...',
+      sosBtn:'立即求救', cancel:'取消', locateBtn:'获取我的位置并定位', 
+      contrast:'对比度', grayscale:'灰度', saturate:'饱和度', crosshair:'准星颜色', 
+      enableCursor:'启用高亮十字准星', reset:'重置', langTitle:'选择语言', 
+      emergQueueMsg:'支援正在抵达现场', selectServiceError:'请至少选择一种支援类型', 
+      locationRequiredError:'请先获取您的位置', 
+      captchaRequiredError:'请完成人机验证',
+      captchaModalTitle:'验证 required',
+      captchaModalText:'请完成下方验证后继续。',
+      captchaConfirm:'确认',
+      captchaCancel:'取消',
+      dbNotice:'UPL 国家数据库 | 全国数据同步', lostTitle:'失物招领', 
+      btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', 
+      btn5:'请求', btn6:'投诉、感谢和建议',
+      btn7:'公开信息', btn8:'加入SSPD', btn9:'前往警察局',
+      timeCheckTitle:'你的时间不准',
+      timeCheckSubtitle:'您的时钟不准。现在时间是：',
+      utcTime:'UTC 时间',
+      localTime:'本地时间',
+      buddhistYear:'佛历 (BE)',
+      lunarYear:'农历',
+      unixTimestamp:'Unix 时间戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'这是你的时间（错误）：',
+      timeWarning:'您的时间不准可能导致某些功能不可用。',
+      continueBtn:'继续访问网站',
+      reconnecting:'重新加载连接...',
+      folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', 
+      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', 
+      folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
+      chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', 
+      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。' 
+    },
+    es: {
+      emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
+      callNote:'110/009 llamada gratuita, no se necesita SIM (se requiere cobertura celular) | 110/009 informe por SMS disponible',
+      justice:'JUSTICIA', professionalism:'PROFESIONALISMO', protection:'PROTECCION',
+      respTime:'TIEMPO DE RESPUESTA MEDIO 2025', clearRate:'TASA DE RESOLUCION MEDIA 2025',
+      respTooltip:'Específicamente se refiere al intervalo de tiempo promedio desde que el operador cuelga la llamada de emergencia y el despachador completa la asignación, hasta que el primer agente llega al lugar y confirma la ubicación. Su cálculo normalmente incluye el tiempo de gestión de la llamada y el tiempo de desplazamiento, pero excluye el tiempo de intervención en el lugar. Este indicador es un KPI central que mide la movilidad policial y la densidad de cobertura jurisdiccional; valores más bajos indican una mayor capacidad de respuesta ante emergencias.',
+      clearTooltip:'Dentro de un período estadístico específico, el porcentaje promedio obtenido al dividir el número de casos cerrados legalmente (resueltos, remitidos para enjuiciamiento o archivados de otra forma) por el número total de casos registrados en el mismo período. Tenga en cuenta que este indicador no refleja directamente si ocurrió un delito; solo mide la eficiencia en el procesamiento de los casos denunciados. En el sistema Uniform Crime Reporting de EE. UU., el cierre se logra normalmente mediante arresto o medios excepcionales. Es otro KPI central para evaluar la eficacia investigativa y la calidad de la gestión de la seguridad pública.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menos vs 2024',
+      footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Soporte tecnico por Wareflame',
+      modalHead:'Reporte de Emergencia',
+      directCallHint:'Para emergencias, marque 110 directamente. No se necesita tarjeta SIM.',
+      serviceLabel:'Seleccione Servicios (haga clic para seleccionar, se permiten multiples)',
+      servicePolice:'Policia', serviceRescue:'Rescate', serviceFire:'Bomberos', serviceMedical:'Medico',
+      locationLabel:'Ubicacion / Coordenadas GPS',
+      visibleLabel:'Esta en un area abierta o visible?', optYes:'Si', optNo:'No',
+      contactLabel:'Contacto (opcional)',
+      commentLabel:'Comentarios Adicionales', commentPlaceholder:'Por favor describa su situacion en detalle...',
+      sosBtn:'SOS INMEDIATO', cancel:'Cancelar', locateBtn:'Obtener mi ubicacion',
+      contrast:'Contraste', grayscale:'Escala de grises', saturate:'Saturacion', crosshair:'Color de mira',
+      enableCursor:'Activar asistencia de mira', reset:'Reiniciar', langTitle:'Seleccionar Idioma',
+      emergQueueMsg:'Apoyo en camino', selectServiceError:'Por favor seleccione al menos un servicio',
+      locationRequiredError:'Por favor obtenga su ubicacion primero',
+      captchaRequiredError:'Por favor complete la verificacion',
+      captchaModalTitle:'Verificacion requerida',
+      captchaModalText:'Por favor complete la verificacion a continuacion para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
+      dbNotice:'Base de datos nacional UPL | Datos sincronizados a nivel nacional', lostTitle:'Objetos Perdidos',
+      btn1:'Reportar un Crimen', btn2:'Diganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar',
+      btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
+      btn7:'Archivos Públicos', btn8:'Unirse a SSPD', btn9:'Ir a la Policía',
+      timeCheckTitle:'Tu Reloj es Inexacto',
+      timeCheckSubtitle:'Su reloj es inexacto. La hora correcta es:',
+      utcTime:'Hora UTC',
+      localTime:'Hora Local',
+      buddhistYear:'Era Budista (BE)',
+      lunarYear:'Calendario Lunar',
+      unixTimestamp:'Marca de Tiempo Unix',
+      julianDay:'Día Juliano (JD)',
+      yourTime:'Hora de su dispositivo (incorrecta):',
+      timeWarning:'Su reloj inexacto puede causar que algunas funciones no estén disponibles.',
+      continueBtn:'Continuar al Sitio Web',
+      reconnecting:'Reconectando...',
+      folderName:'Carpeta Transparente', chargerName:'Cargador HP Laptop 45W', drinkName:'Bebida Lucozade',
+      folderDate:'Abril 2026', chargerDate:'Ene - Feb 2026', drinkDate:'Abr 2025 - Nov 2025',
+      folderDetail:'Cremallera roja. Marcador permanente "2026 Biology" en plastico. Contiene materiales de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Cualquier pista llame al 009.',
+      chargerDetail:'Cargador de portatil. Sospechoso: hombre negro con cabello rizado negro, visto cerca de Ratcliffe on the Wreake, Charnwood, Leicestershire (Ene/Feb 2026). Testigo reporto. Cualquier pista llame al 009.',
+      drinkDetail:'Sospechoso: hombre negro con cabello rizado negro, misma ubicacion que el cargador. Robado entre Abr 2025 - Nov 2025. Cualquier pista llame al 009.'
+    },
+    de: {
+      emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', reportEmerg:'NOTFALL MELDEN',
+      callNote:'110/009 Kostenloser Anruf, keine SIM-Karte erforderlich (Mobilfunkabdeckung erforderlich) | 110/009 SMS-Meldung verfugbar',
+      justice:'GERECHTIGKEIT', professionalism:'PROFESSIONALITAT', protection:'SCHUTZ',
+      respTime:'DURCHSCHNITTLICHE REAKTIONSZEIT 2025', clearRate:'DURCHSCHNITTLICHE AUFKLARUNGSRATE 2025',
+      respTooltip:'Bezeichnet konkret das durchschnittliche Zeitintervall von dem Moment, in dem der Anrufbeantworter den Notruf auflegt und der Disponent den Einsatz zuweist, bis zum Eintreffen der ersten Einsatzkraft vor Ort und der Bestätigung des Standorts. Die Berechnung umfasst in der Regel die Anrufbearbeitungszeit und die Fahrzeit, jedoch nicht die Einsatzzeit vor Ort. Diese Kennzahl ist ein zentraler KPI zur Messung der polizeilichen Mobilität und der Abdeckungsdichte im Zuständigkeitsbereich; niedrigere Werte bedeuten eine höhere Einsatzfähigkeit.',
+      clearTooltip:'Innerhalb eines bestimmten statistischen Zeitraums der prozentuale Durchschnitt, der sich aus der Division der Anzahl der rechtmäßig abgeschlossenen (aufgeklärten, zur Strafverfolgung übergebenen oder anderweitig erledigten) Fälle durch die Gesamtzahl der im gleichen Zeitraum erfassten Fälle ergibt. Beachten Sie, dass diese Kennzahl nicht direkt widerspiegelt, ob eine Straftat stattgefunden hat; sie misst lediglich die Bearbeitungseffizienz gemeldeter Fälle. Im US-amerikanischen Uniform Crime Reporting-System erfolgt die Aufklärung in der Regel durch Festnahme oder Ausnahmefälle. Es ist ein weiterer zentraler KPI zur Bewertung der Ermittlungseffektivität und der Qualität der öffentlichen Sicherheitsverwaltung.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% niedriger vs 2024',
+      footer:'© 2025-2026 POLIZEIBEHORDE SIXSIDE | Technischer Support von Wareflame',
+      modalHead:'Notfallmeldung',
+      directCallHint:'Bei Notfallen wahlen Sie bitte direkt 110. Keine SIM-Karte erforderlich.',
+      serviceLabel:'Dienste auswahlen (zum Auswahlen klicken, mehrere moglich)',
+      servicePolice:'Polizei', serviceRescue:'Rettung', serviceFire:'Feuerwehr', serviceMedical:'Medizinisch',
+      locationLabel:'Standort / Geo-Koordinaten',
+      visibleLabel:'Befinden Sie sich in einem offenen/sichtbaren Bereich?', optYes:'Ja', optNo:'Nein',
+      contactLabel:'Kontakt (optional)',
+      commentLabel:'Zusatzliche Kommentare', commentPlaceholder:'Bitte beschreiben Sie Ihre Situation im Detail...',
+      sosBtn:'SOFORT SOS', cancel:'Abbrechen', locateBtn:'Meinen Standort abrufen',
+      contrast:'Kontrast', grayscale:'Graustufen', saturate:'Sattigung', crosshair:'Fadenkreuzfarbe',
+      enableCursor:'Fadenkreuz-Assistent aktivieren', reset:'Zurucksetzen', langTitle:'Sprache auswahlen',
+      emergQueueMsg:'Unterstutzung unterwegs', selectServiceError:'Bitte wahlen Sie mindestens einen Dienst aus',
+      locationRequiredError:'Bitte rufen Sie zuerst Ihren Standort ab',
+      captchaRequiredError:'Bitte schlieSSen Sie die Verifizierung ab',
+      captchaModalTitle:'Verifizierung erforderlich',
+      captchaModalText:'Bitte schlieSSen Sie die untenstehende Verifizierung ab, um fortzufahren.',
+      captchaConfirm:'Bestatigen',
+      captchaCancel:'Abbrechen',
+      dbNotice:'UPL Nationale Datenbank | Bundesweit synchronisierte Daten', lostTitle:'Fundburo',
+      btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundburo', btn4:'Beantragen oder Registrieren',
+      btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
+      btn7:'Öffentliche Dateien', btn8:'SSPD beitreten', btn9:'Zur Polizei',
+      timeCheckTitle:'Ihre Uhr ist ungenau',
+      timeCheckSubtitle:'Ihre Uhr ist ungenau. Die korrekte Zeit ist:',
+      utcTime:'UTC Zeit',
+      localTime:'Lokale Zeit',
+      buddhistYear:'Buddhistische Zeitrechnung (BE)',
+      lunarYear:'Mondkalender',
+      unixTimestamp:'Unix-Zeitstempel',
+      julianDay:'Julianisches Datum (JD)',
+      yourTime:'Ihre Gerätezeit (falsch):',
+      timeWarning:'Ihre ungenaue Uhr kann dazu führen, dass einige Funktionen nicht verfügbar sind.',
+      continueBtn:'Zur Website fortfahren',
+      reconnecting:'Verbindung wird wiederhergestellt...',
+      folderName:'Transparente Mappe', chargerName:'HP Laptop 45W Ladegerat', drinkName:'Lucozade-Getrank',
+      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025',
+      folderDetail:'Roter ReiBverschluss. Permanentmarker "2026 Biology" auf Kunststoff. Enthalt GCSE-Biologiematerialien. Belohnung: £10 (≈9.98 UCC). Hinweise bitte unter 009.',
+      chargerDetail:'Laptop-Ladegerat. Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gesehen in der Nahe von Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Zeuge gemeldet. Hinweise bitte unter 009.',
+      drinkDetail:'Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gleicher Ort wie Ladegerat. Gestohlen zwischen Apr 2025 - Nov 2025. Hinweise bitte unter 009.'
+    },
+    pt: {
+      emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NAO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
+      callNote:'110/009 chamada gratuita, nao precisa de SIM (cobertura celular necessaria) | 110/009 relatorio por SMS disponivel',
+      justice:'JUSTICA', professionalism:'PROFISSIONALISMO', protection:'PROTECAO',
+      respTime:'TEMPO MEDIO DE RESPOSTA 2025', clearRate:'TAXA MEDIA DE RESOLUCAO 2025',
+      respTooltip:'Refere-se especificamente ao intervalo de tempo médio desde que o operador desliga a chamada de emergência e o despachante conclui a atribuição, até que o primeiro agente chega ao local e confirma a localização. O seu cálculo normalmente inclui o tempo de atendimento da chamada e o tempo de deslocação, mas exclui o tempo de intervenção no local. Este indicador é um KPI central que mede a mobilidade policial e a densidade de cobertura jurisdicional; valores mais baixos indicam maior capacidade de resposta a emergências.',
+      clearTooltip:'Dentro de um período estatístico específico, a percentagem média obtida dividindo o número de casos legalmente encerrados (resolvidos, remetidos para acusação ou de outra forma arquivados) pelo número total de casos registados no mesmo período. Note que este indicador não reflete diretamente se ocorreu um crime; apenas mede a eficiência de processamento dos casos denunciados. No sistema Uniform Crime Reporting dos EUA, o encerramento é normalmente alcançado por detenção ou meios excecionais. É outro KPI central para avaliar a eficácia da investigação e a qualidade da gestão da segurança pública.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% menor vs 2024',
+      footer:'© 2025-2026 DEPARTAMENTO DE POLICIA DE SIXSIDE | Suporte tecnico por Wareflame',
+      modalHead:'Relatorio de Emergencia',
+      directCallHint:'Para emergencias, disque 110 diretamente. Nao e necessario cartao SIM.',
+      serviceLabel:'Selecione Servicos (clique para selecionar, multiplos permitidos)',
+      servicePolice:'Policia', serviceRescue:'Resgate', serviceFire:'Bombeiros', serviceMedical:'Medico',
+      locationLabel:'Localizacao / Coordenadas GPS',
+      visibleLabel:'Voce esta em uma area aberta/visivel?', optYes:'Sim', optNo:'Nao',
+      contactLabel:'Contato (opcional)',
+      commentLabel:'Comentarios Adicionais', commentPlaceholder:'Por favor, descreva sua situacao em detalhes...',
+      sosBtn:'SOS IMEDIATO', cancel:'Cancelar', locateBtn:'Obter minha localizacao',
+      contrast:'Contraste', grayscale:'Escala de cinza', saturate:'Saturacao', crosshair:'Cor da mira',
+      enableCursor:'Ativar assistencia de mira', reset:'Redefinir', langTitle:'Selecionar Idioma',
+      emergQueueMsg:'Suporte a caminho', selectServiceError:'Por favor, selecione pelo menos um servico',
+      locationRequiredError:'Por favor, obtenha sua localizacao primeiro',
+      captchaRequiredError:'Por favor, complete a verificacao',
+      captchaModalTitle:'Verificacao necessaria',
+      captchaModalText:'Por favor, complete a verificacao abaixo para continuar.',
+      captchaConfirm:'Confirmar',
+      captchaCancel:'Cancelar',
+      dbNotice:'Banco de dados nacional UPL | Dados sincronizados em todo o pais', lostTitle:'Achados e Perdidos',
+      btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar',
+      btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
+      btn7:'Arquivos Públicos', btn8:'Juntar-se à SSPD', btn9:'Para a Polícia',
+      timeCheckTitle:'Seu Relógio Está Inexato',
+      timeCheckSubtitle:'Seu relógio está inexato. A hora correta é:',
+      utcTime:'Hora UTC',
+      localTime:'Hora Local',
+      buddhistYear:'Era Budista (BE)',
+      lunarYear:'Calendário Lunar',
+      unixTimestamp:'Timestamp Unix',
+      julianDay:'Dia Juliano (JD)',
+      yourTime:'Hora do seu dispositivo (incorreta):',
+      timeWarning:'Seu relógio inexato pode fazer com que algumas funções não estejam disponíveis.',
+      continueBtn:'Continuar para o Site',
+      reconnecting:'Reconectando...',
+      folderName:'Pasta Transparente', chargerName:'Carregador HP Laptop 45W', drinkName:'Bebida Lucozade',
+      folderDate:'Abril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Abr 2025 - Nov 2025',
+      folderDetail:'Ziper vermelho. Marcador permanente "2026 Biology" no plastico. Contem materiais de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Qualquer pista ligue para 009.',
+      chargerDetail:'Carregador de laptop. Suspeito: homem negro com cabelo cacheado preto, visto perto de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Testemunha reportou. Qualquer pista ligue para 009.',
+      drinkDetail:'Suspeito: homem negro com cabelo cacheado preto, mesmo local do carregador. Roubado entre Abr 2025 - Nov 2025. Qualquer pista ligue para 009.'
+    },
+    'zh-Hant': {
+      emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', reportEmerg:'報告緊急事件',
+      callNote:'110/009 撥打無需 SIM 卡且完全免費 (需蜂窩網絡覆蓋) | 110/009 短信報警可用',
+      justice:'正義', professionalism:'專業精神', protection:'保護',
+      respTime:'2025年平均響應時間', clearRate:'2025年平均辦結率',
+      respTooltip:'具體指從接警員掛斷報警電話、調度員完成派單起，至第一名警力抵達現場並確認位置止的時間間隔的平均值。其計算口徑通常包含通話處理耗時與路途行駛耗時，但不包含現場處置時間。該指標是衡量警務機動性與轄區管控密度的核心關鍵績效指標，數值越低代表應急處突能力越強。',
+      clearTooltip:'在特定統計週期內，警方依法辦結（破獲、移送起訴或作其他處理）的案件數除以同期立案總數所得的百分比平均值。注意，該指標不直接反映犯罪是否發生，僅衡量已報案件的處理效率。在美國統一犯罪報告體系中，通常以逮捕或例外情形結案作為清除標準。它是評估警局偵查效能與治安管控質量的另一項核心關鍵績效指標。',
+      respVal:'17分04秒', clearVal:'98.2%', respTrend:'比2024年快6秒', clearTrend:'比2024年低0.6%',
+      footer:'© 2025-2026 六面警察局 | 技術支援 Wareflame',
+      modalHead:'緊急報告',
+      directCallHint:'緊急情況請直接撥打110。無需SIM卡。',
+      serviceLabel:'選擇支援類型 (點擊選擇，可多選)',
+      servicePolice:'警察', serviceRescue:'救援', serviceFire:'火警', serviceMedical:'醫療',
+      locationLabel:'位置 / 經緯度',
+      visibleLabel:'您在戶外或警員可見區域嗎？', optYes:'是', optNo:'否',
+      contactLabel:'聯繫方式 (選填)',
+      commentLabel:'補充說明', commentPlaceholder:'請詳細描述您的情況...',
+      sosBtn:'立即求救', cancel:'取消', locateBtn:'獲取我的位置並定位',
+      contrast:'對比度', grayscale:'灰度', saturate:'飽和度', crosshair:'準星顏色',
+      enableCursor:'啟用高亮十字準星', reset:'重置', langTitle:'選擇語言',
+      emergQueueMsg:'支援正在抵達現場', selectServiceError:'請至少選擇一種支援類型',
+      locationRequiredError:'請先獲取您的位置',
+      captchaRequiredError:'請完成人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL 國家數據庫 | 全國數據同步', lostTitle:'失物招領',
+      btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊',
+      btn5:'請求', btn6:'投訴、感謝和建議',
+      btn7:'公開信息', btn8:'加入SSPD', btn9:'前往警察局',
+      timeCheckTitle:'你的時間不準',
+      timeCheckSubtitle:'您的時鐘不準。現在時間是：',
+      utcTime:'UTC 時間',
+      localTime:'本地時間',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      unixTimestamp:'Unix 時間戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'這是你的時間（錯誤）：',
+      timeWarning:'您的時間不準可能導致某些功能不可用。',
+      continueBtn:'繼續訪問網站',
+      reconnecting:'重新加載連接...',
+      folderName:'透明文件夾', chargerName:'惠普電腦45瓦充電器', drinkName:'Lucozade飲料',
+      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月',
+      folderDetail:'紅色拉鏈。透明塑料上用永久馬克筆寫著"2026 Biology"。內含GCSE生物資料。酬金：10英鎊(≈9.98 UCC)。有線索請撥打009。',
+      chargerDetail:'筆記本電腦充電器。嫌疑人：有黑色卷發的黑人男性，2026年1/2月出現在萊斯特郡查恩伍德拉特克利夫村附近。有目擊證人。任何線索請撥打009。',
+      drinkDetail:'嫌疑人：有黑色卷發的黑人男性，同充電器地點。2025年4月至11月間失竊。任何線索請撥打009。'
+    },
+    fr: {
+      emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', reportEmerg:'SIGNALER UNE URGENCE',
+      callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
+      justice:'JUSTICE', professionalism:'PROFESSIONNALISME', protection:'PROTECTION',
+      respTime:'TEMPS DE REPONSE MOYEN 2025', clearRate:'TAUX DE RESOLUTION MOYEN 2025',
+      respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartiteur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
+      clearTooltip:'Dans une période statistique donnée, le pourcentage moyen obtenu en divisant le nombre d\'affaires légalement classées (résolues, transmises pour poursuites ou autrement traitées) par le nombre total d\'affaires enregistrées sur la même période. Notez que cet indicateur ne reflète pas directement si un crime a eu lieu ; il mesure uniquement l\'efficacité du traitement des affaires signalées. Dans le système Uniform Crime Reporting américain, le classement est généralement obtenu par arrestation ou moyens exceptionnels. C\'est un autre KPI central pour évaluer l\'efficacité des enquêtes et la qualité de la gestion de la sécurité publique.',
+      respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% plus bas vs 2024',
+      footer:'© 2025-2026 SERVICE DE POLICE DE SIXSIDE | Support technique par Wareflame',
+      modalHead:'Rapport d\'Urgence',
+      directCallHint:'Pour les urgences, composez le 110 directement. Aucune carte SIM requise.',
+      serviceLabel:'Selectionner les services (cliquer pour selectionner, multiples autorises)',
+      servicePolice:'Police', serviceRescue:'Secours', serviceFire:'Pompiers', serviceMedical:'Medical',
+      locationLabel:'Emplacement / Coordonnees GPS',
+      visibleLabel:'Etes-vous dans une zone ouverte/visible?', optYes:'Oui', optNo:'Non',
+      contactLabel:'Contact (optionnel)',
+      commentLabel:'Commentaires Supplementaires', commentPlaceholder:'Veuillez decrire votre situation en detail...',
+      sosBtn:'SOS IMMEDIAT', cancel:'Annuler', locateBtn:'Obtenir ma position',
+      contrast:'Contraste', grayscale:'Niveaux de gris', saturate:'Saturation', crosshair:'Couleur du viseur',
+      enableCursor:'Activer l\'assistance viseur', reset:'Reinitialiser', langTitle:'Choisir la langue',
+      emergQueueMsg:'Soutien en route', selectServiceError:'Veuillez selectionner au moins un service',
+      locationRequiredError:'Veuillez d\'abord obtenir votre position',
+      captchaRequiredError:'Veuillez completer la verification',
+      captchaModalTitle:'Verification requise',
+      captchaModalText:'Veuillez completer la verification ci-dessous pour continuer.',
+      captchaConfirm:'Confirmer',
+      captchaCancel:'Annuler',
+      dbNotice:'Base de donnees nationale UPL | Donnees synchronisees a l\'echelle nationale', lostTitle:'Objets Perdus',
+      btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer',
+      btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
+      btn7:'Fichiers Publics', btn8:'Rejoindre SSPD', btn9:'Vers la Police',
+      timeCheckTitle:'Votre Horloge est Inexacte',
+      timeCheckSubtitle:'Votre horloge est inexacte. L\'heure correcte est :',
+      utcTime:'Heure UTC',
+      localTime:'Heure Locale',
+      buddhistYear:'Ère Bouddhiste (BE)',
+      lunarYear:'Calendrier Lunaire',
+      unixTimestamp:'Horodatage Unix',
+      julianDay:'Jour Julien (JD)',
+      yourTime:'Heure de votre appareil (incorrecte) :',
+      timeWarning:'Votre horloge inexacte peut rendre certaines fonctions indisponibles.',
+      continueBtn:'Continuer vers le Site',
+      reconnecting:'Reconnexion...',
+      folderName:'Dossier Transparent', chargerName:'Chargeur HP Laptop 45W', drinkName:'Boisson Lucozade',
+      folderDate:'Avril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Avr 2025 - Nov 2025',
+      folderDetail:'Fermeture eclair rouge. Marqueur permanent "2026 Biology" sur plastique. Contient du materiel de biologie GCSE. Recompense: £10 (≈9.98 UCC). Tout indice appelez le 009.',
+      chargerDetail:'Chargeur d\'ordinateur portable. Suspect: homme noir aux cheveux boucles noirs, vu pres de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Temoin signale. Tout indice appelez le 009.',
+      drinkDetail:'Suspect: homme noir aux cheveux boucles noirs, meme endroit que le chargeur. Vole entre Avr 2025 - Nov 2025. Tout indice appelez le 009.'
+    },
+    lzh: {
+      emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
+      callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      justice:'義', professionalism:'專', protection:'護',
+      respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
+      footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      modalHead:'急報',
+      directCallHint:'警急直撥110。毋需SIM卡。',
+      serviceLabel:'擇援類 (點選，可多擇)',
+      servicePolice:'警', serviceRescue:'救', serviceFire:'火', serviceMedical:'醫',
+      locationLabel:'所在 / 經緯',
+      visibleLabel:'君在曠野或可見處否？', optYes:'然', optNo:'否',
+      contactLabel:'繫方 (選填)',
+      commentLabel:'附言', commentPlaceholder:'詳述君之情狀...',
+      sosBtn:'急求', cancel:'止', locateBtn:'取吾所在並定址',
+      contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星色',
+      enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
+      emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
+      locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
+      btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
+      btn5:'求', btn6:'訴、謝、議',
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      timeCheckTitle:'君之時不準',
+      timeCheckSubtitle:'君之時鐘不準。今時為：',
+      utcTime:'UTC 時',
+      localTime:'本地時',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      unixTimestamp:'Unix 時戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'此乃君之時（誤）：',
+      timeWarning:'君時不準，或致部分功能不可用。',
+      continueBtn:'繼續訪網',
+      reconnecting:'重連中...',
+      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
+      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
+      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
+      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
+    },
+    ru: {
+      emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', reportEmerg:'СООБЩИТЬ О ЧП',
+      callNote:'110/009 бесплатный звонок, SIM-карта не требуется (требуется сотовая связь) | 110/009 отчет по SMS доступен',
+      justice:'СПРАВЕДЛИВОСТЬ', professionalism:'ПРОФЕССИОНАЛИЗМ', protection:'ЗАЩИТА',
+      respTime:'СРЕДНЕЕ ВРЕМЯ ОТВЕТА 2025', clearRate:'СРЕДНИЙ УРОВЕНЬ РАСКРЫВАЕМОСТИ 2025',
+      respTooltip:'Конкретно означает средний временной интервал с момента, когда оператор вешает трубку после экстренного вызова и диспетчер завершает назначение, до прибытия первого сотрудника на место и подтверждения местоположения. В расчет обычно включается время обработки вызова и время в пути, но исключается время работы на месте. Этот показатель является ключевым KPI, измеряющим мобильность полиции и плотность охвата территории; чем ниже значение, тем выше способность к экстренному реагированию.',
+      clearTooltip:'В течение определенного статистического периода средний процент, полученный путем деления числа дел, законно закрытых (раскрытых, переданных в суд или иным образом урегулированных), на общее число зарегистрированных дел за тот же период. Обратите внимание, что этот показатель не отражает напрямую, произошло ли преступление; он лишь измеряет эффективность обработки зарегистрированных дел. В системе Uniform Crime Reporting США закрытие обычно достигается путем ареста или исключительных обстоятельств. Это еще один ключевой KPI для оценки эффективности расследований и качества управления общественной безопасностью.',
+      respVal:'17м 04с', clearVal:'98.2%', respTrend:'6с vs 2024', clearTrend:'0.6% ниже vs 2024',
+      footer:'© 2025-2026 ПОЛИЦЕЙСКИЙ ДЕПАРТАМЕНТ СИКСАЙД | Техподдержка Wareflame',
+      modalHead:'Сообщение о ЧП',
+      directCallHint:'При чрезвычайных ситуациях звоните 110 напрямую. SIM-карта не требуется.',
+      serviceLabel:'Выберите услуги (нажмите для выбора, можно несколько)',
+      servicePolice:'Полиция', serviceRescue:'Спасение', serviceFire:'Пожар', serviceMedical:'Медицина',
+      locationLabel:'Местоположение / Координаты',
+      visibleLabel:'Вы находитесь на открытой/видной местности?', optYes:'Да', optNo:'Нет',
+      contactLabel:'Контакт (опционально)',
+      commentLabel:'Дополнительные комментарии', commentPlaceholder:'Пожалуйста, подробно опишите ситуацию...',
+      sosBtn:'НЕМЕДЛЕННО SOS', cancel:'Отмена', locateBtn:'Определить мое местоположение',
+      contrast:'Контраст', grayscale:'Оттенки серого', saturate:'Насыщенность', crosshair:'Цвет прицела',
+      enableCursor:'Включить помощь прицела', reset:'Сброс', langTitle:'Выберите язык',
+      emergQueueMsg:'Поддержка в пути', selectServiceError:'Пожалуйста, выберите хотя бы одну услугу',
+      locationRequiredError:'Пожалуйста, сначала определите ваше местоположение',
+      captchaRequiredError:'Пожалуйста, завершите верификацию',
+      captchaModalTitle:'Требуется верификация',
+      captchaModalText:'Пожалуйста, завершите верификацию ниже, чтобы продолжить.',
+      captchaConfirm:'Подтвердить',
+      captchaCancel:'Отмена',
+      dbNotice:'Национальная база данных UPL | Общенациональные синхронизированные данные', lostTitle:'Бюро находок',
+      btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку',
+      btn5:'Запрос', btn6:'Жалоба, благодарность',
+      btn7:'Общественные файлы', btn8:'Вступить в SSPD', btn9:'В полицию',
+      timeCheckTitle:'Ваши Часы Неточны',
+      timeCheckSubtitle:'Ваши часы неточны. Правильное время:',
+      utcTime:'Время UTC',
+      localTime:'Местное Время',
+      buddhistYear:'Буддийская Эра (BE)',
+      lunarYear:'Лунный Календарь',
+      unixTimestamp:'Unix Время',
+      julianDay:'Юлианский День (JD)',
+      yourTime:'Время вашего устройства (неверное):',
+      timeWarning:'Неточные часы могут привести к недоступности некоторых функций.',
+      continueBtn:'Продолжить на Сайт',
+      reconnecting:'Переподключение...',
+      folderName:'Прозрачная папка', chargerName:'Зарядное устройство HP Laptop 45W', drinkName:'Напиток Lucozade',
+      folderDate:'Апрель 2026', chargerDate:'Янв - Фев 2026', drinkDate:'Апр 2025 - Ноя 2025',
+      folderDetail:'Красная молния. Перманентный маркер "2026 Biology" на пластике. Содержит материалы по биологии GCSE. Награда: £10 (≈9.98 UCC). Любые подсказки звоните 009.',
+      chargerDetail:'Зарядное устройство для ноутбука. Подозреваемый: чернокожий мужчина с вьющимися черными волосами, замечен недалеко от Рэтклифф-он-те-Рик, Чарнвуд, Лестершир (Янв/Фев 2026). Свидетель сообщил. Любые подсказки звоните 009.',
+      drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.'
+    },
+    mn: {
+      emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', reportEmerg:'ЯАЛТАЙ МЭДЭЭЛЭХ',
+      callNote:'110/009 дуудлага үнэгүй, SIM карт шаардлагагүй (Үүрэн холбооны хамрах хүрээ шаардлагатай) | 110/009 SMS мэдээлэх боломжтой',
+      justice:'ШУДАРГА ЁС', professionalism:'МЭРГЭЖИЛ', protection:'ХАМГААЛАЛ',
+      respTime:'2025 ОНЫ ДУНДАЖ ХАРИУ АВСАН ХУГАЦАА', clearRate:'2025 ОНЫ ДУНДАЖ ШИЙДВЭРЛЭЛТИЙН ТҮВШИН',
+      respTooltip:'Яаралтай дуудлагыг оператор тасалж, диспетчер даалгаврыг гүйцэтгэсэн үеэс эхлэн анхны цагдаагийн албан хаагч газар дээр ирж, байршлыг баталгаажуулах хүртэлх дундаж хугацааны завсар. Тооцоололд дуудлага боловсруулах хугацаа, замд явах хугацаа багтах боловч газар дээр ажиллах хугацаа орохгүй. Энэ үзүүлэлт нь цагдаагийн хөдөлгөөнт чадвар, харьяалах нутаг дэвсгэрийн хамрах хүрээний нягтралыг хэмжих гол KPI юм. Бага утга нь илүү өндөр хариу үйлдэл үзүүлэх чадварыг илтгэнэ.',
+      clearTooltip:'Тухайн статистикийн хугацаанд хуулийн дагуу шийдвэрлэсэн (илрүүлсэн, яллах дүгнэлт үйлдсэн эсвэл өөр аргаар шийдвэрлэсэн) хэргийн тоог мөн хугацаанд бүртгэгдсэн нийт хэргийн тоонд хувааж олсон дундаж хувь. Анхаарна уу: энэ үзүүлэлт нь гэмт хэрэг гарсан эсэхийг шууд илтгэдэггүй; зөвхөн бүртгэгдсэн хэргийн боловсруулалтын үр ашгийг хэмждэг. АНУ-ын Нэгдсэн Гэмт Хэргийн Тайлангийн системд хэргийг ихэвчлэн баривчлах эсвэл онцгой тохиолдлоор шийдвэрлэдэг. Энэ нь мөрдөн байцаалтын үр нөлөө, нийтийн аюулгүй байдлын удирдлагын чанарыг үнэлэх өөр нэг гол KPI юм.',
+      respVal:'17м 04с', clearVal:'98.2%', respTrend:'2024-ээс 6с хурдан', clearTrend:'2024-ээс 0.6% бага',
+      footer:'© 2025-2026 СИКСАЙД ЦАГДААГЫН ГАЗАР | Техникийн дэмжлэг Wareflame',
+      modalHead:'Яаралтай мэдээлэх',
+      directCallHint:'Яаралтай тохиолдолд 110 руу шууд залгана уу. SIM карт шаардлагагүй.',
+      serviceLabel:'Үйлчилгээ сонгох (дарах замаар сонгох, олон сонголттой)',
+      servicePolice:'Цагдаа', serviceRescue:'Аврах', serviceFire:'Гал', serviceMedical:'Эмнэлэг',
+      locationLabel:'Байршил / Координат',
+      visibleLabel:'Та нээлттэй үзэгдэх хэсэгт байна уу?', optYes:'Тийм', optNo:'Үгүй',
+      contactLabel:'Холбоо барих (заавал биш)',
+      commentLabel:'Нэмэлт сэтгэгдэл', commentPlaceholder:'Та нөхцөл байдлыг дэлгэрэнгүй тайлбарлана уу...',
+      sosBtn:'ЯАРАЛТАЙ SOS', cancel:'Цуцлах', locateBtn:'Байршлаа авах',
+      contrast:'Ялгаа', grayscale:'Саарал', saturate:'Ханасан байдал', crosshair:'Харааны цэгийн өнгө',
+      enableCursor:'Харааны цэгийн туслах идэвхжүүлэх', reset:'Дахин тохируулах', langTitle:'Хэл сонгох',
+      emergQueueMsg:'Тусламж замдаа', selectServiceError:'Дор хаяж нэг үйлчилгээ сонгоно уу',
+      locationRequiredError:'Эхлээд байршлаа аваарай',
+      captchaRequiredError:'Баталгаажуулалтыг гүйцэтгэнэ үү',
+      captchaModalTitle:'Баталгаажуулалт шаардлагатай',
+      captchaModalText:'Үргэлжлүүлэхийн тулд доорх баталгаажуулалтыг гүйцэтгэнэ үү.',
+      captchaConfirm:'Баталгаажуулах',
+      captchaCancel:'Цуцлах',
+      dbNotice:'UPL Үндэсний мэдээллийн сан | Үндэсний хэмжээний синхрончлогдсон өгөгдөл', lostTitle:'Алдагдсан эд зүйлс',
+      btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах',
+      btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
+      btn7:'Нээлттэй файлууд', btn8:'SSPD-д элсэх', btn9:'Цагдаа руу',
+      timeCheckTitle:'Таны Цаг Буруу Байна',
+      timeCheckSubtitle:'Таны цаг буруу байна. Зөв цаг нь:',
+      utcTime:'UTC Цаг',
+      localTime:'Орон Нутгийн Цаг',
+      buddhistYear:'Буддын Он (BE)',
+      lunarYear:'Цагаан сар',
+      unixTimestamp:'Unix Цагийн Тэмдэг',
+      julianDay:'Юлианы Өдөр (JD)',
+      yourTime:'Таны төхөөрөмжийн цаг (буруу):',
+      timeWarning:'Таны цаг буруу тул зарим функц ажиллахгүй байж болно.',
+      continueBtn:'Вэбсайт руу Үргэлжлүүлэх',
+      reconnecting:'Дахин холбогдож байна...',
+      folderName:'Ил товч', chargerName:'HP Laptop 45W Цэнэглэгч', drinkName:'Lucozade Ундаа',
+      folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
+      folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
+      chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
+      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.'
+    },
+    ja: {
+      emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', reportEmerg:'緊急通報',
+      callNote:'110/009 通話無料、SIM不要（携帯電話の圏内が必要）| 110/009 SMS通報可能',
+      justice:'正義', professionalism:'専門性', protection:'保護',
+      respTime:'2025年平均応答時間', clearRate:'2025年平均解決率',
+      respTooltip:'具体的には、通報受付者が緊急通話を切り、指令担当者が指令を完了した時点から、最初の警察官が現場に到着し位置を確認するまでの平均時間間隔を指します。その計算には通常、通話処理時間と移動時間が含まれ、現場対応時間は含まれません。この指標は警察の機動力と管轄区域のカバー密度を測定する中核的なKPIであり、数値が低いほど緊急対応能力が高いことを示します。',
+      clearTooltip:'特定の統計期間内において、法的に処理（解決、起訴送致、またはその他の処理）された事件数を、同期間に受理された事件総数で割った平均パーセンテージです。なお、この指標は犯罪が発生したかどうかを直接反映するものではなく、報告された事件の処理効率のみを測定します。米国の統一犯罪報告システムでは、通常、逮捕または例外的な手段による処理をもって解決とみなされます。これは捜査効率と治安管理の質を評価するもう一つの中核的なKPIです。',
+      respVal:'17分04秒', clearVal:'98.2%', respTrend:'2024年より6秒高速', clearTrend:'2024年より0.6%低下',
+      footer:'© 2025-2026 シックスサイド警察署 | 技術サポート Wareflame',
+      modalHead:'緊急通報',
+      directCallHint:'緊急時は110に直接おかけください。SIMカードは不要です。',
+      serviceLabel:'サービスを選択（クリックで選択、複数選択可）',
+      servicePolice:'警察', serviceRescue:'救助', serviceFire:'消防', serviceMedical:'医療',
+      locationLabel:'位置 / GPS座標',
+      visibleLabel:'開けた場所/目に見える場所にいますか？', optYes:'はい', optNo:'いいえ',
+      contactLabel:'連絡先（任意）',
+      commentLabel:'追加コメント', commentPlaceholder:'状況を詳しく説明してください...',
+      sosBtn:'緊急SOS', cancel:'キャンセル', locateBtn:'現在地を取得',
+      contrast:'コントラスト', grayscale:'グレースケール', saturate:'彩度', crosshair:'クロスヘアカラー',
+      enableCursor:'クロスヘアアシストを有効にする', reset:'リセット', langTitle:'言語を選択',
+      emergQueueMsg:'支援が向かっています', selectServiceError:'少なくとも1つのサービスを選択してください',
+      locationRequiredError:'最初に現在地を取得してください',
+      captchaRequiredError:'認証を完了してください',
+      captchaModalTitle:'認証が必要です',
+      captchaModalText:'続行するには下の認証を完了してください。',
+      captchaConfirm:'確認',
+      captchaCancel:'キャンセル',
+      dbNotice:'UPL全国データベース | 全国同期データ', lostTitle:'忘れ物',
+      btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録',
+      btn5:'リクエスト', btn6:'苦情・感謝・提案',
+      btn7:'公開情報', btn8:'SSPD参加', btn9:'警察署へ',
+      timeCheckTitle:'時計が不正確です',
+      timeCheckSubtitle:'お使いの時計が不正確です。正しい時刻は：',
+      utcTime:'UTC 時刻',
+      localTime:'現地時刻',
+      buddhistYear:'仏暦 (BE)',
+      lunarYear:'旧暦',
+      unixTimestamp:'Unix タイムスタンプ',
+      julianDay:'ユリウス日 (JD)',
+      yourTime:'お使いの端末の時刻（誤り）：',
+      timeWarning:'時計が不正確なため、一部の機能が利用できない可能性があります。',
+      continueBtn:'サイトへ進む',
+      reconnecting:'再接続中...',
+      folderName:'透明フォルダ', chargerName:'HPノートPC45W充電器', drinkName:'ルコザード飲料',
+      folderDate:'2026年4月', chargerDate:'2026年1月-2月', drinkDate:'2025年4月-11月',
+      folderDetail:'赤いジッパー。プラスチックに永久マーカーで「2026 Biology」と記載。GCSE生物学資料を含む。報奨金：£10 (≈9.98 UCC)。手がかりは009へ。',
+      chargerDetail:'ノートパソコン充電器。容疑者：黒い縮れ毛の黒人男性、ラトクリフ・オン・ザ・リーク、チャーンウッド、レスターシャー近郊で目撃（2026年1月/2月）。目撃者あり。手がかりは009へ。',
+      drinkDetail:'容疑者：黒い縮れ毛の黒人男性、充電器と同じ場所。2025年4月から11月の間に盗難。手がかりは009へ。'
+    },
+    ko: {
+      emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', reportEmerg:'긴급 신고',
+      callNote:'110/009 통화 무료, SIM 필요 없음 (셀룰러 커버리지 필요) | 110/009 SMS 신고 가능',
+      justice:'정의', professionalism:'전문성', protection:'보호',
+      respTime:'2025년 평균 응답 시간', clearRate:'2025년 평균 해결율',
+      respTooltip:'구체적으로, 신고 접수원이 긴급 전화를 끊고 배차 담당자가 배차를 완료한 시점부터 첫 번째 경찰관이 현장에 도착하여 위치를 확인할 때까지의 평균 시간 간격을 의미합니다. 계산에는 일반적으로 통화 처리 시간과 이동 시간이 포함되며, 현장 처리 시간은 제외됩니다. 이 지표는 경찰의 기동성과 관할 구역 커버리지 밀도를 측정하는 핵심 KPI로, 수치가 낮을수록 긴급 대응 능력이 높음을 나타냅니다.',
+      clearTooltip:'특정 통계 기간 동안 법적으로 종결(해결, 기소 의견 송치 또는 기타 처리)된 사건 수를 같은 기간 접수된 총 사건 수로 나눈 백분율 평균입니다. 이 지표는 범죄 발생 여부를 직접 반영하지 않으며, 신고된 사건의 처리 효율만을 측정합니다. 미국 통합 범죄 보고 시스템에서는 일반적으로 체포 또는 예외적 수단에 의한 종결을 해결 기준으로 삼습니다. 이는 수사 효율성과 치안 관리 품질을 평가하는 또 다른 핵심 KPI입니다.',
+      respVal:'17분 04초', clearVal:'98.2%', respTrend:'2024년 대비 6초 단축', clearTrend:'2024년 대비 0.6% 하락',
+      footer:'© 2025-2026 식스사이드 경찰국 | 기술 지원 Wareflame',
+      modalHead:'긴급 신고',
+      directCallHint:'긴급 상황시 110으로 직접 전화하세요. SIM 카드가 필요하지 않습니다.',
+      serviceLabel:'서비스 선택 (클릭하여 선택, 여러 개 선택 가능)',
+      servicePolice:'경찰', serviceRescue:'구조', serviceFire:'화재', serviceMedical:'의료',
+      locationLabel:'위치 / GPS 좌표',
+      visibleLabel:'열린 공간/보이는 장소에 있습니까?', optYes:'예', optNo:'아니오',
+      contactLabel:'연락처 (선택 사항)',
+      commentLabel:'추가 코멘트', commentPlaceholder:'상황을 자세히 설명해주세요...',
+      sosBtn:'긴급 SOS', cancel:'취소', locateBtn:'내 위치 가져오기',
+      contrast:'대비', grayscale:'흑백', saturate:'채도', crosshair:'조준선 색상',
+      enableCursor:'조준선 지원 활성화', reset:'초기화', langTitle:'언어 선택',
+      emergQueueMsg:'지원 출동 중', selectServiceError:'최소 하나의 서비스를 선택하세요',
+      locationRequiredError:'먼저 내 위치를 가져오세요',
+      captchaRequiredError:'인증을 완료해주세요',
+      captchaModalTitle:'인증 필요',
+      captchaModalText:'계속하려면 아래 인증을 완료해주세요.',
+      captchaConfirm:'확인',
+      captchaCancel:'취소',
+      dbNotice:'UPL 국가 데이터베이스 | 전국 동기화 데이터', lostTitle:'분실물',
+      btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록',
+      btn5:'요청', btn6:'불만, 감사, 제안',
+      btn7:'공개 정보', btn8:'SSPD 가입', btn9:'경찰서로',
+      timeCheckTitle:'시계가 부정확합니다',
+      timeCheckSubtitle:'시계가 부정확합니다. 올바른 시간은:',
+      utcTime:'UTC 시간',
+      localTime:'현지 시간',
+      buddhistYear:'불기 (BE)',
+      lunarYear:'음력',
+      unixTimestamp:'Unix 타임스탬프',
+      julianDay:'율리우스일 (JD)',
+      yourTime:'기기 시간 (오류):',
+      timeWarning:'시계가 부정확하여 일부 기능을 사용하지 못할 수 있습니다.',
+      continueBtn:'웹사이트 계속하기',
+      reconnecting:'다시 연결 중...',
+      folderName:'투명 폴더', chargerName:'HP 노트북 45W 충전기', drinkName:'루코자데 음료',
+      folderDate:'2026년 4월', chargerDate:'2026년 1월-2월', drinkDate:'2025년 4월-11월',
+      folderDetail:'빨간색 지퍼. 플라스틱에 "2026 Biology"라고 쓰여 있음. GCSE 생물학 자료 포함. 보상: £10 (≈9.98 UCC). 제보는 009로.',
+      chargerDetail:'노트북 충전기. 용의자: 곱슬머리의 흑인 남성, Ratcliffe on the Wreake, Charnwood, Leicestershire 근처에서 목격됨 (2026년 1월/2월). 목격자 신고. 제보는 009로.',
+      drinkDetail:'용의자: 곱슬머리의 흑인 남성, 충전기와 같은 장소. 2025년 4월-11월 사이 도난. 제보는 009로.'
+    },
+    hi: {
+      emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपातकाल:', reportEmerg:'आपातकाल रिपोर्ट करें',
+      callNote:'110/009 कॉल मुफ्त है, SIM की आवश्यकता नहीं (सेलुलर कवरेज आवश्यक) | 110/009 एसएमएस रिपोर्टिंग उपलब्ध',
+      justice:'न्याय', professionalism:'व्यावसायिकता', protection:'सुरक्षा',
+      respTime:'2025 औसत प्रतिक्रिया समय', clearRate:'2025 औसत निपटान दर',
+      respTooltip:'विशेष रूप से, उस समय से औसत समय अंतराल को संदर्भित करता है जब कॉल लेने वाला आपातकालीन कॉल काट देता है और डिस्पैचर कार्य सौंप देता है, तब से लेकर पहला अधिकारी घटनास्थल पर पहुंचकर स्थान की पुष्टि करता है। इसकी गणना में आमतौर पर कॉल हैंडलिंग समय और यात्रा समय शामिल होता है, लेकिन घटनास्थल पर कार्रवाई का समय शामिल नहीं होता। यह मीट्रिक पुलिस की गतिशीलता और क्षेत्राधिकार कवरेज घनत्व को मापने वाला एक मुख्य KPI है; कम मान आपातकालीन प्रतिक्रिया क्षमता को अधिक मजबूत दर्शाते हैं।',
+      clearTooltip:'एक विशिष्ट सांख्यिकीय अवधि के भीतर, कानूनी रूप से बंद (सुलझाए गए, अभियोजन के लिए भेजे गए, या अन्यथा निपटाए गए) मामलों की संख्या को उसी अवधि में दर्ज मामलों की कुल संख्या से विभाजित करके प्राप्त प्रतिशत औसत। ध्यान दें कि यह मीट्रिक सीधे यह नहीं दर्शाता कि अपराध हुआ या नहीं; यह केवल दर्ज मामलों की प्रसंस्करण दक्षता को मापता है। अमेरिकी यूनिफ़ॉर्म क्राइम रिपोर्टिंग प्रणाली में, आमतौर पर गिरफ्तारी या असाधारण स्थितियों में मामले को बंद करना समाशोधन माना जाता है। यह जांच प्रभावशीलता और सार्वजनिक सुरक्षा प्रबंधन गुणवत्ता का आकलन करने के लिए एक अन्य मुख्य KPI है।',
+      respVal:'17मी 04से', clearVal:'98.2%', respTrend:'2024 से 6से तेज', clearTrend:'2024 से 0.6% कम',
+      footer:'© 2025-2026 सिक्ससाइड पुलिस विभाग | तकनीकी सहायता Wareflame',
+      modalHead:'आपातकाल रिपोर्ट',
+      directCallHint:'आपात स्थिति के लिए सीधे 110 डायल करें। SIM कार्ड की आवश्यकता नहीं।',
+      serviceLabel:'सेवाएं चुनें (चुनने के लिए क्लिक करें, एकाधिक की अनुमति)',
+      servicePolice:'पुलिस', serviceRescue:'बचाव', serviceFire:'अग्निशमन', serviceMedical:'चिकित्सा',
+      locationLabel:'स्थान / जीपीएस निर्देशांक',
+      visibleLabel:'क्या आप खुले/दिखाई देने वाले क्षेत्र में हैं?', optYes:'हां', optNo:'नहीं',
+      contactLabel:'संपर्क (वैकल्पिक)',
+      commentLabel:'अतिरिक्त टिप्पणियां', commentPlaceholder:'कृपया अपनी स्थिति का विस्तार से वर्णन करें...',
+      sosBtn:'तत्काल SOS', cancel:'रद्द करें', locateBtn:'मेरा स्थान प्राप्त करें',
+      contrast:'कंट्रास्ट', grayscale:'ग्रेस्केल', saturate:'संतृप्ति', crosshair:'क्रॉसहेयर रंग',
+      enableCursor:'क्रॉसहेयर सहायता सक्षम करें', reset:'रीसेट', langTitle:'भाषा चुनें',
+      emergQueueMsg:'सहायता मार्ग पर', selectServiceError:'कृपया कम से कम एक सेवा चुनें',
+      locationRequiredError:'कृपया पहले अपना स्थान प्राप्त करें',
+      captchaRequiredError:'कृपया सत्यापन पूरा करें',
+      captchaModalTitle:'सत्यापन आवश्यक है',
+      captchaModalText:'जारी रखने के लिए कृपया नीचे दिया गया सत्यापन पूरा करें।',
+      captchaConfirm:'पुष्टि करें',
+      captchaCancel:'रद्द करें',
+      dbNotice:'UPL राष्ट्रीय डेटाबेस | राष्ट्रव्यापी सिंक्रनाइज़ डेटा', lostTitle:'खोई हुई वस्तुएं',
+      btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें',
+      btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
+      btn7:'सार्वजनिक फ़ाइलें', btn8:'SSPD में शामिल हों', btn9:'पुलिस स्टेशन जाएं',
+      timeCheckTitle:'आपकी घड़ी गलत है',
+      timeCheckSubtitle:'आपकी घड़ी गलत है। सही समय है:',
+      utcTime:'UTC समय',
+      localTime:'स्थानीय समय',
+      buddhistYear:'बौद्ध युग (BE)',
+      lunarYear:'चंद्र कैलेंडर',
+      unixTimestamp:'यूनिक्स टाइमस्टैम्प',
+      julianDay:'जूलियन दिवस (JD)',
+      yourTime:'आपके डिवाइस का समय (गलत):',
+      timeWarning:'आपकी गलत घड़ी के कारण कुछ सुविधाएँ अनुपलब्ध हो सकती हैं।',
+      continueBtn:'वेबसाइट पर जारी रखें',
+      reconnecting:'पुनः कनेक्ट हो रहा है...',
+      folderName:'पारदर्शी फ़ोल्डर', chargerName:'HP लैपटॉप 45W चार्जर', drinkName:'ल्यूकोजेड पेय',
+      folderDate:'अप्रैल 2026', chargerDate:'जनवरी-फरवरी 2026', drinkDate:'अप्रैल 2025-नवंबर 2025',
+      folderDetail:'लाल ज़िपर। प्लास्टिक पर "2026 Biology" लिखा है। GCSE जीव विज्ञान सामग्री शामिल है। पुरस्कार: £10 (≈9.98 UCC)। कोई सुराग 009 पर कॉल करें।',
+      chargerDetail:'लैपटॉप चार्जर। संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, रैटक्लिफ ऑन द रीक, चार्नवुड, लीसेस्टरशायर के पास देखा गया (जनवरी/फरवरी 2026)। गवाह ने रिपोर्ट किया। कोई सुराग 009 पर कॉल करें।',
+      drinkDetail:'संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, चार्जर के समान स्थान। अप्रैल 2025 - नवंबर 2025 के बीच चोरी हुआ। कोई सुराग 009 पर कॉल करें।'
+    },
+    'zh-Classical': {
+      emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
+      callNote:'110/009 撥打免費，無需SIM卡 (需蜂窩覆蓋) | 110/009 短信報警可用',
+      justice:'義', professionalism:'專', protection:'護',
+      respTime:'乙巳年均應時', clearRate:'乙巳年均結率',
+      respTooltip:'自接警者掛電、調度者派單始，至首警至現場確位止之時均也。其算含通話費時與道途費時，不含現場處置時。此乃衡警機動與轄區密佈之要績，數愈微則應急之能愈強。',
+      clearTooltip:'特定期內，警依法結（破、移訴或他處）之案數，除以同期立案總數之百分均也。當知，此數不直示罪之生否，惟衡報案之處理效耳。在美統罪報系中，常以逮或例外結為清準。此乃評警偵效與治安質之又一要績也。',
+      respVal:'十七分四秒', clearVal:'九八二厘', respTrend:'快六秒比甲辰', clearTrend:'低六毫比甲辰',
+      footer:'© 乙巳至丙午 六面警署 | 技援 Wareflame',
+      modalHead:'急報',
+      directCallHint:'警急直撥110。毋需SIM卡。',
+      serviceLabel:'擇援類 (點選，可多擇)',
+      servicePolice:'警', serviceRescue:'救', serviceFire:'火', serviceMedical:'醫',
+      locationLabel:'所在 / 經緯',
+      visibleLabel:'君在曠野或可見處否？', optYes:'然', optNo:'否',
+      contactLabel:'繫方 (選填)',
+      commentLabel:'附言', commentPlaceholder:'詳述君之情狀...',
+      sosBtn:'急求', cancel:'止', locateBtn:'取吾所在並定址',
+      contrast:'對比', grayscale:'灰度', saturate:'飽和', crosshair:'準星色',
+      enableCursor:'啟準星輔', reset:'復原', langTitle:'擇語',
+      emergQueueMsg:'援至途中', selectServiceError:'請至少擇一援類',
+      locationRequiredError:'請先取君所在',
+      captchaRequiredError:'請完人機驗證',
+      captchaModalTitle:'驗證 required',
+      captchaModalText:'請完成下方驗證後繼續。',
+      captchaConfirm:'確認',
+      captchaCancel:'取消',
+      dbNotice:'UPL國庫 | 全國同數', lostTitle:'失物',
+      btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
+      btn5:'求', btn6:'訴、謝、議',
+      btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      timeCheckTitle:'君之時不準',
+      timeCheckSubtitle:'君之時鐘不準。今時為：',
+      utcTime:'UTC 時',
+      localTime:'本地時',
+      buddhistYear:'佛曆 (BE)',
+      lunarYear:'農曆',
+      unixTimestamp:'Unix 時戳',
+      julianDay:'儒略日 (JD)',
+      yourTime:'此乃君之時（誤）：',
+      timeWarning:'君時不準，或致部分功能不可用。',
+      continueBtn:'繼續訪網',
+      reconnecting:'重連中...',
+      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
+      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
+      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
+      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
+    }
+  };
 
-  // ===== Security banner logic =====
-  let bannerOpen = false;
+  // ======================= 简化农历计算 =======================
+  const SimpleLunar = (function() {
+    const LUNAR_DATA = [
+      0x04bd, 0x04ae, 0x0a57, 0x0a4d, 0x0d26, 0x0d53, 0x0d4a, 0x0b44, 0x055d, 0x055b,
+      0x04ae, 0x0a5d, 0x0a4e, 0x0d15, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
+      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae
+    ];
+    const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const LUNAR_MONTH = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+    const LUNAR_DAY = ['初','十','廿','卅'];
 
-  function openBanner() {
-    document.getElementById("securityFull").classList.add("open");
-    document.getElementById("securityCollapsed").style.display = "none";
-    bannerOpen = true;
+    function getGanZhiYear(year) {
+      let offset = (year - 4) % 60;
+      return GAN[offset % 10] + ZHI[offset % 12] + '年';
+    }
+
+    function getSpringFestival(year) {
+      let data = LUNAR_DATA[year - 1900];
+      let month = Math.floor(data / 100);
+      let day = data % 100;
+      return new Date(year, month - 1, day);
+    }
+
+    function getLunarDate(date) {
+      let year = date.getFullYear();
+      let spring = getSpringFestival(year);
+      if (date < spring) { year--; spring = getSpringFestival(year); }
+      let diff = Math.floor((date - spring) / (1000 * 60 * 60 * 24));
+      let data = LUNAR_DATA[year - 1900];
+      let monthBits = data & 0x1FFF;
+      let month = 0, dayCount = 0;
+      for (let i = 0; i < 12; i++) {
+        let daysInMonth = (monthBits & (1 << i)) ? 30 : 29;
+        if (diff < daysInMonth) { month = i; dayCount = diff + 1; break; }
+        diff -= daysInMonth;
+      }
+      let dayStr = '';
+      if (dayCount <= 10) dayStr = '初' + (dayCount === 10 ? '十' : LUNAR_DAY[dayCount]);
+      else if (dayCount < 20) dayStr = '十' + (dayCount === 11 ? '一' : dayCount === 12 ? '二' : LUNAR_DAY[dayCount - 10]);
+      else if (dayCount === 20) dayStr = '二十';
+      else if (dayCount < 30) dayStr = '廿' + (dayCount === 21 ? '一' : dayCount === 22 ? '二' : LUNAR_DAY[dayCount - 20]);
+      else dayStr = '三十';
+      return getGanZhiYear(year) + LUNAR_MONTH[month] + '月' + dayStr;
+    }
+
+    return { getLunarDate, getGanZhiYear };
+  })();
+
+  // ======================= 儒略日计算 =======================
+  function getJulianDay(date) {
+    let y = date.getUTCFullYear();
+    let m = date.getUTCMonth() + 1;
+    let d = date.getUTCDate();
+    let h = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600;
+    if (m <= 2) { y--; m += 12; }
+    let A = Math.floor(y / 100);
+    let B = 2 - A + Math.floor(A / 4);
+    let JD = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h / 24 + B - 1524.5;
+    return JD.toFixed(5);
   }
-  function closeBanner() {
-    document.getElementById("securityFull").classList.remove("open");
-    document.getElementById("securityCollapsed").style.display = "flex";
-    bannerOpen = false;
+
+  function getUnixTimestamp(date) {
+    return Math.floor(date.getTime() / 1000);
   }
 
-  document.getElementById("closeBannerBtn").onclick = (e) => { e.stopPropagation(); closeBanner(); };
-  document.getElementById("securityCollapsed").onclick = openBanner;
-
-  // Auto-open on page load with animation
-  document.getElementById("securityCollapsed").style.display = "flex";
-  setTimeout(() => openBanner(), 350);
-
-  // ===== Gallery functions (unchanged) =====
-  function getGalleryCaption(img, langCode) {
-    const nameMap = { en:img.nameEn, es:img.nameEs, pt:img.namePt, de:img.nameDe, fr:img.nameFr, ru:img.nameRu, mn:img.nameMn, "zh-simple":img.nameZhSimple, "zh-classical":img.nameZhClassical, "zh-traditional":img.nameZhTraditional, "zh-huaxia":img.nameZhHuaxia };
-    return nameMap[langCode] || img.nameEn;
+  function formatDateTime(date) {
+    let y = date.getFullYear();
+    let m = String(date.getMonth() + 1).padStart(2, '0');
+    let d = String(date.getDate()).padStart(2, '0');
+    let h = String(date.getHours()).padStart(2, '0');
+    let min = String(date.getMinutes()).padStart(2, '0');
+    let s = String(date.getSeconds()).padStart(2, '0');
+    return `${y}-${m}-${d} ${h}:${min}:${s}`;
   }
 
-  function showGalleryDetail() {
-    document.getElementById("homeView").style.display = "none";
-    const detailDiv = document.getElementById("detailView");
-    const data = langData[currentLang];
-    const galleryHtml = galleryImages.map(img => `<div class="gallery-detail-item" data-file="${img.file}"><img src="${img.file}" alt="${getGalleryCaption(img, currentLang)}" loading="lazy"><div class="gallery-detail-caption">${getGalleryCaption(img, currentLang)}</div></div>`).join("");
-    detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${data.galleryDetailTitle}</h2><div class="gallery-detail-grid">${galleryHtml}</div><div class="gallery-license">${data.galleryLicenseText}</div></div>`;
-    detailDiv.style.display = "block";
-    document.getElementById("currentLocation").innerText = data.galleryDetailTitle;
-    document.getElementById("backHomeBtn").onclick = goHome;
-    document.querySelectorAll(".gallery-detail-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const file = item.getAttribute("data-file");
-        const caption = item.querySelector(".gallery-detail-caption").innerText;
-        document.getElementById("lightboxImg").src = file;
-        document.getElementById("lightboxImg").alt = caption;
-        document.getElementById("lightboxDownload").href = file;
-        document.getElementById("lightbox").classList.add("show");
+  async function fetchUTCTime() {
+    try {
+      const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+      const data = await response.json();
+      return new Date(data.utc_datetime);
+    } catch (e) {
+      console.warn('UTC API failed, using local time as fallback');
+      return new Date();
+    }
+  }
+
+  // ======================= 时间校验弹窗控制 =======================
+  const TimeCheckModal = {
+    modal: null,
+    baseDate: null,
+    timer: null,
+    userTimeTimer: null,
+    isActive: false,
+    isClosing: false,
+    timerPending: false,
+
+    init() {
+      this.modal = document.getElementById('timeCheckModal');
+      document.getElementById('continueBtn').onclick = () => this.handleContinue();
+    },
+
+    startTimer() {
+      if (this.timerPending || this.isActive || this.isClosing) return;
+      if (sessionStorage.getItem('timeCheckShown')) return;
+      
+      this.timerPending = true;
+      let delay = 2000 + Math.random() * 6000;
+      setTimeout(() => this.show(), delay);
+    },
+
+    async show() {
+      if (this.isActive || this.isClosing) return;
+      if (sessionStorage.getItem('timeCheckShown')) return;
+      
+      this.isActive = true;
+      this.timerPending = false;
+      sessionStorage.setItem('timeCheckShown', 'true');
+      
+      let nowDate = await fetchUTCTime();
+      // 加上 993 年
+      this.baseDate = new Date(nowDate);
+      this.baseDate.setFullYear(this.baseDate.getFullYear() + 993);
+      
+      this.updateStaticText();
+      this.modal.style.display = 'flex';
+      this.startRefreshTimer();
+      this.startUserTimeTimer();
+    },
+
+    updateStaticText() {
+      const t = translations[currentLang];
+      if (!t) return;
+      document.getElementById('timeCheckTitle').innerText = t.timeCheckTitle;
+      document.getElementById('timeCheckSubtitle').innerText = t.timeCheckSubtitle;
+      document.getElementById('utcTimeLabel').innerText = t.utcTime;
+      document.getElementById('localTimeLabel').innerText = t.localTime;
+      document.getElementById('buddhistYearLabel').innerText = t.buddhistYear;
+      document.getElementById('lunarYearLabel').innerText = t.lunarYear;
+      document.getElementById('unixTimestampLabel').innerText = t.unixTimestamp;
+      document.getElementById('julianDayLabel').innerText = t.julianDay;
+      document.getElementById('yourTimeLabel').innerText = t.yourTime;
+      document.getElementById('timeWarning').innerText = t.timeWarning;
+      document.getElementById('continueBtn').innerText = t.continueBtn;
+      document.getElementById('loadingText').innerText = t.reconnecting;
+    },
+
+    startRefreshTimer() {
+      if (this.timer) clearInterval(this.timer);
+      this.timer = setInterval(() => this.refresh(), 1000);
+      this.refresh();
+    },
+
+    startUserTimeTimer() {
+      if (this.userTimeTimer) clearInterval(this.userTimeTimer);
+      this.userTimeTimer = setInterval(() => this.updateUserTime(), 1000);
+      this.updateUserTime();
+    },
+
+    refresh() {
+      if (!this.baseDate) return;
+      this.baseDate = new Date(this.baseDate.getTime() + 1000);
+      
+      let utcYear = this.baseDate.getUTCFullYear();
+      let utcMonth = String(this.baseDate.getUTCMonth() + 1).padStart(2, '0');
+      let utcDay = String(this.baseDate.getUTCDate()).padStart(2, '0');
+      let utcHours = String(this.baseDate.getUTCHours()).padStart(2, '0');
+      let utcMins = String(this.baseDate.getUTCMinutes()).padStart(2, '0');
+      let utcSecs = String(this.baseDate.getUTCSeconds()).padStart(2, '0');
+      
+      document.getElementById('utcTimeValue').innerText = `${utcYear}-${utcMonth}-${utcDay} ${utcHours}:${utcMins}:${utcSecs}`;
+      
+      let localDate = new Date(this.baseDate);
+      document.getElementById('localTimeValue').innerText = formatDateTime(localDate);
+      document.getElementById('buddhistYearValue').innerText = `${utcYear + 543}-${utcMonth}-${utcDay} ${utcHours}:${utcMins}:${utcSecs}`;
+      document.getElementById('lunarYearValue').innerText = SimpleLunar.getLunarDate(localDate) + ' ' + 
+        String(localDate.getHours()).padStart(2, '0') + ':' + 
+        String(localDate.getMinutes()).padStart(2, '0') + ':' + 
+        String(localDate.getSeconds()).padStart(2, '0');
+      document.getElementById('unixTimestampValue').innerText = getUnixTimestamp(this.baseDate);
+      document.getElementById('julianDayValue').innerText = getJulianDay(this.baseDate);
+    },
+
+    updateUserTime() {
+      let userDate = new Date();
+      document.getElementById('userTimeValue').innerText = formatDateTime(userDate);
+    },
+
+    handleContinue() {
+      if (this.isClosing) return;
+      this.isClosing = true;
+      
+      const btn = document.getElementById('continueBtn');
+      const loading = document.getElementById('loadingText');
+      btn.disabled = true;
+      btn.style.display = 'none';
+      loading.style.display = 'block';
+      
+      let delay = 1000 + Math.random() * 1300;
+      setTimeout(() => this.close(), delay);
+    },
+
+    close() {
+      if (this.timer) clearInterval(this.timer);
+      if (this.userTimeTimer) clearInterval(this.userTimeTimer);
+      this.modal.style.display = 'none';
+      this.isActive = false;
+      this.isClosing = false;
+      
+      const btn = document.getElementById('continueBtn');
+      const loading = document.getElementById('loadingText');
+      btn.disabled = false;
+      btn.style.display = 'block';
+      loading.style.display = 'none';
+    }
+  };
+
+  // ======================= 原有代码继续 =======================
+  let currentLang = 'zh-Hans';
+  let currentLatLng = null;
+  let selectedServices = [];
+  let counts = { EMERGENCY: 0 };
+  let mottoIndex = 0, mottoInterval = null;
+  let pendingLostCallback = null;
+  let reportCaptchaWidgetId = null;
+  let lostCaptchaWidgetId = null;
+  let langSelected = false;
+
+  const FORMSPREE_URL = 'https://formspree.io/f/mjgplavv';
+
+  async function getDeviceInfo() {
+    const userAgent = navigator.userAgent;
+    let device = 'Unknown', os = 'Unknown';
+    if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      device = 'Apple ' + (/iPhone/i.test(userAgent) ? 'iPhone' : (/iPad/i.test(userAgent) ? 'iPad' : 'iPod'));
+      os = 'iOS';
+    } else if (/Android/i.test(userAgent)) {
+      device = 'Android Device'; os = 'Android';
+    } else if (/Windows/i.test(userAgent)) {
+      device = 'Windows PC'; os = 'Windows';
+    } else if (/Macintosh|Mac OS/i.test(userAgent)) {
+      device = 'Mac'; os = 'macOS';
+    } else if (/Linux/i.test(userAgent)) {
+      device = 'Linux PC'; os = 'Linux';
+    }
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let ip = 'Unable to retrieve';
+    try {
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipResponse.json();
+      ip = ipData.ip;
+    } catch (e) { ip = 'IP retrieval failed'; }
+    return { device, os, timezone, ip, userAgent };
+  }
+
+  function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notify' + (isError ? ' error' : '');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  async function sendEmailAlert(data) {
+    try {
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
       });
+      if (response.ok) {
+        const t = translations[currentLang];
+        showToast(t.sosBtn === '立即求救' ? '报警已发送！警方正在赶往现场' : 'Alert sent! Police are on the way');
+        return true;
+      } else {
+        const t = translations[currentLang];
+        showToast(t.sosBtn === '立即求救' ? '发送失败，请直接拨打110' : 'Send failed, please dial 110 directly', true);
+        return false;
+      }
+    } catch (error) {
+      const t = translations[currentLang];
+      showToast(t.sosBtn === '立即求救' ? '网络错误，请直接拨打110' : 'Network error, please dial 110 directly', true);
+      return false;
+    }
+  }
+
+  function updateMotto() {
+    let mottoDiv = document.getElementById('currentMotto');
+    if(!mottoDiv) return;
+    let list = mottoes[currentLang] || mottoes.en;
+    mottoDiv.style.animation = 'none';
+    setTimeout(() => { mottoDiv.innerText = list[mottoIndex % list.length]; mottoDiv.style.animation = 'fadeInOut 4s ease-in-out forwards'; }, 10);
+    mottoIndex = (mottoIndex + 1) % list.length;
+  }
+  function startMottoCarousel() { if(mottoInterval) clearInterval(mottoInterval); updateMotto(); mottoInterval = setInterval(updateMotto, 4000); }
+
+  function renderServiceButtons() {
+    let t = translations[currentLang];
+    const btns = [
+      { text: t.btn1, url: 'https://uplgov.github.io/sixside/police/form1.htm' },
+      { text: t.btn2, url: 'https://uplgov.github.io/sixside/police/form2.htm' },
+      { text: t.btn3, url: '#', isLost: true },
+      { text: t.btn4, url: 'https://uplgov.github.io/sixside/police/form3.htm' },
+      { text: t.btn5, url: 'https://uplgov.github.io/sixside/police/form4.htm' },
+      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' },
+      { text: t.btn7, url: 'publicfiles.htm' },
+      { text: t.btn8, url: 'jointhepd.htm' },
+      { text: t.btn9, url: 'tothepd.htm' }
+    ];
+    const container = document.getElementById('serviceButtonsGrid');
+    if(!container) return;
+    container.innerHTML = '';
+    btns.forEach(btn => {
+      const card = document.createElement('div');
+      card.className = 'service-card';
+      card.innerHTML = `<h3>${btn.text}</h3>`;
+      if(btn.isLost) card.onclick = () => { showCaptchaForLost(); };
+      else card.onclick = () => window.open(btn.url, '_blank');
+      container.appendChild(card);
+    });
+  }
+  
+  function showCaptchaForLost() {
+    const t = translations[currentLang];
+    const captchaContainer = document.getElementById('lostCaptcha');
+    if (captchaContainer) {
+      captchaContainer.innerHTML = '<div class="h-captcha" data-sitekey="f21e8c1a-d6e8-4332-8106-83ac0cc65c54"></div>';
+      if (typeof hcaptcha !== 'undefined') {
+        const newCaptchaDiv = captchaContainer.querySelector('.h-captcha');
+        if (newCaptchaDiv) lostCaptchaWidgetId = hcaptcha.render(newCaptchaDiv);
+      }
+    }
+    document.getElementById('captchaModalTitle').innerText = t.captchaModalTitle;
+    document.getElementById('captchaModalText').innerText = t.captchaModalText;
+    document.getElementById('confirmCaptchaBtn').innerText = t.captchaConfirm;
+    document.getElementById('cancelCaptchaBtn').innerText = t.captchaCancel;
+    document.getElementById('lostCaptchaError').innerText = '';
+    document.getElementById('captchaModal').style.display = 'block';
+    pendingLostCallback = () => { showLostAndFoundContent(); };
+  }
+  
+  function showLostAndFoundContent() {
+    let t = translations[currentLang];
+    let items = [
+      { name: t.folderName, date: t.folderDate, detail: t.folderDetail },
+      { name: t.chargerName, date: t.chargerDate, detail: t.chargerDetail },
+      { name: t.drinkName, date: t.drinkDate, detail: t.drinkDetail }
+    ];
+    let html = '<div class="lost-grid">';
+    items.forEach(item => {
+      html += `<div class="lost-card" onclick="alert('${item.name}\\n\\n${item.detail}')"><div class="lost-header"><span class="lost-name">${item.name}</span><span class="lost-date">${item.date}</span></div></div>`;
+    });
+    html += `</div><div class="db-notice">${t.dbNotice}</div>`;
+    document.getElementById('lostDetailTitle').innerText = t.lostTitle;
+    document.getElementById('lostDetailContent').innerHTML = html;
+    document.getElementById('lostDetailModal').style.display = 'block';
+  }
+
+  function updateServiceButtonsUI() {
+    document.querySelectorAll('.service-option-btn').forEach(btn => {
+      btn.classList.toggle('selected', selectedServices.includes(btn.getAttribute('data-service')));
+    });
+  }
+  
+  function initServiceButtons() {
+    document.querySelectorAll('.service-option-btn').forEach(btn => {
+      btn.onclick = () => {
+        const service = btn.getAttribute('data-service');
+        selectedServices.includes(service) ? selectedServices = selectedServices.filter(s => s !== service) : selectedServices.push(service);
+        updateServiceButtonsUI();
+        document.getElementById('serviceWarning').innerText = '';
+      };
     });
   }
 
-  function getDeptName(dept, langCode) {
-    if (langCode === "en") return dept.nameEn;
-    const map = { es:dept.nameEs, pt:dept.namePt, de:dept.nameDe, fr:dept.nameFr, ru:dept.nameRu, mn:dept.nameMn, "zh-simple":dept.nameZhSimple, "zh-classical":dept.nameZhClassical, "zh-traditional":dept.nameZhTraditional, "zh-huaxia":dept.nameZhHuaxia };
-    return `${dept.nameEn} (${map[langCode]})`;
-  }
-  function getOtherName(other, langCode) {
-    if (langCode === "en") return other.nameEn;
-    const map = { es:other.nameEs, pt:other.namePt, de:other.nameDe, fr:other.nameFr, ru:other.nameRu, mn:other.nameMn, "zh-simple":other.nameZhSimple, "zh-classical":other.nameZhClassical, "zh-traditional":other.nameZhTraditional, "zh-huaxia":other.nameZhHuaxia };
-    return `${other.nameEn} (${map[langCode]})`;
-  }
-  function getDesc(d, langCode) {
-    if (langCode === "en") return d.descEn;
-    const map = { es:d.descEs, pt:d.descPt, de:d.descDe, fr:d.descFr, ru:d.descRu, mn:d.descMn, "zh-simple":d.descZhSimple, "zh-classical":d.descZhClassical, "zh-traditional":d.descZhTraditional, "zh-huaxia":d.descZhHuaxia };
-    return map[langCode] || d.descEn;
-  }
-
-  // ===== Render quick services =====
-  function renderQuickServices() {
-    const data = langData[currentLang];
-    document.getElementById("quickServicesTitle").innerText = data.quickServicesTitle;
-    const services = [
-      { label: data.quickJobs,      icon: "◈", url: "https://uplgov.github.io/findoppotunities.htm" },
-      { label: data.quickDemocracy, icon: "◎", url: "https://uplgov.github.io/democracy.htm" },
-      { label: data.quickLibrary,   icon: "▣", url: "https://uplgov.github.io/provicial-library.htm" }
-    ];
-    const row = document.getElementById("quickServicesRow");
-    row.innerHTML = services.map(s =>
-      `<a class="quick-btn" href="${s.url}" target="_blank"><span class="quick-btn-icon">${s.icon}</span>${s.label}</a>`
-    ).join("");
+  function applyLanguage(lang) {
+    let t = translations[lang];
+    if(!t) return;
+    
+    ['emergencyLabel','nonEmergencyLabel','callNote','wordJustice','wordProfessionalism','wordProtection',
+     'respTimeVal','clearRateVal','respTrend','clearTrend','respLabel','clearLabel','footerText',
+     'modalHead','directCallHint','serviceLabel','locationLabel','visibleLabel','optYes','optNo',
+     'contactLabel','commentLabel','sosBtn','cancelModalBtn','locateBtn','contrastLabel','grayscaleLabel',
+     'saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle'].forEach(id => { 
+      let el = document.getElementById(id); if(el && t[id] !== undefined) el.innerText = t[id]; 
+    });
+    
+    document.getElementById('respTooltip') && (document.getElementById('respTooltip').innerText = t.respTooltip);
+    document.getElementById('clearTooltip') && (document.getElementById('clearTooltip').innerText = t.clearTooltip);
+    document.getElementById('servicePoliceBtn') && (document.getElementById('servicePoliceBtn').innerText = t.servicePolice);
+    document.getElementById('serviceRescueBtn') && (document.getElementById('serviceRescueBtn').innerText = t.serviceRescue);
+    document.getElementById('serviceFireBtn') && (document.getElementById('serviceFireBtn').innerText = t.serviceFire);
+    document.getElementById('serviceMedicalBtn') && (document.getElementById('serviceMedicalBtn').innerText = t.serviceMedical);
+    
+    const commentInput = document.getElementById('commentInput');
+    if(commentInput && t.commentPlaceholder) commentInput.placeholder = t.commentPlaceholder;
+    document.getElementById('emergencyBtn') && (document.getElementById('emergencyBtn').innerText = t.reportEmerg);
+    document.getElementById('submitSosBtn') && (document.getElementById('submitSosBtn').innerText = t.sosBtn);
+    
+    if (TimeCheckModal.isActive) TimeCheckModal.updateStaticText();
+    renderServiceButtons();
+    startMottoCarousel();
   }
 
-  function applyLanguage(langCode) {
-    const data = langData[langCode];
-    if (!data) return;
-    document.getElementById("mainTitle").innerText = data.mainTitle;
-    document.getElementById("mainSubtitle").innerText = data.mainSubtitle;
-    document.getElementById("aboutTitle").innerText = data.aboutTitle;
-    document.getElementById("govTitle").innerText = data.govTitle;
-    document.getElementById("otherTitle").innerText = data.otherTitle;
-    document.getElementById("viewAllBtn").innerText = data.viewAllBtn;
-    document.getElementById("copyrightLine").innerHTML = data.copyrightLine;
-    document.getElementById("techSupportLine").innerHTML = data.techSupportLine;
-    document.getElementById("nationalLink").innerText = data.nationalLink;
-    document.getElementById("themeToggleBtn").innerText = data.themeToggle;
-    document.getElementById("langReopenBtn").innerText = data.langToggle;
-    window.privacyMsg = data.privacyText;
-    window.licenseMsg = data.licenseText;
-    document.getElementById("accessTitle").innerText = data.accessTitle;
-    document.getElementById("contrastLabel").innerHTML = `${data.contrastLabel} <span id="contrastVal">${contrastSlider.value}</span>`;
-    document.getElementById("grayscaleLabel").innerHTML = `${data.grayscaleLabel} <span id="grayscaleVal">${grayscaleSlider.value}</span>`;
-    document.getElementById("saturateLabel").innerHTML = `${data.saturateLabel} <span id="saturateVal">${saturateSlider.value}</span>`;
-    document.getElementById("cursorColorLabel").innerText = data.cursorColorLabel;
-    document.getElementById("cursorRed").innerText = data.cursorRed;
-    document.getElementById("cursorYellow").innerText = data.cursorYellow;
-    document.getElementById("cursorEnableLabel").innerText = data.cursorEnableLabel;
-    document.getElementById("resetAccessibilityBtn").innerText = data.resetBtn;
-    // Security banner
-    document.getElementById("securityTitle").innerText = data.securityTitle;
-    document.getElementById("securityDomain").innerText = data.securityDomain;
-    document.getElementById("securityHttps").innerText = data.securityHttps;
-    document.getElementById("securityCollapsedText").innerText = data.securityCollapsed;
-    // Footer
-    document.getElementById("footerSupportLabel").innerText = data.footerSupportLabel;
-    document.getElementById("donateText").innerText = data.donateText;
-    document.getElementById("footerContactLabel").innerText = data.footerContactLabel;
-    document.getElementById("footerMediaLabel").innerText = data.footerMediaLabel;
-    document.getElementById("footerLinksLabel").innerText = data.footerLinksLabel;
-    localStorage.setItem("sixside_lang", langCode);
-    currentLang = langCode;
-    renderHome();
-  }
-
-  function renderHome() {
-    const data = langData[currentLang];
-    const aboutGrid = document.getElementById("aboutGrid");
-    aboutGrid.innerHTML = `
-      <div class="card"><h3>${data.historyTitle}</h3><p>${data.historyText}</p></div>
-      <div class="card"><h3>${data.geographyTitle}</h3><p>${data.geographyText}</p></div>
-      <div class="card"><h3>${data.populationTitle}</h3><p>${data.populationText}</p></div>
-      <div class="card" id="galleryCard"><h3>${data.galleryCardTitle}</h3><p>Click to view landscapes</p></div>
-    `;
-    document.getElementById("galleryCard").onclick = showGalleryDetail;
-    const featuredDepts = document.getElementById("featuredDepts");
-    featuredDepts.innerHTML = featuredIds.map(id => {
-      const dept = allDepts.find(d => d.id === id);
-      return `<div class="card" data-id="${dept.id}"><h3>${getDeptName(dept, currentLang)}</h3><p>${getDesc(dept, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">Head: ${dept.head}</p></div>`;
-    }).join("");
-    const otherGrid = document.getElementById("otherOfficesGrid");
-    otherGrid.innerHTML = otherOffices.map(o => `<div class="card"><h3>${getOtherName(o, currentLang)}</h3><p>${getDesc(o, currentLang)}</p><p style="margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">Head: ${o.head}</p></div>`).join("");
-    document.querySelectorAll(".card[data-id]").forEach(card => { card.addEventListener("click", () => showDetail(card.getAttribute("data-id"))); });
-    renderQuickServices();
-  }
-
-  function showDetail(id) {
-    const dept = allDepts.find(d => d.id === id);
-    if (!dept) return;
-    document.getElementById("homeView").style.display = "none";
-    const detailDiv = document.getElementById("detailView");
-    let extra = "";
-    if (id === "sra") extra = `<h3>Tax Rates (selected)</h3><table><thead><tr><th>Item</th><th>Rate</th></tr></thead><tbody><tr><td>Wholemeal bread</td><td>0%</td></tr><tr><td>Sugar / White bread</td><td>22%</td></tr><tr><td>Grass-fed beef</td><td>0%</td></tr><tr><td>Grain-fed beef</td><td>10%</td></tr></tbody></table>`;
-    detailDiv.innerHTML = `<div class="detail-section"><div class="back-home" id="backHomeBtn">← Back</div><h2>${getDeptName(dept, currentLang)}</h2><p><strong>Head:</strong> ${dept.head}</p><p>${getDesc(dept, currentLang)}</p>${extra}</div>`;
-    detailDiv.style.display = "block";
-    document.getElementById("backHomeBtn").onclick = goHome;
-    document.getElementById("currentLocation").innerText = getDeptName(dept, currentLang);
-  }
-
-  function goHome() {
-    document.getElementById("detailView").style.display = "none";
-    document.getElementById("homeView").style.display = "block";
-    document.getElementById("currentLocation").innerText = "Home";
-  }
-
-  function showAllDepartments() {
-    const modal = document.createElement("div");
-    modal.className = "modal-overlay";
-    modal.innerHTML = `<div class="all-depts-modal"><h3>${langData[currentLang].viewAllBtn}</h3><div id="allDeptsList"></div><button class="btn-square" id="closeModalBtn" style="margin-top:1rem;">Close</button></div>`;
-    document.body.appendChild(modal);
-    const listDiv = modal.querySelector("#allDeptsList");
-    listDiv.innerHTML = allDepts.map(d => `<div class="card" data-id="${d.id}" style="margin-bottom:0.8rem;"><h3>${getDeptName(d, currentLang)}</h3><p>${getDesc(d, currentLang)}</p><p style="font-size:0.75rem; color:var(--text-secondary);">Head: ${d.head}</p></div>`).join("");
-    modal.querySelectorAll(".card").forEach(card => { card.addEventListener("click", () => { modal.remove(); showDetail(card.getAttribute("data-id")); }); });
-    modal.querySelector("#closeModalBtn").onclick = () => modal.remove();
-  }
-
-  function showLangModal(force = false) {
-    const modal = document.createElement("div");
-    modal.className = "modal-overlay";
-    let opts = "";
-    for (const lang of langOrder) { const d = langData[lang]; opts += `<div class="lang-option" data-lang="${lang}">${d.name}<div class="lang-welcome">${d.welcome}</div></div>`; }
-    modal.innerHTML = `<div class="lang-modal"><h3>Select Language</h3>${opts}<button class="btn-square" id="closeLangBtn" style="margin-top:1rem;">Cancel</button></div>`;
-    document.body.appendChild(modal);
-    modal.querySelectorAll(".lang-option").forEach(opt => { opt.addEventListener("click", () => { applyLanguage(opt.getAttribute("data-lang")); modal.remove(); }); });
-    modal.querySelector("#closeLangBtn").onclick = () => modal.remove();
-  }
-
-  // Accessibility controls (unchanged)
-  const contrastSlider = document.getElementById("contrastSlider");
-  const grayscaleSlider = document.getElementById("grayscaleSlider");
-  const saturateSlider = document.getElementById("saturateSlider");
-  let filterTimeout;
-  function applyFilters() {
-    const c = contrastSlider.value, g = grayscaleSlider.value, s = saturateSlider.value;
-    document.body.style.filter = `contrast(${c}) grayscale(${g}) saturate(${s})`;
-    const cv = document.getElementById("contrastVal"), gv = document.getElementById("grayscaleVal"), sv = document.getElementById("saturateVal");
-    if(cv) cv.innerText = c; if(gv) gv.innerText = g; if(sv) sv.innerText = s;
-  }
-  function handleSliderInput() { if (filterTimeout) clearTimeout(filterTimeout); filterTimeout = setTimeout(applyFilters, 16); }
-  contrastSlider.addEventListener("input", handleSliderInput);
-  grayscaleSlider.addEventListener("input", handleSliderInput);
-  saturateSlider.addEventListener("input", handleSliderInput);
-  applyFilters();
-
-  const cursorCheckbox = document.getElementById("cursorCheckbox");
-  const cursorColorSelect = document.getElementById("cursorColorSelect");
-  let cursorActive = false;
-  function updateCursor() {
-    if (cursorActive) {
-      document.body.classList.add("highlight-cursor");
-      document.body.classList.remove("cursor-red", "cursor-yellow");
-      document.body.classList.add(`cursor-${cursorColorSelect.value}`);
-      document.body.style.cursor = "none";
+  function addDispatchCard() {
+    let t = translations[currentLang];
+    counts.EMERGENCY++;
+    let root = document.getElementById('dispatchRoot');
+    let cardId = 'card-EMERGENCY';
+    let card = document.getElementById(cardId);
+    let msg = t.emergQueueMsg;
+    if(!card) {
+      card = document.createElement('div'); card.id = cardId; card.className = 'dispatch-card';
+      card.innerHTML = `<div class="num-anim-110">110</div><div class="queue-msg">${msg}</div><div class="count-tag" id="${cardId}-c" style="display:none;">x1</div>`;
+      root.appendChild(card);
     } else {
-      document.body.classList.remove("highlight-cursor", "cursor-red", "cursor-yellow");
-      document.body.style.cursor = "";
+      card.querySelector('.queue-msg').innerText = msg;
+    }
+    let tag = document.getElementById(cardId + '-c');
+    if(counts.EMERGENCY > 1) { tag.style.display = 'block'; tag.innerText = 'x' + counts.EMERGENCY; }
+  }
+
+  let map, currentMarker=null, mapInited=false;
+  function initMap(){ if(!mapInited){ map=L.map('map').setView([52.5, -1.0], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); mapInited=true; } else map.invalidateSize(); }
+  
+  document.getElementById('locateBtn').addEventListener('click',()=>{
+    initMap();
+    document.getElementById('locationError').innerText = '';
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos=>{
+        let lat=pos.coords.latitude, lng=pos.coords.longitude;
+        map.setView([lat,lng],15);
+        if(currentMarker) map.removeLayer(currentMarker);
+        currentMarker=L.marker([lat,lng]).addTo(map).bindPopup('Your location').openPopup();
+        currentLatLng = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        document.getElementById('latlngInput').value = currentLatLng;
+      }, err=>{ document.getElementById('locationError').innerText = 'Location failed: ' + err.message; });
+    } else { document.getElementById('locationError').innerText = 'Geolocation not supported'; }
+  });
+
+  function openModal(){ 
+    document.getElementById('reportModal').style.display='block'; initMap(); 
+    if(currentMarker&&map)map.removeLayer(currentMarker); currentMarker=null; currentLatLng=null; 
+    document.getElementById('latlngInput').value=''; selectedServices = []; updateServiceButtonsUI();
+    document.querySelectorAll('input[name="visibility"]').forEach(r=>r.checked=false); 
+    document.getElementById('contactInput').value=''; document.getElementById('commentInput').value='';
+    document.getElementById('serviceWarning').innerText=''; document.getElementById('locationError').innerText='';
+    document.getElementById('captchaError').innerText = '';
+    if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(reportCaptchaWidgetId); } catch(e) {}
     }
   }
-  cursorCheckbox.addEventListener("change", (e) => { cursorActive = e.target.checked; updateCursor(); });
-  cursorColorSelect.addEventListener("change", () => { if (cursorActive) updateCursor(); });
-  document.addEventListener("mousemove", (e) => { if (cursorActive) { document.body.style.setProperty("--mouse-x", e.clientX + "px"); document.body.style.setProperty("--mouse-y", e.clientY + "px"); } });
-  document.getElementById("resetAccessibilityBtn").onclick = () => {
-    contrastSlider.value = "1"; grayscaleSlider.value = "0"; saturateSlider.value = "1";
-    applyFilters(); cursorCheckbox.checked = false; cursorActive = false; updateCursor();
+  function closeModal(){ document.getElementById('reportModal').style.display='none'; }
+  document.getElementById('cancelModalBtn').onclick=closeModal;
+  document.getElementById('closeLostDetail').onclick=()=>document.getElementById('lostDetailModal').style.display='none';
+  document.getElementById('closeLangModal').onclick=()=>document.getElementById('langModal').style.display='none';
+  
+  document.getElementById('confirmCaptchaBtn').onclick = async () => {
+    const t = translations[currentLang];
+    let captchaToken = null;
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { captchaToken = hcaptcha.getResponse(lostCaptchaWidgetId); } catch(e) {}
+    }
+    if (!captchaToken || captchaToken.length === 0) {
+      document.getElementById('lostCaptchaError').innerText = t.captchaRequiredError;
+      return;
+    }
+    document.getElementById('captchaModal').style.display = 'none';
+    if (pendingLostCallback) { pendingLostCallback(); pendingLostCallback = null; }
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(lostCaptchaWidgetId); } catch(e) {}
+    }
+  };
+  
+  document.getElementById('cancelCaptchaBtn').onclick = () => {
+    document.getElementById('captchaModal').style.display = 'none';
+    pendingLostCallback = null;
+    if (typeof hcaptcha !== 'undefined' && lostCaptchaWidgetId !== null) {
+      try { hcaptcha.reset(lostCaptchaWidgetId); } catch(e) {}
+    }
+  };
+  
+  document.getElementById('submitSosBtn').onclick=async () => {
+    let t = translations[currentLang];
+    let captchaToken = null;
+    if (typeof hcaptcha !== 'undefined') {
+      try {
+        if (reportCaptchaWidgetId !== null) captchaToken = hcaptcha.getResponse(reportCaptchaWidgetId);
+        else { const captchaElem = document.querySelector('#reportModal .h-captcha'); if (captchaElem) captchaToken = hcaptcha.getResponse(captchaElem); }
+      } catch(e) {}
+    }
+    if (!captchaToken || captchaToken.length === 0) { document.getElementById('captchaError').innerText = t.captchaRequiredError; return; }
+    if(selectedServices.length === 0){ document.getElementById('serviceWarning').innerText = t.selectServiceError; return; }
+    if(!currentLatLng){ document.getElementById('locationError').innerText = t.locationRequiredError; return; }
+    
+    let visibilityRadio = document.querySelector('input[name="visibility"]:checked');
+    let visibility = visibilityRadio ? visibilityRadio.value : 'Not specified';
+    let contact = document.getElementById('contactInput').value || 'Not provided';
+    let comment = document.getElementById('commentInput').value || 'No additional comments';
+    let now = new Date();
+    let timeStr = now.toLocaleString(currentLang === 'zh-Hans' ? 'zh-CN' : 'en-US', { timeZone: 'Asia/Shanghai' });
+    let serviceMap = {'police': t.servicePolice || 'Police','rescue': t.serviceRescue || 'Rescue','fire': t.serviceFire || 'Fire','medical': t.serviceMedical || 'Medical'};
+    let serviceNames = selectedServices.map(s => serviceMap[s] || s).join(', ');
+    const deviceInfo = await getDeviceInfo();
+    
+    const emailData = {
+      _subject: 'SSPD EMERGENCY ALERT', time: timeStr, location: currentLatLng, latlng: currentLatLng,
+      services: serviceNames, visibility: visibility === 'yes' ? 'Yes (Open/Visible Area)' : (visibility === 'no' ? 'No (Hidden Area)' : 'Not specified'),
+      contact: contact, comment: comment, device: deviceInfo.device, os: deviceInfo.os,
+      timezone: deviceInfo.timezone, ip: deviceInfo.ip, userAgent: deviceInfo.userAgent,
+      'h-captcha-response': captchaToken,
+      message: `ALERT DETAILS\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nTime: ${timeStr}\nLocation: ${currentLatLng}\nServices: ${serviceNames}\nVisible Area: ${visibility === 'yes' ? 'Yes' : (visibility === 'no' ? 'No' : 'Not specified')}\nContact: ${contact}\nComment: ${comment}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nDEVICE INFORMATION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nDevice: ${deviceInfo.device}\nOS: ${deviceInfo.os}\nIP Address: ${deviceInfo.ip}\nTimezone: ${deviceInfo.timezone}\nUser Agent: ${deviceInfo.userAgent}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPlease handle this alert immediately.`
+    };
+    const success = await sendEmailAlert(emailData);
+    if (success) { addDispatchCard(); closeModal(); if (typeof hcaptcha !== 'undefined' && reportCaptchaWidgetId !== null) { try { hcaptcha.reset(reportCaptchaWidgetId); } catch(e) {} } }
   };
 
-  document.getElementById("homeBtn").onclick = goHome;
-  document.getElementById("viewAllBtn").onclick = showAllDepartments;
-  document.getElementById("langReopenBtn").onclick = () => showLangModal(false);
-  const toggleBtn = document.getElementById("accessibilityToggle");
-  const panel = document.getElementById("accessibilityPanel");
-  if (toggleBtn && panel) toggleBtn.onclick = () => panel.classList.toggle("show");
-  document.getElementById("themeToggleBtn").onclick = () => document.body.classList.toggle("light");
-  document.getElementById("privacyLink").onclick = (e) => { e.preventDefault(); alert(window.privacyMsg); };
-  document.getElementById("licenseLink").onclick = (e) => { e.preventDefault(); alert(window.licenseMsg); };
-  document.getElementById("lightboxClose").onclick = () => document.getElementById("lightbox").classList.remove("show");
-  document.getElementById("lightbox").onclick = (e) => { if (e.target === document.getElementById("lightbox")) document.getElementById("lightbox").classList.remove("show"); };
+  document.addEventListener('mousemove', (e) => {
+    const cursor = document.getElementById('cursor-highlight');
+    if (cursor && cursor.style.display === 'block') {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    }
+  });
 
-  renderHome();
-  showLangModal(true);
+  function toggleCursorAssist(on){ let h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }
+  function updateCursorStyle(){ let sel=document.getElementById('cursor-color-select'); if(sel){ let [bg,border]=sel.value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); } }
+  document.getElementById('cursor-cb').addEventListener('change',e=>toggleCursorAssist(e.target.checked));
+  document.getElementById('cursor-color-select')?.addEventListener('change',updateCursorStyle);
+  function applyFilters(){ let c=document.getElementById('con-range').value,g=document.getElementById('gray-range').value,s=document.getElementById('sat-range').value; document.getElementById('mainFilter').style.filter=`contrast(${c}) grayscale(${g}) saturate(${s})`; }
+  function resetAcc(){ document.getElementById('con-range').value=1; document.getElementById('gray-range').value=0; document.getElementById('sat-range').value=1; document.getElementById('cursor-cb').checked=false; toggleCursorAssist(false); applyFilters(); }
+  function toggleAccPanel(){ document.getElementById('accPanel').classList.toggle('show'); }
+
+  document.getElementById('emergencyBtn').onclick=openModal;
+  document.getElementById('policeDeptLink').onclick=()=>window.open('https://uplgov.github.io/sixside/police/index.htm','_blank');
+  let popupMenu=null;
+  document.getElementById('navBrand').onclick=(e)=>{ if(popupMenu)popupMenu.remove(); let div=document.createElement('div'); div.className='popup-menu'; div.innerHTML=`<a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/police/index.htm">Police Home</a><a class="popup-menu-item" target="_blank" href="https://uplgov.github.io/sixside/">Government Portal</a>`; document.body.appendChild(div); let rect=document.getElementById('navBrand').getBoundingClientRect(); div.style.position='fixed'; div.style.top=rect.bottom+window.scrollY+'px'; div.style.left=rect.left+window.scrollX+'px'; popupMenu=div; setTimeout(()=>document.addEventListener('click',function handler(ev){ if(!div.contains(ev.target)&&ev.target!==document.getElementById('navBrand')){ div.remove(); document.removeEventListener('click',handler); } }),10); };
+
+  function showLangModal() {
+    let modal = document.getElementById('langModal');
+    let grid = document.getElementById('langGrid');
+    let langList = [
+      {code:'en', name:'English (UK)'},{code:'zh-Hans', name:'简体白话'},{code:'es', name:'Español'},{code:'de', name:'Deutsch'},
+      {code:'pt', name:'Português'},{code:'zh-Hant', name:'正體官話'},{code:'fr', name:'Français'},{code:'lzh', name:'简体文言'},
+      {code:'ru', name:'Русский'},{code:'mn', name:'Монгол хэл'},{code:'ja', name:'日本語'},{code:'ko', name:'한국어'},
+      {code:'hi', name:'हिन्दी'},{code:'zh-Classical', name:'華夏文言'}
+    ];
+    grid.innerHTML = '';
+    langList.forEach(l => {
+      let btn = document.createElement('div'); btn.className = 'lang-option'; btn.innerText = l.name;
+      btn.onclick = () => { 
+        currentLang = l.code; 
+        applyLanguage(currentLang); 
+        modal.style.display = 'none'; 
+        localStorage.setItem('sspd_lang', currentLang);
+        if (!langSelected) {
+          langSelected = true;
+          TimeCheckModal.startTimer();
+        }
+      };
+      grid.appendChild(btn);
+    });
+    modal.style.display = 'flex';
+  }
+  document.getElementById('langSwitchBtn').onclick=()=>showLangModal();
+
+  window.onload = function() {
+    initMap();
+    showLangModal();
+    TimeCheckModal.init();
+    if (typeof hcaptcha !== 'undefined') {
+      const reportCaptchaElem = document.querySelector('#reportModal .h-captcha');
+      if (reportCaptchaElem) reportCaptchaWidgetId = hcaptcha.render(reportCaptchaElem);
+      const lostCaptchaElem = document.querySelector('#lostCaptcha .h-captcha');
+      if (lostCaptchaElem) lostCaptchaWidgetId = hcaptcha.render(lostCaptchaElem);
+    }
+  };
+  
+  let savedLang = localStorage.getItem('sspd_lang');
+  if(savedLang && translations[savedLang]) { currentLang = savedLang; langSelected = true; }
+  applyLanguage(currentLang);
+  initServiceButtons();
+  // 如果已有保存的语言，直接启动计时器
+  if (langSelected) TimeCheckModal.startTimer();
 </script>
 </body>
 </html>

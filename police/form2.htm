@@ -185,6 +185,7 @@
     .hero-word {
       text-align: center;
       position: relative;
+      max-width: 100%;
     }
 
     .main-word {
@@ -194,13 +195,19 @@
       color: white;
       text-shadow: 0 0 25px rgba(255,255,255,0.4);
       margin-bottom: 2rem;
-      white-space: nowrap;
+      word-break: break-word;
+      line-height: 1.2;
     }
 
     @media (max-width: 760px) {
       .main-word {
-        font-size: 3.2rem;
-        white-space: normal;
+        font-size: 3.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-word {
+        font-size: 2.5rem;
       }
     }
 
@@ -313,6 +320,40 @@
       border-color: var(--accent);
       background: var(--card-bg);
     }
+
+    body.light {
+      --bg-primary: #f4f6f9;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a2634;
+      --text-secondary: #3a4a5e;
+      --border-color: #d0d8e4;
+      --card-bg: #ffffff;
+      --card-border: #dce2ec;
+      --btn-bg: #eef2f7;
+      --sec-bg: #e8f4fd;
+      --sec-border: #b8d8f0;
+      --sec-text: #2a5f80;
+      --quick-card: #f0f6ff;
+      --quick-border: #c8dff0;
+    }
+
+    body.light .security-item img {
+      filter: none;
+      opacity: 0.7;
+    }
+
+    body.light .main-word {
+      color: #1a2634;
+      text-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    body.light .lang-item {
+      color: rgba(26,38,52,0.55);
+    }
+
+    body.light .lang-item:hover {
+      color: rgba(26,38,52,0.85);
+    }
   </style>
 </head>
 <body>
@@ -325,15 +366,15 @@
         <h3 id="securityTitle">How do you know this website is safe?</h3>
         <div class="security-items">
           <div class="security-item">
-            <img src="Government.png" alt="Official domain" id="securityImgGov">
+            <img src="https://uplgov.github.io/sixside/Government.png" alt="Official domain">
             <span id="securityDomain">uplgov.github.io is the official and only domain of the UPL Government</span>
           </div>
           <div class="security-item">
-            <img src="Lock.png" alt="Secure connection" id="securityImgLock">
+            <img src="https://uplgov.github.io/sixside/Lock.png" alt="Secure connection">
             <span id="securityHttps">The lock icon and https:// in your browser mean your connection is encrypted and secure</span>
           </div>
           <div class="security-item">
-            <img src="Rubbishbin.png" alt="No data storage" id="securityImgBin">
+            <img src="https://uplgov.github.io/sixside/Rubbishbin.png" alt="No data storage">
             <span id="securityNoStorage">This portal does not store any data. According to the 2133 "Privacy and Cybersecurity for Government Departments - Version 2" regulation, government portals must visibly indicate when data storage is about to begin.</span>
           </div>
         </div>
@@ -421,40 +462,6 @@
         window.location.reload();
       });
     }
-
-    const style = document.createElement('style');
-    style.textContent = `
-      body.light {
-        --bg-primary: #f4f6f9;
-        --bg-secondary: #ffffff;
-        --text-primary: #1a2634;
-        --text-secondary: #3a4a5e;
-        --border-color: #d0d8e4;
-        --card-bg: #ffffff;
-        --card-border: #dce2ec;
-        --btn-bg: #eef2f7;
-        --sec-bg: #e8f4fd;
-        --sec-border: #b8d8f0;
-        --sec-text: #2a5f80;
-        --quick-card: #f0f6ff;
-        --quick-border: #c8dff0;
-      }
-      body.light .security-item img {
-        filter: none;
-        opacity: 0.7;
-      }
-      body.light .main-word {
-        color: #1a2634;
-        text-shadow: 0 0 15px rgba(0,0,0,0.1);
-      }
-      body.light .lang-item {
-        color: rgba(26,38,52,0.55);
-      }
-      body.light .lang-item:hover {
-        color: rgba(26,38,52,0.85);
-      }
-    `;
-    document.head.appendChild(style);
   })();
 </script>
 </body>

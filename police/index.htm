@@ -405,9 +405,104 @@
       70% { opacity: 1; }
       100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
     }
+        .support-gov-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 5px 15px;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-family: 'Georgia', serif;
+      transition: background-color 0.8s ease, border-color 0.15s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+      margin-left: 10px;
+    }
+    .support-gov-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,0,0,0.4) 0%, rgba(255,255,0,0.3) 50%, rgba(255,192,203,0.2) 100%);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease-out, height 0.4s ease-out;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .support-gov-btn:hover::before {
+      width: 200%;
+      height: 200%;
+    }
+    .support-gov-btn:hover {
+      animation: warmFlow 1.5s infinite alternate;
+      border-color: #ff6666;
+    }
+    .support-gov-btn span {
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes warmFlow {
+      0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.6), 0 0 10px rgba(255, 255, 0, 0.4); background-color: rgba(255, 100, 100, 0.2); }
+      50% { box-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(255, 192, 203, 0.6); background-color: rgba(255, 255, 150, 0.2); }
+      100% { box-shadow: 0 0 8px rgba(255, 192, 203, 0.7), 0 0 15px rgba(255, 0, 0, 0.5); background-color: rgba(255, 192, 203, 0.2); }
+    }
+    .support-gov-btn:not(:hover) {
+      animation: coolDown 2s ease-out forwards;
+    }
+    @keyframes coolDown {
+      0% { background-color: #4a6a9e; box-shadow: 0 0 8px #4a6a9e; }
+      100% { background-color: var(--btn-bg); box-shadow: none; }
+    }
   </style>
 </head>
 <body>
+
+<!-- ========== SECURITY BANNER ========== -->
+<div id="securityBanner" style="--sec-bg: #071220; --sec-border: #1a3a5c; --sec-text: #7aabcc; --sec-icon: #4a8ab0; background: var(--sec-bg); border-bottom: 1px solid var(--sec-border);">
+  <div id="securityFull" style="overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, padding 0.45s ease; padding: 0 2rem;">
+    <div id="securityFull-inner" style="display: flex; align-items: flex-start; gap: 1rem;">
+      <button id="closeBannerBtn" title="Close" style="flex-shrink: 0; margin-top: 2px; width: 13px; height: 13px; border-radius: 50%; background: #cc3333; border: none; cursor: pointer; position: relative; transition: background 0.18s;"></button>
+      <div class="security-body" style="flex: 1;">
+        <h3 id="securityTitle" style="font-size: 0.82rem; font-weight: bold; color: var(--sec-text); margin-bottom: 10px; font-family: 'Georgia', serif; letter-spacing: 0.02em;">How do you know this website is safe?</h3>
+        <div class="security-items" style="display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start;">
+          <div class="security-item" style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.75rem; color: var(--sec-text); flex: 1; min-width: 200px;">
+            <img src="Government.png" alt="Official domain" id="securityImgGov" style="width: 32px; height: 32px; object-fit: contain; opacity: 0.85; filter: hue-rotate(180deg) brightness(1.2); flex-shrink: 0;">
+            <span id="securityDomain" style="opacity: 0.9; line-height: 1.4;">uplgov.github.io is the official and only domain of the UPL Government</span>
+          </div>
+          <div class="security-item" style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.75rem; color: var(--sec-text); flex: 1; min-width: 200px;">
+            <img src="Lock.png" alt="Secure connection" id="securityImgLock" style="width: 32px; height: 32px; object-fit: contain; opacity: 0.85; filter: hue-rotate(180deg) brightness(1.2); flex-shrink: 0;">
+            <span id="securityHttps" style="opacity: 0.9; line-height: 1.4;">The lock icon and https:// in your browser mean your connection is encrypted and secure</span>
+          </div>
+          <div class="security-item" style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.75rem; color: var(--sec-text); flex: 1; min-width: 200px;">
+            <img src="Rubbishbin.png" alt="No data storage" id="securityImgBin" style="width: 32px; height: 32px; object-fit: contain; opacity: 0.85; filter: hue-rotate(180deg) brightness(1.2); flex-shrink: 0;">
+            <span id="securityNoStorage" style="opacity: 0.9; line-height: 1.4;">This portal does not store any data. According to the 2133 "Privacy and Cybersecurity for Government Departments - Version 2" regulation, government portals must visibly indicate when data storage is about to begin.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="securityCollapsed" style="padding: 7px 2rem; font-size: 0.72rem; color: var(--sec-text); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: opacity 0.2s; font-family: 'Georgia', serif; letter-spacing: 0.01em;">
+    <span id="securityCollapsedText">Learn why this page is safe</span>
+  </div>
+</div>
+<style>
+  #closeBannerBtn::before, #closeBannerBtn::after { content: ''; position: absolute; width: 7px; height: 1.5px; background: transparent; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg); transition: background 0.18s; }
+  #closeBannerBtn::after { transform: translate(-50%, -50%) rotate(-45deg); }
+  #closeBannerBtn:hover { background: #888; }
+  #closeBannerBtn:hover::before, #closeBannerBtn:hover::after { background: #fff; }
+  #securityFull.open { max-height: 260px !important; opacity: 1 !important; padding: 14px 2rem !important; }
+  body.light #securityBanner { --sec-bg: #e8f4fd; --sec-border: #b8d8f0; --sec-text: #2a5f80; --sec-icon: #3a7fa8; }
+  body.light .security-item img { filter: none !important; opacity: 0.7 !important; }
+  #securityCollapsed::before { content: '›'; font-size: 0.9rem; transition: transform 0.2s; }
+  #securityCollapsed:hover { opacity: 0.7; }
+  #securityCollapsed:hover::before { transform: translateX(2px); }
+</style>
+<!-- ========== END SECURITY BANNER ========== -->
+  
 <div id="cursor-highlight"></div>
 <div id="dispatchRoot"></div>
 <div class="emergency-top-bar">
@@ -418,6 +513,9 @@
 </div>
 <nav class="top-nav">
   <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
+
+  <button class="support-gov-btn" id="supportGovBtn"><span id="supportGovText">Support Government</span></button>
+  
   <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
   <div class="acc-panel" id="accPanel">
     <div class="acc-item"><label id="contrastLabel">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
@@ -458,7 +556,6 @@
 </div>
 <footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
 
-<!-- 时间校验弹窗 -->
 <div class="modal-overlay" id="timeCheckModal">
   <div class="time-check-modal">
     <div class="time-check-content">

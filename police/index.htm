@@ -555,7 +555,11 @@
   </div>
 </div>
 <footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
-
+    document.getElementById('securityTitle') && (document.getElementById('securityTitle').innerText = t.securityTitle);
+    document.getElementById('securityDomain') && (document.getElementById('securityDomain').innerText = t.securityDomain);
+    document.getElementById('securityHttps') && (document.getElementById('securityHttps').innerText = t.securityHttps);
+    document.getElementById('securityNoStorage') && (document.getElementById('securityNoStorage').innerText = t.securityNoStorage);
+    document.getElementById('securityCollapsedText') && (document.getElementById('securityCollapsedText').innerText = t.securityCollapsed);
 <div class="modal-overlay" id="timeCheckModal">
   <div class="time-check-modal">
     <div class="time-check-content">
@@ -1659,7 +1663,8 @@
       { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' },
       { text: t.btn7, url: 'publicfiles.htm' },
       { text: t.btn8, url: 'jointhepd.htm' },
-      { text: t.btn9, url: 'tothepd.htm' }
+      { text: t.btn9, url: 'tothepd.htm' },
+      { text: t.btnNews, url: 'https://uplgov.github.io/sixside/news' }
     ];
     const container = document.getElementById('serviceButtonsGrid');
     if(!container) return;
@@ -1735,7 +1740,7 @@
      'respTimeVal','clearRateVal','respTrend','clearTrend','respLabel','clearLabel','footerText',
      'modalHead','directCallHint','serviceLabel','locationLabel','visibleLabel','optYes','optNo',
      'contactLabel','commentLabel','sosBtn','cancelModalBtn','locateBtn','contrastLabel','grayscaleLabel',
-     'saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle'].forEach(id => { 
+     'saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle','supportGovText'].forEach(id => { 
       let el = document.getElementById(id); if(el && t[id] !== undefined) el.innerText = t[id]; 
     });
     
@@ -1749,6 +1754,7 @@
     const commentInput = document.getElementById('commentInput');
     if(commentInput && t.commentPlaceholder) commentInput.placeholder = t.commentPlaceholder;
     document.getElementById('emergencyBtn') && (document.getElementById('emergencyBtn').innerText = t.reportEmerg);
+    document.getElementById('supportGovBtn') && (document.getElementById('supportGovBtn').querySelector('span').innerText = t.supportGovText);
     document.getElementById('submitSosBtn') && (document.getElementById('submitSosBtn').innerText = t.sosBtn);
     
     if (TimeCheckModal.isActive) TimeCheckModal.updateStaticText();
@@ -1934,7 +1940,7 @@
   if(savedLang && translations[savedLang]) { currentLang = savedLang; langSelected = true; }
   applyLanguage(currentLang);
   initServiceButtons();
-  // 如果已有保存的语言，直接启动计时器
+ 
   if (langSelected) TimeCheckModal.startTimer();
 </script>
 </body>

@@ -6,7 +6,6 @@
   <title>Sixside Police| SSPD</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- hCaptcha -->
   <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -458,7 +457,6 @@
 </div>
 <footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
 
-<!-- 时间校验弹窗 -->
 <div class="modal-overlay" id="timeCheckModal">
   <div class="time-check-modal">
     <div class="time-check-content">
@@ -530,7 +528,6 @@
 </div></div>
 
 <script>
-  // ======================= 格言库 =======================
   const mottoes = {
     en: ["Serving the citizens of Sixside since 1989.","Courage, Integrity, Service — Our core values.","Protecting with honour, serving with pride.","Your safety is our sacred duty.","Twenty-four seven, three hundred sixty-five — We stand guard.","Where justice meets compassion.","Every call matters, every life counts."],
     'zh-Hans': ["自1989年以来为Sixside市民服务。","勇气、正直、服务 — 我们的核心价值观。","以荣誉守护，以自豪服务。","您的安全是我们的神圣职责。","一年365天，一周7天，全天候守护。","正义与同情在此交汇。","每一次求助都重要，每一条生命都珍贵。"],
@@ -548,7 +545,6 @@
     'zh-Classical': ["自一九八九年奉公於六面之民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"]
   };
 
-  // ======================= 完整14种语言翻译 =======================
   const translations = {
     en: { 
       emergencyLabel:'EMERGENCY:', nonEmergencyLabel:'NON-EMERGENCY:', reportEmerg:'REPORT EMERGENCY', 
@@ -581,6 +577,7 @@
       btn1:'Report a Crime', btn2:'Tell Us', btn3:'Lost and Found', btn4:'Apply or Register', 
       btn5:'Request', btn6:'Complaint, Thanks & Suggestion',
       btn7:'Public Files', btn8:'Join SSPD', btn9:'To the PD',
+      btn10:'Chief\'s Space',
       timeCheckTitle:'Your Clock is Inaccurate',
       timeCheckSubtitle:'Your clock is inaccurate. The correct time is:',
       utcTime:'UTC Time',
@@ -630,6 +627,7 @@
       btn1:'报告犯罪', btn2:'告诉我们', btn3:'失物招领', btn4:'申请或注册', 
       btn5:'请求', btn6:'投诉、感谢和建议',
       btn7:'公开信息', btn8:'加入SSPD', btn9:'前往警察局',
+      btn10:'警长空间',
       timeCheckTitle:'你的时间不准',
       timeCheckSubtitle:'您的时钟不准。现在时间是：',
       utcTime:'UTC 时间',
@@ -679,6 +677,7 @@
       btn1:'Reportar un Crimen', btn2:'Diganos', btn3:'Objetos Perdidos', btn4:'Solicitar o Registrar',
       btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
       btn7:'Archivos Públicos', btn8:'Unirse a SSPD', btn9:'Ir a la Policía',
+      btn10:'Espacio del Jefe',
       timeCheckTitle:'Tu Reloj es Inexacto',
       timeCheckSubtitle:'Su reloj es inexacto. La hora correcta es:',
       utcTime:'Hora UTC',
@@ -728,6 +727,7 @@
       btn1:'Straftat melden', btn2:'Teilen Sie uns mit', btn3:'Fundburo', btn4:'Beantragen oder Registrieren',
       btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
       btn7:'Öffentliche Dateien', btn8:'SSPD beitreten', btn9:'Zur Polizei',
+      btn10:'Chef Raum',
       timeCheckTitle:'Ihre Uhr ist ungenau',
       timeCheckSubtitle:'Ihre Uhr ist ungenau. Die korrekte Zeit ist:',
       utcTime:'UTC Zeit',
@@ -777,6 +777,7 @@
       btn1:'Reportar Crime', btn2:'Conte-nos', btn3:'Objetos Perdidos', btn4:'Solicitar ou Registrar',
       btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
       btn7:'Arquivos Públicos', btn8:'Juntar-se à SSPD', btn9:'Para a Polícia',
+      btn10:'Espaço do Chefe',
       timeCheckTitle:'Seu Relógio Está Inexato',
       timeCheckSubtitle:'Seu relógio está inexato. A hora correta é:',
       utcTime:'Hora UTC',
@@ -826,6 +827,7 @@
       btn1:'報告犯罪', btn2:'告訴我們', btn3:'失物招領', btn4:'申請或註冊',
       btn5:'請求', btn6:'投訴、感謝和建議',
       btn7:'公開信息', btn8:'加入SSPD', btn9:'前往警察局',
+      btn10:'警長空間',
       timeCheckTitle:'你的時間不準',
       timeCheckSubtitle:'您的時鐘不準。現在時間是：',
       utcTime:'UTC 時間',
@@ -875,6 +877,7 @@
       btn1:'Signaler un Crime', btn2:'Dites-nous', btn3:'Objets Perdus', btn4:'Demander ou Enregistrer',
       btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
       btn7:'Fichiers Publics', btn8:'Rejoindre SSPD', btn9:'Vers la Police',
+      btn10:'Espace du Chef',
       timeCheckTitle:'Votre Horloge est Inexacte',
       timeCheckSubtitle:'Votre horloge est inexacte. L\'heure correcte est :',
       utcTime:'Heure UTC',
@@ -924,6 +927,7 @@
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
       btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      btn10:'警長之室',
       timeCheckTitle:'君之時不準',
       timeCheckSubtitle:'君之時鐘不準。今時為：',
       utcTime:'UTC 時',
@@ -973,6 +977,7 @@
       btn1:'Сообщить о преступлении', btn2:'Сообщите нам', btn3:'Бюро находок', btn4:'Подать заявку',
       btn5:'Запрос', btn6:'Жалоба, благодарность',
       btn7:'Общественные файлы', btn8:'Вступить в SSPD', btn9:'В полицию',
+      btn10:'Кабинет начальника',
       timeCheckTitle:'Ваши Часы Неточны',
       timeCheckSubtitle:'Ваши часы неточны. Правильное время:',
       utcTime:'Время UTC',
@@ -1022,6 +1027,7 @@
       btn1:'Гэмт хэрэг мэдээлэх', btn2:'Бидэнд хэлэх', btn3:'Алдагдсан эд зүйлс', btn4:'Өргөдөл гаргах',
       btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
       btn7:'Нээлттэй файлууд', btn8:'SSPD-д элсэх', btn9:'Цагдаа руу',
+      btn10:'Даргын өрөө',
       timeCheckTitle:'Таны Цаг Буруу Байна',
       timeCheckSubtitle:'Таны цаг буруу байна. Зөв цаг нь:',
       utcTime:'UTC Цаг',
@@ -1071,6 +1077,7 @@
       btn1:'犯罪を報告', btn2:'お知らせ', btn3:'忘れ物', btn4:'申請または登録',
       btn5:'リクエスト', btn6:'苦情・感謝・提案',
       btn7:'公開情報', btn8:'SSPD参加', btn9:'警察署へ',
+      btn10:'署長室',
       timeCheckTitle:'時計が不正確です',
       timeCheckSubtitle:'お使いの時計が不正確です。正しい時刻は：',
       utcTime:'UTC 時刻',
@@ -1120,6 +1127,7 @@
       btn1:'범죄 신고', btn2:'알려주세요', btn3:'분실물', btn4:'신청 또는 등록',
       btn5:'요청', btn6:'불만, 감사, 제안',
       btn7:'공개 정보', btn8:'SSPD 가입', btn9:'경찰서로',
+      btn10:'서장실',
       timeCheckTitle:'시계가 부정확합니다',
       timeCheckSubtitle:'시계가 부정확합니다. 올바른 시간은:',
       utcTime:'UTC 시간',
@@ -1169,6 +1177,7 @@
       btn1:'अपराध रिपोर्ट करें', btn2:'हमें बताएं', btn3:'खोई हुई वस्तुएं', btn4:'आवेदन करें',
       btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
       btn7:'सार्वजनिक फ़ाइलें', btn8:'SSPD में शामिल हों', btn9:'पुलिस स्टेशन जाएं',
+      btn10:'प्रमुख कक्ष',
       timeCheckTitle:'आपकी घड़ी गलत है',
       timeCheckSubtitle:'आपकी घड़ी गलत है। सही समय है:',
       utcTime:'UTC समय',
@@ -1218,6 +1227,7 @@
       btn1:'報罪', btn2:'告吾', btn3:'失物', btn4:'請或註',
       btn5:'求', btn6:'訴、謝、議',
       btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
+      btn10:'警長之室',
       timeCheckTitle:'君之時不準',
       timeCheckSubtitle:'君之時鐘不準。今時為：',
       utcTime:'UTC 時',
@@ -1238,28 +1248,10 @@
     }
   };
 
-  // ======================= 简化农历计算 =======================
   const SimpleLunar = (function() {
     const LUNAR_DATA = [
       0x04bd, 0x04ae, 0x0a57, 0x0a4d, 0x0d26, 0x0d53, 0x0d4a, 0x0b44, 0x055d, 0x055b,
       0x04ae, 0x0a5d, 0x0a4e, 0x0d15, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
-      0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae,
       0x0a5d, 0x0a56, 0x0d1a, 0x0d55, 0x0d54, 0x0b5a, 0x056d, 0x055d, 0x055b, 0x04ae
     ];
     const GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
@@ -1304,7 +1296,6 @@
     return { getLunarDate, getGanZhiYear };
   })();
 
-  // ======================= 儒略日计算 =======================
   function getJulianDay(date) {
     let y = date.getUTCFullYear();
     let m = date.getUTCMonth() + 1;
@@ -1342,7 +1333,6 @@
     }
   }
 
-  // ======================= 时间校验弹窗控制 =======================
   const TimeCheckModal = {
     modal: null,
     baseDate: null,
@@ -1375,7 +1365,6 @@
       sessionStorage.setItem('timeCheckShown', 'true');
       
       let nowDate = await fetchUTCTime();
-      // 加上 993 年
       this.baseDate = new Date(nowDate);
       this.baseDate.setFullYear(this.baseDate.getFullYear() + 993);
       
@@ -1472,7 +1461,6 @@
     }
   };
 
-  // ======================= 原有代码继续 =======================
   let currentLang = 'zh-Hans';
   let currentLatLng = null;
   let selectedServices = [];
@@ -1554,15 +1542,17 @@
   function renderServiceButtons() {
     let t = translations[currentLang];
     const btns = [
-      { text: t.btn1, url: 'https://uplgov.github.io/sixside/police/form1.htm' },
-      { text: t.btn2, url: 'https://uplgov.github.io/sixside/police/form2.htm' },
-      { text: t.btn3, url: '#', isLost: true },
-      { text: t.btn4, url: 'https://uplgov.github.io/sixside/police/form3.htm' },
-      { text: t.btn5, url: 'https://uplgov.github.io/sixside/police/form4.htm' },
-      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm' },
-      { text: t.btn7, url: 'publicfiles.htm' },
-      { text: t.btn8, url: 'jointhepd.htm' },
-      { text: t.btn9, url: 'tothepd.htm' }
+      { text: t.btn1, url: 'https://uplgov.github.io/sixside/police/form1.htm', isSpecial: false },
+      { text: t.btn2, url: 'https://uplgov.github.io/sixside/police/form2.htm', isSpecial: false },
+      { text: t.btn3, url: '#', isLost: true, isSpecial: false },
+      { text: t.btn4, url: 'https://uplgov.github.io/sixside/police/form3.htm', isSpecial: false },
+      { text: t.btn5, url: 'https://uplgov.github.io/sixside/police/form4.htm', isSpecial: false },
+      { text: t.btn6, url: 'https://uplgov.github.io/sixside/police/form5.htm', isSpecial: false },
+      { text: t.btn7, url: 'publicfiles.htm', isSpecial: false },
+      { text: t.btn8, url: 'jointhepd.htm', isSpecial: false },
+      { text: t.btn9, url: 'tothepd.htm', isSpecial: false },
+      { text: 'The Cosmica', url: 'https://uplgov.github.io/the-cosmica/index.htm', isSpecial: true, fixedLabel: true },
+      { text: t.btn10, url: 'http://uplgov.github.io/sixside/police/thechief\'s.htm', isSpecial: true, fixedLabel: false }
     ];
     const container = document.getElementById('serviceButtonsGrid');
     if(!container) return;
@@ -1570,9 +1560,13 @@
     btns.forEach(btn => {
       const card = document.createElement('div');
       card.className = 'service-card';
-      card.innerHTML = `<h3>${btn.text}</h3>`;
-      if(btn.isLost) card.onclick = () => { showCaptchaForLost(); };
-      else card.onclick = () => window.open(btn.url, '_blank');
+      let displayText = btn.fixedLabel ? 'The Cosmica' : btn.text;
+      card.innerHTML = `<h3>${displayText}</h3>`;
+      if(btn.isLost) {
+        card.onclick = () => { showCaptchaForLost(); };
+      } else {
+        card.onclick = () => window.open(btn.url, '_blank');
+      }
       container.appendChild(card);
     });
   }
@@ -1837,7 +1831,6 @@
   if(savedLang && translations[savedLang]) { currentLang = savedLang; langSelected = true; }
   applyLanguage(currentLang);
   initServiceButtons();
-  // 如果已有保存的语言，直接启动计时器
   if (langSelected) TimeCheckModal.startTimer();
 </script>
 </body>

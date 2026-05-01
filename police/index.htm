@@ -65,7 +65,64 @@
     .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(100%) contrast(1.2); transition: filter 0.2s; }
     .acc-icon-btn:hover { filter: grayscale(50%) contrast(1); }
     
-    .lang-switch-btn, .tool-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; }
+    .lang-switch-btn, .tool-btn, .support-gov-btn { padding:5px 15px; cursor:pointer; margin-left:10px; background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 3px; transition: all 0.3s ease; position: relative; overflow: hidden; z-index: 1; }
+    .support-gov-btn {
+      transition: color 0.3s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+      animation: coolToWarm 0.6s forwards;
+    }
+    @keyframes coolToWarm {
+      0% { background: var(--btn-bg); color: var(--text-primary); border-color: var(--border-color); box-shadow: 0 0 0 rgba(255,100,0,0); }
+      100% { background: #ff4500; color: #ffffff; border-color: #ffaa33; box-shadow: 0 0 15px rgba(255,69,0,0.8), 0 0 8px rgba(255,200,0,0.6); }
+    }
+    @keyframes warmToCool {
+      0% { background: #ff4500; color: #ffffff; border-color: #ffaa33; box-shadow: 0 0 15px rgba(255,69,0,0.8); }
+      100% { background: var(--btn-bg); color: var(--text-primary); border-color: var(--border-color); box-shadow: 0 0 0 rgba(0,0,0,0); }
+    }
+    .support-gov-btn.mosaic-active {
+      animation: coolToWarm 0.3s ease forwards;
+    }
+    .support-gov-btn.mosaic-exit {
+      animation: warmToCool 0.5s ease forwards;
+    }
+    .mosaic-wave {
+      position: fixed;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255, 69, 0, 0.4) 0deg 10deg,
+        rgba(255, 200, 0, 0.4) 10deg 20deg,
+        rgba(255, 80, 0, 0.4) 20deg 30deg,
+        rgba(255, 160, 0, 0.4) 30deg 40deg
+      );
+      background-size: 40px 40px;
+      mix-blend-mode: overlay;
+      backdrop-filter: blur(12px);
+      mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 80%);
+      -webkit-mask: radial-gradient(circle at var(--x, 50%) var(--y, 50%), transparent 0%, black 80%);
+      animation: rippleExpand 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+    }
+    @keyframes rippleExpand {
+      0% {
+        mask-size: 0% 0%;
+        -webkit-mask-size: 0% 0%;
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        mask-size: 300% 300%;
+        -webkit-mask-size: 300% 300%;
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+    
     .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
     .acc-panel.show { display: block; }
     .acc-item { margin-bottom: 15px; }
@@ -417,7 +474,7 @@
 </div>
 <nav class="top-nav">
   <div class="nav-brand" id="navBrand">SIXSIDE <span id="policeDeptLink">| POLICE DEPARTMENT</span></div>
-  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
+  <div><button class="lang-switch-btn" id="langSwitchBtn">A/文</button><button class="tool-btn" onclick="document.body.classList.toggle('light')">THEME</button><button class="support-gov-btn" id="supportGovBtn">Support Government</button><button class="acc-icon-btn" onclick="toggleAccPanel()">♿</button></div>
   <div class="acc-panel" id="accPanel">
     <div class="acc-item"><label id="contrastLabel">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
     <div class="acc-item"><label id="grayscaleLabel">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
@@ -578,6 +635,7 @@
       btn5:'Request', btn6:'Complaint, Thanks & Suggestion',
       btn7:'Public Files', btn8:'Join SSPD', btn9:'To the PD',
       btn10:'Chief\'s Space',
+      supportGov:'Support Government',
       timeCheckTitle:'Your Clock is Inaccurate',
       timeCheckSubtitle:'Your clock is inaccurate. The correct time is:',
       utcTime:'UTC Time',
@@ -628,6 +686,7 @@
       btn5:'请求', btn6:'投诉、感谢和建议',
       btn7:'公开信息', btn8:'加入SSPD', btn9:'前往警察局',
       btn10:'警长空间',
+      supportGov:'支持政府',
       timeCheckTitle:'你的时间不准',
       timeCheckSubtitle:'您的时钟不准。现在时间是：',
       utcTime:'UTC 时间',
@@ -678,6 +737,7 @@
       btn5:'Solicitud', btn6:'Queja, Gracias y Sugerencia',
       btn7:'Archivos Públicos', btn8:'Unirse a SSPD', btn9:'Ir a la Policía',
       btn10:'Espacio del Jefe',
+      supportGov:'Apoyar Gobierno',
       timeCheckTitle:'Tu Reloj es Inexacto',
       timeCheckSubtitle:'Su reloj es inexacto. La hora correcta es:',
       utcTime:'Hora UTC',
@@ -728,6 +788,7 @@
       btn5:'Anfrage', btn6:'Beschwerde, Dank und Vorschlag',
       btn7:'Öffentliche Dateien', btn8:'SSPD beitreten', btn9:'Zur Polizei',
       btn10:'Chef Raum',
+      supportGov:'Regierung unterstützen',
       timeCheckTitle:'Ihre Uhr ist ungenau',
       timeCheckSubtitle:'Ihre Uhr ist ungenau. Die korrekte Zeit ist:',
       utcTime:'UTC Zeit',
@@ -778,6 +839,7 @@
       btn5:'Solicitacao', btn6:'Reclamacao, Agradecimento e Sugestao',
       btn7:'Arquivos Públicos', btn8:'Juntar-se à SSPD', btn9:'Para a Polícia',
       btn10:'Espaço do Chefe',
+      supportGov:'Apoiar Governo',
       timeCheckTitle:'Seu Relógio Está Inexato',
       timeCheckSubtitle:'Seu relógio está inexato. A hora correta é:',
       utcTime:'Hora UTC',
@@ -828,6 +890,7 @@
       btn5:'請求', btn6:'投訴、感謝和建議',
       btn7:'公開信息', btn8:'加入SSPD', btn9:'前往警察局',
       btn10:'警長空間',
+      supportGov:'支持政府',
       timeCheckTitle:'你的時間不準',
       timeCheckSubtitle:'您的時鐘不準。現在時間是：',
       utcTime:'UTC 時間',
@@ -878,6 +941,7 @@
       btn5:'Demande', btn6:'Plainte, Remerciement et Suggestion',
       btn7:'Fichiers Publics', btn8:'Rejoindre SSPD', btn9:'Vers la Police',
       btn10:'Espace du Chef',
+      supportGov:'Soutenir Gouvernement',
       timeCheckTitle:'Votre Horloge est Inexacte',
       timeCheckSubtitle:'Votre horloge est inexacte. L\'heure correcte est :',
       utcTime:'Heure UTC',
@@ -928,6 +992,7 @@
       btn5:'求', btn6:'訴、謝、議',
       btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
       btn10:'警長之室',
+      supportGov:'輔政',
       timeCheckTitle:'君之時不準',
       timeCheckSubtitle:'君之時鐘不準。今時為：',
       utcTime:'UTC 時',
@@ -978,6 +1043,7 @@
       btn5:'Запрос', btn6:'Жалоба, благодарность',
       btn7:'Общественные файлы', btn8:'Вступить в SSPD', btn9:'В полицию',
       btn10:'Кабинет начальника',
+      supportGov:'Поддержать правительство',
       timeCheckTitle:'Ваши Часы Неточны',
       timeCheckSubtitle:'Ваши часы неточны. Правильное время:',
       utcTime:'Время UTC',
@@ -1028,6 +1094,7 @@
       btn5:'Хүсэлт', btn6:'Гомдол, талархал, санал',
       btn7:'Нээлттэй файлууд', btn8:'SSPD-д элсэх', btn9:'Цагдаа руу',
       btn10:'Даргын өрөө',
+      supportGov:'Засгийг дэмжих',
       timeCheckTitle:'Таны Цаг Буруу Байна',
       timeCheckSubtitle:'Таны цаг буруу байна. Зөв цаг нь:',
       utcTime:'UTC Цаг',
@@ -1078,6 +1145,7 @@
       btn5:'リクエスト', btn6:'苦情・感謝・提案',
       btn7:'公開情報', btn8:'SSPD参加', btn9:'警察署へ',
       btn10:'署長室',
+      supportGov:'政府を支援',
       timeCheckTitle:'時計が不正確です',
       timeCheckSubtitle:'お使いの時計が不正確です。正しい時刻は：',
       utcTime:'UTC 時刻',
@@ -1128,6 +1196,7 @@
       btn5:'요청', btn6:'불만, 감사, 제안',
       btn7:'공개 정보', btn8:'SSPD 가입', btn9:'경찰서로',
       btn10:'서장실',
+      supportGov:'정부 지원',
       timeCheckTitle:'시계가 부정확합니다',
       timeCheckSubtitle:'시계가 부정확합니다. 올바른 시간은:',
       utcTime:'UTC 시간',
@@ -1178,6 +1247,7 @@
       btn5:'अनुरोध', btn6:'शिकायत, धन्यवाद, सुझाव',
       btn7:'सार्वजनिक फ़ाइलें', btn8:'SSPD में शामिल हों', btn9:'पुलिस स्टेशन जाएं',
       btn10:'प्रमुख कक्ष',
+      supportGov:'सरकार का समर्थन करें',
       timeCheckTitle:'आपकी घड़ी गलत है',
       timeCheckSubtitle:'आपकी घड़ी गलत है। सही समय है:',
       utcTime:'UTC समय',
@@ -1228,6 +1298,7 @@
       btn5:'求', btn6:'訴、謝、議',
       btn7:'公開文牘', btn8:'入SSPD', btn9:'赴警署',
       btn10:'警長之室',
+      supportGov:'輔政',
       timeCheckTitle:'君之時不準',
       timeCheckSubtitle:'君之時鐘不準。今時為：',
       utcTime:'UTC 時',
@@ -1643,6 +1714,9 @@
     document.getElementById('serviceFireBtn') && (document.getElementById('serviceFireBtn').innerText = t.serviceFire);
     document.getElementById('serviceMedicalBtn') && (document.getElementById('serviceMedicalBtn').innerText = t.serviceMedical);
     
+    const supportGovBtn = document.getElementById('supportGovBtn');
+    if (supportGovBtn && t.supportGov) supportGovBtn.innerText = t.supportGov;
+    
     const commentInput = document.getElementById('commentInput');
     if(commentInput && t.commentPlaceholder) commentInput.placeholder = t.commentPlaceholder;
     document.getElementById('emergencyBtn') && (document.getElementById('emergencyBtn').innerText = t.reportEmerg);
@@ -1814,6 +1888,38 @@
     modal.style.display = 'flex';
   }
   document.getElementById('langSwitchBtn').onclick=()=>showLangModal();
+
+  function createMosaicWave(event) {
+    const wave = document.createElement('div');
+    wave.className = 'mosaic-wave';
+    const rect = event.target.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    wave.style.setProperty('--x', x + 'px');
+    wave.style.setProperty('--y', y + 'px');
+    document.body.appendChild(wave);
+    wave.addEventListener('animationend', () => {
+      wave.remove();
+    });
+  }
+
+  const supportBtn = document.getElementById('supportGovBtn');
+  let hoverTimeout;
+  supportBtn.addEventListener('mouseenter', (e) => {
+    supportBtn.classList.remove('mosaic-exit');
+    supportBtn.classList.add('mosaic-active');
+    createMosaicWave(e);
+    hoverTimeout = setTimeout(() => {
+    }, 100);
+  });
+  supportBtn.addEventListener('mouseleave', (e) => {
+    supportBtn.classList.remove('mosaic-active');
+    supportBtn.classList.add('mosaic-exit');
+    createMosaicWave(e);
+  });
+  supportBtn.addEventListener('click', () => {
+    window.open('https://uplgov.github.io/sixside/support-the-government.html', '_blank');
+  });
 
   window.onload = function() {
     initMap();

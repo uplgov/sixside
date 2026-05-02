@@ -274,7 +274,8 @@
     }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; }
-    .report-modal, .lost-modal, .lang-modal, .captcha-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    .report-modal, .lost-modal, .lang-modal, .captcha-modal, .privacy-modal, .license-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; }
+    .privacy-modal p, .license-modal p { margin-bottom: 15px; line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; }
     
     .time-check-modal {
       background: var(--bg-secondary);
@@ -393,6 +394,9 @@
     .lost-date { color: var(--text-secondary); font-size: 0.85rem; }
     .db-notice { text-align: center; margin-top: 30px; padding: 12px; background: rgba(74,107,140,0.2); border-radius: 8px; font-size: 0.9rem; border: 1px dashed var(--police-blue); }
     footer { text-align: center; padding: 40px; border-top: 1px solid var(--border-color); margin-top: 40px; }
+    .footer-buttons { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+    .footer-btn { background: none; border: none; color: var(--police-blue); cursor: pointer; font-size: 0.9rem; text-decoration: underline; padding: 5px 10px; transition: color 0.2s; }
+    .footer-btn:hover { color: var(--accent-red); }
     
     #dispatchRoot { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; }
     .dispatch-card { background: var(--bg-primary); border-left: 4px solid var(--accent-red); padding: 12px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 20px; position: relative; animation: slideUp 0.3s ease; }
@@ -512,7 +516,13 @@
     <div class="service-buttons-grid" id="serviceButtonsGrid"></div>
   </div>
 </div>
-<footer><p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p></footer>
+<footer>
+  <div class="footer-buttons">
+    <button class="footer-btn" id="privacyPolicyBtn">Privacy Policy</button>
+    <button class="footer-btn" id="licenseBtn">License</button>
+  </div>
+  <p id="footerText">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</p>
+</footer>
 
 <div class="modal-overlay" id="timeCheckModal">
   <div class="time-check-modal">
@@ -584,22 +594,14 @@
   <button class="btn-action" id="cancelCaptchaBtn">Cancel</button>
 </div></div>
 
+<div class="modal-overlay" id="privacyModal"><div class="privacy-modal"><h2 id="privacyModalTitle">Privacy Policy</h2><div id="privacyModalContent" style="max-height: 60vh; overflow-y: auto; white-space: pre-wrap;"></div><button class="btn-action" id="closePrivacyModal">Close</button></div></div>
+
+<div class="modal-overlay" id="licenseModal"><div class="license-modal"><h2 id="licenseModalTitle">License</h2><div id="licenseModalContent" style="max-height: 60vh; overflow-y: auto; white-space: pre-wrap;"></div><button class="btn-action" id="closeLicenseModal">Close</button></div></div>
+
 <script>
   const mottoes = {
     en: ["Serving the citizens of Sixside since 1989.","Courage, Integrity, Service — Our core values.","Protecting with honour, serving with pride.","Your safety is our sacred duty.","Twenty-four seven, three hundred sixty-five — We stand guard.","Where justice meets compassion.","Every call matters, every life counts."],
-    'zh-Hans': ["自1989年以来为Sixside市民服务。","勇气、正直、服务 — 我们的核心价值观。","以荣誉守护，以自豪服务。","您的安全是我们的神圣职责。","一年365天，一周7天，全天候守护。","正义与同情在此交汇。","每一次求助都重要，每一条生命都珍贵。"],
-    es: ["Sirviendo a los ciudadanos de Sixside desde 1989.","Coraje, Integridad, Servicio — Nuestros valores fundamentales.","Protegiendo con honor, sirviendo con orgullo.","Su seguridad es nuestro sagrado deber.","Veinticuatro siete, trescientos sesenta y cinco — Vigilamos.","Donde la justicia se encuentra con la compasión.","Cada llamada importa, cada vida cuenta."],
-    de: ["Den Bürgern von Sixside seit 1989 dienen.","Mut, Integrität, Dienst — Unsere Kernwerte.","Mit Ehre schützen, mit Stolz dienen.","Ihre Sicherheit ist unsere heilige Pflicht.","Vierundzwanzig sieben, dreihundertfünfundsechzig — Wir halten Wache.","Wo Gerechtigkeit auf Mitgefühl trifft.","Jeder Anruf zählt, jedes Leben zählt."],
-    pt: ["Servindo os cidadãos de Sixside desde 1989.","Coragem, Integridade, Serviço — Nossos valores fundamentais.","Protegendo com honra, servindo com orgulho.","Sua segurança é nosso dever sagrado.","Vinte e quatro sete, trezentos e sessenta e cinco — Vigiamos.","Onde a justiça encontra a compaixão.","Cada chamada importa, cada vida conta."],
-    'zh-Hant': ["自1989年以來為Sixside市民服務。","勇氣、正直、服務 — 我們的核心價值觀。","以榮譽守護，以自豪服務。","您的安全是我們的神聖職責。","一年365天，一週7天，全天候守護。","正義與同情在此交匯。","每一次求助都重要，每一條生命都珍貴。"],
-    fr: ["Au service des citoyens de Sixside depuis 1989.","Courage, Intégrité, Service — Nos valeurs fondamentales.","Protéger avec honneur, servir avec fierté.","Votre sécurité est notre devoir sacré.","Vingt-quatre sept, trois cent soixante-cinq — Nous veillons.","Là où la justice rencontre la compassion.","Chaque appel compte, chaque vie compte."],
-    lzh: ["自一九八九年奉公於六面市民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"],
-    ru: ["На службе граждан Sixside с 1989 года.","Мужество, Честность, Служение — Наши основные ценности.","Защищаем с честью, служим с гордостью.","Ваша безопасность — наш священный долг.","Двадцать четыре семь, триста шестьдесят пять — Мы на страже.","Где справедливость встречает сострадание.","Каждый звонок важен, каждая жизнь имеет значение."],
-    mn: ["1989 оноос хойш Sixside иргэдэд үйлчилж байна.","Эр зориг, Шударга ёс, Үйлчилгээ — Бидний үндсэн үнэт зүйлс.","Нэр төртэй хамгаалах, бахархалтай үйлчлэх.","Таны аюулгүй байдал бол бидний ариун үүрэг.","Долоон хоног, гурван зуун жаран тав — Бид харуулдаа.","Шударга ёс энэрэлтэй нийлдэг газар.","Дуудлага бүр чухал, амь бүр үнэтэй."],
-    ja: ["1989年よりSixside市民に奉仕。","勇気、誠実、奉仕 — 私たちの核となる価値観。","名誉をもって守り、誇りをもって奉仕する。","あなたの安全は私たちの神聖な義務です。","年中無休、24時間体制 — 私たちが見守ります。","正義と思いやりが出会う場所。","すべての通報は重要、すべての命は貴重です。"],
-    ko: ["1989년부터 Sixside 시민을 위해 봉사합니다.","용기, 청렴, 봉사 — 우리의 핵심 가치입니다.","명예롭게 보호하고, 자랑스럽게 봉사합니다.","여러분의 안전이 저희의 신성한 의무입니다.","연중무휴 24시간 — 저희가 지키겠습니다.","정의와 연민이 만나는 곳.","모든 신고는 중요하고, 모든 생명은 소중합니다."],
-    hi: ["1989 से सिक्ससाइड के नागरिकों की सेवा।","साहस, ईमानदारी, सेवा — हमारे मूल मूल्य।","सम्मान के साथ रक्षा करना, गर्व के साथ सेवा करना।","आपकी सुरक्षा हमारा पवित्र कर्तव्य है।","चौबीसों घंटे, साल के 365 दिन — हम पहरा देते हैं।","जहाँ न्याय करुणा से मिलता है।","हर कॉल मायने रखती है, हर जीवन मायने रखता है।"],
-    'zh-Classical': ["自一九八九年奉公於六面之民。","勇、正、務 — 吾等核心之德。","以榮守護，以傲奉公。","君之安危，吾之神職。","晝夜不休，終年無歇 — 吾等守衛。","正義與慈悲交匯之處。","每求皆重，每命皆珍。"]
+    'zh-Hans': ["自1989年以来为Sixside市民服务。","勇气、正直、服务 — 我们的核心价值观。","以荣誉守护，以自豪服务。","您的安全是我们的神圣职责。","一年365天，一周7天，全天候守护。","正义与同情在此交汇。","每一次求助都重要，每一条生命都珍贵。"]
   };
 
   const translations = {
@@ -652,7 +654,12 @@
       folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', 
       folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
       chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', 
-      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.' 
+      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.',
+      btnMLP:'Motorway & Lane Patrol',
+      privacyPolicy:'Privacy Policy',
+      license:'License',
+      privacyText:'In accordance with the requirements set out in national regulation 2133 "Privacy and Cybersecurity for Government Departments – Version 2" (UPL National Parliament, national law), all government‑affiliated online portals are obliged to provide users with a clear and visible notice whenever any form of data collection or storage is about to take place. This requirement ensures that users are fully informed and able to understand how their information may be handled prior to the commencement of any data processing activities.\n\nThe website uplgov.github.io/sixside does not store, record, or retain any user data, files, or materials. It operates solely as an informational platform and does not initiate any form of data collection.\n\nHowever, certain subdomains operating under the Sixside umbrella—such as portals administered by specific departments, including the police department—may implement their own data‑handling mechanisms and may store information as part of their operational functions. As these subdomains are managed independently, their data‑processing practices may vary.',
+      licenseText:'This website and all materials contained herein are protected under a restrictive licence designed to safeguard the integrity of the work. The content may be used solely for non‑commercial purposes, and any such use must include a clear and visible attribution to the original source: uplgov.github.io/sixside. No part of this website may be modified, adapted, altered, or used to create derivative works. Commercial use is strictly prohibited under all circumstances. Any use beyond the permissions expressly granted requires prior written authorisation from the site owner.'
     },
     'zh-Hans': { 
       emergencyLabel:'紧急情况:', nonEmergencyLabel:'非紧急:', reportEmerg:'报告紧急事件', 
@@ -703,7 +710,12 @@
       folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', 
       folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
       chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', 
-      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。' 
+      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。',
+      btnMLP:'公路和道路骑警',
+      privacyPolicy:'隐私政策',
+      license:'许可证',
+      privacyText:'根据国家法规第2133号《政府部门隐私与网络安全 — 第二版》（UPL国家议会，国家法律）中的要求，所有政府关联的在线门户网站，在即将进行任何形式的数据收集或存储时，均有义务向用户提供清晰且可见的通知。该要求确保用户在开始任何数据处理活动之前能够完全知情并理解其信息可能被如何处理。\n\n网站uplgov.github.io/sixside 不存储、记录或保留任何用户数据、文件或材料。其仅作为信息平台运作，并且不启动任何形式的数据收集。\n\n然而，在Sixside体系下运营的某些子域名——例如由特定部门（包括警察部门）管理的门户网站——可能会实施自己的数据处理机制，并可能作为其运营功能的一部分存储信息。由于这些子域名被独立管理，其数据处理实践可能会有所不同。',
+      licenseText:'本网站及其中包含的所有材料均受限制性许可证保护，该许可证旨在保护作品的完整性。网站内容只能用于非商业目的，并且任何此类使用必须明确指向原始来源：uplgov.github.io/sixside。本网站的任何部分均不得修改、改编、更改或用于制作衍生作品。在任何情况下都严格禁止商业用途。超出明确许可范围的任何使用均需获得网站所有者的事先书面授权。'
     },
     es: {
       emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
@@ -754,7 +766,12 @@
       folderDate:'Abril 2026', chargerDate:'Ene - Feb 2026', drinkDate:'Abr 2025 - Nov 2025',
       folderDetail:'Cremallera roja. Marcador permanente "2026 Biology" en plastico. Contiene materiales de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Cualquier pista llame al 009.',
       chargerDetail:'Cargador de portatil. Sospechoso: hombre negro con cabello rizado negro, visto cerca de Ratcliffe on the Wreake, Charnwood, Leicestershire (Ene/Feb 2026). Testigo reporto. Cualquier pista llame al 009.',
-      drinkDetail:'Sospechoso: hombre negro con cabello rizado negro, misma ubicacion que el cargador. Robado entre Abr 2025 - Nov 2025. Cualquier pista llame al 009.'
+      drinkDetail:'Sospechoso: hombre negro con cabello rizado negro, misma ubicacion que el cargador. Robado entre Abr 2025 - Nov 2025. Cualquier pista llame al 009.',
+      btnMLP:'Patrulla de Autopistas y Carriles',
+      privacyPolicy:'Política de Privacidad',
+      license:'Licencia',
+      privacyText:'De acuerdo con los requisitos establecidos en la regulación nacional 2133 "Privacidad y Ciberseguridad para Departamentos Gubernamentales – Versión 2" (Parlamento Nacional UPL, ley nacional), todos los portales en línea afiliados al gobierno están obligados a proporcionar a los usuarios un aviso claro y visible cuando esté a punto de tener lugar cualquier forma de recopilación o almacenamiento de datos. Este requisito garantiza que los usuarios estén plenamente informados y puedan comprender cómo se puede manejar su información antes del inicio de cualquier actividad de procesamiento de datos.\n\nEl sitio web uplgov.github.io/sixside no almacena, registra ni retiene ningún dato, archivo o material del usuario. Opera únicamente como una plataforma informativa y no inicia ninguna forma de recopilación de datos.\n\nSin embargo, ciertos subdominios que operan bajo el paraguas de Sixside, como los portales administrados por departamentos específicos, incluido el departamento de policía, pueden implementar sus propios mecanismos de manejo de datos y pueden almacenar información como parte de sus funciones operativas. Como estos subdominios se gestionan de forma independiente, sus prácticas de procesamiento de datos pueden variar.',
+      licenseText:'Este sitio web y todos los materiales contenidos en el mismo están protegidos bajo una licencia restrictiva diseñada para salvaguardar la integridad de la obra. El contenido puede ser utilizado únicamente para fines no comerciales, y cualquier uso de este tipo debe incluir una atribución clara y visible a la fuente original: uplgov.github.io/sixside. Ninguna parte de este sitio web puede ser modificada, adaptada, alterada o utilizada para crear obras derivadas. El uso comercial está estrictamente prohibido bajo todas las circunstancias. Cualquier uso más allá de los permisos expresamente otorgados requiere la autorización previa por escrito del propietario del sitio.'
     },
     de: {
       emergencyLabel:'NOTFALL:', nonEmergencyLabel:'KEIN NOTFALL:', reportEmerg:'NOTFALL MELDEN',
@@ -805,7 +822,12 @@
       folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025',
       folderDetail:'Roter ReiBverschluss. Permanentmarker "2026 Biology" auf Kunststoff. Enthalt GCSE-Biologiematerialien. Belohnung: £10 (≈9.98 UCC). Hinweise bitte unter 009.',
       chargerDetail:'Laptop-Ladegerat. Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gesehen in der Nahe von Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Zeuge gemeldet. Hinweise bitte unter 009.',
-      drinkDetail:'Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gleicher Ort wie Ladegerat. Gestohlen zwischen Apr 2025 - Nov 2025. Hinweise bitte unter 009.'
+      drinkDetail:'Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gleicher Ort wie Ladegerat. Gestohlen zwischen Apr 2025 - Nov 2025. Hinweise bitte unter 009.',
+      btnMLP:'Autobahn- und Fahrspurstreife',
+      privacyPolicy:'Datenschutzrichtlinie',
+      license:'Lizenz',
+      privacyText:'Gemäß den Anforderungen der nationalen Verordnung 2133 „Datenschutz und Cybersicherheit für Regierungsstellen – Version 2“ (UPL Nationalparlament, nationales Recht) sind alle regierungsnahen Online-Portale verpflichtet, den Benutzern einen klaren und sichtbaren Hinweis zu geben, wenn eine Form der Datenerhebung oder -speicherung stattfinden soll. Diese Anforderung stellt sicher, dass die Benutzer vollständig informiert sind und verstehen können, wie ihre Informationen vor Beginn von Datenverarbeitungsaktivitäten behandelt werden können.\n\nDie Website uplgov.github.io/sixside speichert, protokolliert oder behält keine Benutzerdaten, Dateien oder Materialien. Sie fungiert ausschließlich als Informationsplattform und leitet keine Form der Datenerhebung ein.\n\nBestimmte Subdomains, die unter dem Dach von Sixside betrieben werden, wie z. B. Portale, die von bestimmten Abteilungen, einschließlich der Polizeibehörde, verwaltet werden, können jedoch eigene Datenverarbeitungsmechanismen implementieren und Informationen im Rahmen ihrer operativen Funktionen speichern. Da diese Subdomains unabhängig verwaltet werden, können ihre Datenverarbeitungspraktiken variieren.',
+      licenseText:'Diese Website und alle darin enthaltenen Materialien sind durch eine restriktive Lizenz geschützt, die die Integrität des Werks schützen soll. Der Inhalt darf nur für nichtkommerzielle Zwecke verwendet werden, und jede solche Verwendung muss eine klare und sichtbare Zuordnung zur Originalquelle uplgov.github.io/sixside enthalten. Es ist nicht gestattet, Teile dieser Website zu modifizieren, anzupassen, zu verändern oder zur Erstellung abgeleiteter Werke zu verwenden. Die kommerzielle Nutzung ist unter allen Umständen strengstens untersagt. Jede Nutzung, die über die ausdrücklich erteilten Genehmigungen hinausgeht, bedarf der vorherigen schriftlichen Genehmigung des Seiteninhabers.'
     },
     pt: {
       emergencyLabel:'EMERGENCIA:', nonEmergencyLabel:'NAO EMERGENCIA:', reportEmerg:'REPORTAR EMERGENCIA',
@@ -856,7 +878,12 @@
       folderDate:'Abril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Abr 2025 - Nov 2025',
       folderDetail:'Ziper vermelho. Marcador permanente "2026 Biology" no plastico. Contem materiais de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Qualquer pista ligue para 009.',
       chargerDetail:'Carregador de laptop. Suspeito: homem negro com cabelo cacheado preto, visto perto de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Testemunha reportou. Qualquer pista ligue para 009.',
-      drinkDetail:'Suspeito: homem negro com cabelo cacheado preto, mesmo local do carregador. Roubado entre Abr 2025 - Nov 2025. Qualquer pista ligue para 009.'
+      drinkDetail:'Suspeito: homem negro com cabelo cacheado preto, mesmo local do carregador. Roubado entre Abr 2025 - Nov 2025. Qualquer pista ligue para 009.',
+      btnMLP:'Patrulha de Autoestradas e Vias',
+      privacyPolicy:'Política de Privacidade',
+      license:'Licença',
+      privacyText:'De acordo com os requisitos estabelecidos no regulamento nacional 2133 "Privacidade e Cibersegurança para Departamentos Governamentais – Versão 2" (Parlamento Nacional da UPL, lei nacional), todos os portais online afiliados ao governo são obrigados a fornecer aos utilizadores um aviso claro e visível sempre que qualquer forma de recolha ou armazenamento de dados estiver prestes a ocorrer. Este requisito garante que os utilizadores sejam totalmente informados e possam compreender como as suas informações podem ser tratadas antes do início de quaisquer atividades de processamento de dados.\n\nO site uplgov.github.io/sixside não armazena, regista ou retém quaisquer dados, ficheiros ou materiais do utilizador. Opera exclusivamente como uma plataforma informativa e não inicia qualquer forma de recolha de dados.\n\nNo entanto, certos subdomínios que operam sob o guarda-chuva da Sixside, como portais administrados por departamentos específicos, incluindo o departamento de polícia, podem implementar os seus próprios mecanismos de tratamento de dados e podem armazenar informações como parte das suas funções operacionais. Como estes subdomínios são geridos de forma independente, as suas práticas de processamento de dados podem variar.',
+      licenseText:'Este site e todos os materiais aqui contidos estão protegidos sob uma licença restritiva concebida para salvaguardar a integridade do trabalho. O conteúdo pode ser utilizado apenas para fins não comerciais, e qualquer utilização desse tipo deve incluir uma atribuição clara e visível à fonte original: uplgov.github.io/sixside. Nenhuma parte deste site pode ser modificada, adaptada, alterada ou utilizada para criar obras derivadas. A utilização comercial é estritamente proibida em todas as circunstâncias. Qualquer utilização para além das permissões expressamente concedidas requer autorização prévia por escrito do proprietário do site.'
     },
     'zh-Hant': {
       emergencyLabel:'緊急情況:', nonEmergencyLabel:'非緊急:', reportEmerg:'報告緊急事件',
@@ -907,7 +934,12 @@
       folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月',
       folderDetail:'紅色拉鏈。透明塑料上用永久馬克筆寫著"2026 Biology"。內含GCSE生物資料。酬金：10英鎊(≈9.98 UCC)。有線索請撥打009。',
       chargerDetail:'筆記本電腦充電器。嫌疑人：有黑色卷發的黑人男性，2026年1/2月出現在萊斯特郡查恩伍德拉特克利夫村附近。有目擊證人。任何線索請撥打009。',
-      drinkDetail:'嫌疑人：有黑色卷發的黑人男性，同充電器地點。2025年4月至11月間失竊。任何線索請撥打009。'
+      drinkDetail:'嫌疑人：有黑色卷發的黑人男性，同充電器地點。2025年4月至11月間失竊。任何線索請撥打009。',
+      btnMLP:'公路和道路騎警',
+      privacyPolicy:'隱私政策',
+      license:'許可證',
+      privacyText:'根據國家法規第2133號《政府部門隱私與網絡安全 — 第二版》（UPL國家議會，國家法律）中的要求，所有政府關聯的在線門戶網站，在即將進行任何形式的數據收集或存儲時，均有義務向用戶提供清晰且可見的通知。該要求確保用戶在開始任何數據處理活動之前能夠完全知情並理解其信息可能被如何處理。\n\n網站uplgov.github.io/sixside 不存儲、記錄或保留任何用戶數據、文件或材料。其僅作為信息平台運作，並且不啟動任何形式的數據收集。\n\n然而，在Sixside體系下運營的某些子域名——例如由特定部門（包括警察部門）管理的門戶網站——可能會實施自己的數據處理機制，並可能作為其運營功能的一部分存儲信息。由於這些子域名被獨立管理，其數據處理實踐可能會有所不同。',
+      licenseText:'本網站及其中包含的所有材料均受限制性許可證保護，該許可證旨在保護作品的完整性。網站內容只能用於非商業目的，並且任何此類使用必須明確指向原始來源：uplgov.github.io/sixside。本網站的任何部分均不得修改、改編、更改或用於製作衍生作品。在任何情況下都嚴格禁止商業用途。超出明確許可範圍的任何使用均需獲得網站所有者的事先書面授權。'
     },
     fr: {
       emergencyLabel:'URGENCE:', nonEmergencyLabel:'NON URGENCE:', reportEmerg:'SIGNALER UNE URGENCE',
@@ -958,7 +990,12 @@
       folderDate:'Avril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Avr 2025 - Nov 2025',
       folderDetail:'Fermeture eclair rouge. Marqueur permanent "2026 Biology" sur plastique. Contient du materiel de biologie GCSE. Recompense: £10 (≈9.98 UCC). Tout indice appelez le 009.',
       chargerDetail:'Chargeur d\'ordinateur portable. Suspect: homme noir aux cheveux boucles noirs, vu pres de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Temoin signale. Tout indice appelez le 009.',
-      drinkDetail:'Suspect: homme noir aux cheveux boucles noirs, meme endroit que le chargeur. Vole entre Avr 2025 - Nov 2025. Tout indice appelez le 009.'
+      drinkDetail:'Suspect: homme noir aux cheveux boucles noirs, meme endroit que le chargeur. Vole entre Avr 2025 - Nov 2025. Tout indice appelez le 009.',
+      btnMLP:'Patrouille d\'Autoroute et de Voie',
+      privacyPolicy:'Politique de Confidentialite',
+      license:'Licence',
+      privacyText:'Conformément aux exigences énoncées dans le règlement national 2133 « Confidentialite et Cybersecurite pour les Departements Gouvernementaux – Version 2 » (Parlement national de l\'UPL, loi nationale), tous les portails en ligne affiliés au gouvernement sont tenus de fournir aux utilisateurs un avis clair et visible chaque fois qu\'une forme quelconque de collecte ou de stockage de données est sur le point d\'avoir lieu. Cette exigence garantit que les utilisateurs sont pleinement informés et capables de comprendre comment leurs informations peuvent être traitées avant le début de toute activité de traitement de données.\n\nLe site web uplgov.github.io/sixside ne stocke, n\'enregistre ni ne conserve aucune donnée, fichier ou matériel utilisateur. Il fonctionne uniquement comme une plateforme d\'information et n\'initie aucune forme de collecte de données.\n\nCependant, certains sous-domaines fonctionnant sous l\'égide de Sixside, tels que les portails administrés par des départements spécifiques, y compris le département de police, peuvent mettre en œuvre leurs propres mécanismes de traitement des données et peuvent stocker des informations dans le cadre de leurs fonctions opérationnelles. Comme ces sous-domaines sont gérés indépendamment, leurs pratiques de traitement des données peuvent varier.',
+      licenseText:'Ce site web et tous les matériaux qu\'il contient sont protégés par une licence restrictive conçue pour préserver l\'intégrité de l\'œuvre. Le contenu ne peut être utilisé qu\'à des fins non commerciales, et toute utilisation de ce type doit inclure une attribution claire et visible à la source originale : uplgov.github.io/sixside. Aucune partie de ce site web ne peut être modifiée, adaptée, altérée ou utilisée pour créer des œuvres dérivées. L\'utilisation commerciale est strictement interdite en toutes circonstances. Toute utilisation au-delà des autorisations expressément accordées nécessite une autorisation écrite préalable du propriétaire du site.'
     },
     lzh: {
       emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
@@ -1009,7 +1046,12 @@
       folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
       folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
       chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
-      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。',
+      btnMLP:'公路騎警',
+      privacyPolicy:'隱私策',
+      license:'許可證',
+      privacyText:'依國家規第2133號《政府部門隱私與網絡安全 — 第二版》（UPL國會，國法）所定，凡與政府相關之在線門戶，於將行任何形式之數據收集或存儲時，皆有義務向用戶提供清晰可見之通知。此規確保用戶於任何數據處理活動開始前，能完全知情並理解其信息可能如何被處理。\n\n網站uplgov.github.io/sixside 不存儲、記錄或保留任何用戶數據、文件或材料。其僅作信息平台運作，且不啟動任何形式之數據收集。\n\n然，於Sixside體系下運營之某些子域名——例如由特定部門（含警察部門）管理之門戶——可能實施其自有之數據處理機制，並可能作為其運營功能之一部分存儲信息。由於此等子域名獨立管理，其數據處理實踐可能有所不同。',
+      licenseText:'本網站及其所含全部材料均受限制性許可證保護，該許可證旨在保障作品之完整性。網站內容僅可用於非商業目的，且任何此類使用皆須明確且顯著地標明原始來源：uplgov.github.io/sixside。本網站任何部分均不得修改、改編、更動或用於創作衍生作品。任何情況下均嚴格禁止商業用途。超出明確授權範圍之任何使用，均須事先獲得網站所有者之書面授權。'
     },
     ru: {
       emergencyLabel:'ЧП:', nonEmergencyLabel:'НЕ ЧП:', reportEmerg:'СООБЩИТЬ О ЧП',
@@ -1060,7 +1102,12 @@
       folderDate:'Апрель 2026', chargerDate:'Янв - Фев 2026', drinkDate:'Апр 2025 - Ноя 2025',
       folderDetail:'Красная молния. Перманентный маркер "2026 Biology" на пластике. Содержит материалы по биологии GCSE. Награда: £10 (≈9.98 UCC). Любые подсказки звоните 009.',
       chargerDetail:'Зарядное устройство для ноутбука. Подозреваемый: чернокожий мужчина с вьющимися черными волосами, замечен недалеко от Рэтклифф-он-те-Рик, Чарнвуд, Лестершир (Янв/Фев 2026). Свидетель сообщил. Любые подсказки звоните 009.',
-      drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.'
+      drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.',
+      btnMLP:'Патруль автомагистралей и полос',
+      privacyPolicy:'Политика конфиденциальности',
+      license:'Лицензия',
+      privacyText:'В соответствии с требованиями, изложенными в национальном постановлении 2133 «Конфиденциальность и кибербезопасность для государственных департаментов – Версия 2» (Национальный парламент UPL, национальное законодательство), все связанные с правительством онлайн-порталы обязаны предоставлять пользователям четкое и заметное уведомление всякий раз, когда должна иметь место любая форма сбора или хранения данных. Это требование гарантирует, что пользователи будут полностью информированы и смогут понять, как их информация может обрабатываться до начала любых действий по обработке данных.\n\nВеб-сайт uplgov.github.io/sixside не хранит, не записывает и не сохраняет никакие пользовательские данные, файлы или материалы. Он работает исключительно как информационная платформа и не инициирует никаких форм сбора данных.\n\nОднако определенные поддомены, работающие под эгидой Sixside, такие как порталы, управляемые конкретными департаментами, включая полицейский департамент, могут реализовывать собственные механизмы обработки данных и могут хранить информацию в рамках своих операционных функций. Поскольку эти поддомены управляются независимо, их методы обработки данных могут различаться.',
+      licenseText:'Этот веб-сайт и все содержащиеся здесь материалы защищены ограничительной лицензией, предназначенной для сохранения целостности работы. Содержимое может использоваться исключительно в некоммерческих целях, и любое такое использование должно включать четкую и заметную ссылку на первоисточник: uplgov.github.io/sixside. Никакая часть этого веб-сайта не может быть изменена, адаптирована, изменена или использована для создания производных работ. Коммерческое использование строго запрещено при любых обстоятельствах. Любое использование, выходящее за пределы прямо предоставленных разрешений, требует предварительного письменного разрешения владельца сайта.'
     },
     mn: {
       emergencyLabel:'ЯАЛТАЙ:', nonEmergencyLabel:'ЯАЛТГҮЙ:', reportEmerg:'ЯАЛТАЙ МЭДЭЭЛЭХ',
@@ -1111,7 +1158,12 @@
       folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
       folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
       chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
-      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.'
+      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.',
+      btnMLP:'Хурдны зам ба эгнээний эргүүл',
+      privacyPolicy:'Нууцлалын бодлого',
+      license:'Лиценз',
+      privacyText:'Улсын 2133 дугаар "Засгийн газрын хэлтсийн нууцлал ба кибер аюулгүй байдал – 2-р хувилбар" (UPL Үндэсний Парламент, улсын хууль)-д заасан шаардлагын дагуу засгийн газартай холбоотой бүх онлайн порталууд ямар нэгэн хэлбэрийн мэдээлэл цуглуулах эсвэл хадгалах гэж байгаа үед хэрэглэгчдэд тодорхой, харагдах мэдэгдэл өгөх үүрэгтэй. Энэхүү шаардлага нь аливаа мэдээлэл боловсруулах үйл ажиллагаа эхлэхээс өмнө хэрэглэгчид бүрэн мэдээлэлтэй байх, тэдний мэдээллийг хэрхэн боловсруулж болохыг ойлгох боломжийг хангадаг.\n\nuplgov.github.io/sixside вэбсайт нь хэрэглэгчийн мэдээлэл, файл эсвэл материалыг хадгалдаггүй, бүртгэдэггүй, хадгалдаггүй. Энэ нь зөвхөн мэдээллийн платформ хэлбэрээр ажилладаг бөгөөд ямар ч хэлбэрийн мэдээлэл цуглуулах ажиллагааг эхлүүлдэггүй.\n\nГэсэн хэдий ч Sixside-ийн дор ажилладаг тодорхой дэд домэйнууд, тухайлбал цагдаагийн хэлтэс зэрэг тодорхой хэлтсүүдийн удирддаг порталууд нь өөрсдийн мэдээлэл боловсруулах механизмыг хэрэгжүүлж, үйл ажиллагааны функцүүдийн нэг хэсэг болгон мэдээллийг хадгалж болно. Эдгээр дэд домэйнууд бие даан удирдагддаг тул тэдгээрийн мэдээлэл боловсруулах практик нь өөр өөр байж болно.',
+      licenseText:'Энэхүү вэбсайт болон түүнд агуулагдаж буй бүх материалууд нь бүтээлийн бүрэн бүтэн байдлыг хамгаалах зорилготой хязгаарлалтын лицензээр хамгаалагдсан. Агуулгыг зөвхөн арилжааны бус зорилгоор ашиглаж болох бөгөөд ийм аливаа ашиглалт нь анхны эх сурвалж болох uplgov.github.io/sixside-д тодорхой, харагдах атрибутыг оруулах ёстой. Энэхүү вэбсайтын аль ч хэсгийг өөрчлөх, дасан зохицох, өөрчлөх эсвэл дериватив бүтээл бүтээхэд ашиглахыг хориглоно. Арилжааны хэрэглээг ямар ч тохиолдолд хатуу хориглоно. Тодорхой олгогдсон зөвшөөрлөөс хэтэрсэн аливаа хэрэглээ нь сайтын эзнээс урьдчилсан бичгээр зөвшөөрөл авахыг шаардана.'
     },
     ja: {
       emergencyLabel:'緊急:', nonEmergencyLabel:'非緊急:', reportEmerg:'緊急通報',
@@ -1162,7 +1214,12 @@
       folderDate:'2026年4月', chargerDate:'2026年1月-2月', drinkDate:'2025年4月-11月',
       folderDetail:'赤いジッパー。プラスチックに永久マーカーで「2026 Biology」と記載。GCSE生物学資料を含む。報奨金：£10 (≈9.98 UCC)。手がかりは009へ。',
       chargerDetail:'ノートパソコン充電器。容疑者：黒い縮れ毛の黒人男性、ラトクリフ・オン・ザ・リーク、チャーンウッド、レスターシャー近郊で目撃（2026年1月/2月）。目撃者あり。手がかりは009へ。',
-      drinkDetail:'容疑者：黒い縮れ毛の黒人男性、充電器と同じ場所。2025年4月から11月の間に盗難。手がかりは009へ。'
+      drinkDetail:'容疑者：黒い縮れ毛の黒人男性、充電器と同じ場所。2025年4月から11月の間に盗難。手がかりは009へ。',
+      btnMLP:'高速道路・車線パトロール',
+      privacyPolicy:'プライバシーポリシー',
+      license:'ライセンス',
+      privacyText:'国定規則第2133号「政府部門のプライバシーとサイバーセキュリティ – バージョン2」（UPL国会、国内法）に定められた要件に従い、政府関連のオンラインポータルはすべて、何らかの形式のデータ収集または保存が行われようとしている場合、ユーザーに明確かつ目に見える通知を提供する義務を負います。この要件により、ユーザーはデータ処理活動の開始前に十分な情報を得て、自分の情報がどのように処理される可能性があるかを理解できるようになります。\n\nウェブサイト uplgov.github.io/sixside は、ユーザーデータ、ファイル、または資料を保存、記録、または保持しません。情報提供プラットフォームとしてのみ機能し、いかなる形式のデータ収集も開始しません。\n\nただし、Sixsideの傘下で運営される特定のサブドメイン（警察部門を含む特定の部門が管理するポータルなど）は、独自のデータ処理メカニズムを実装し、運用機能の一部として情報を保存する場合があります。これらのサブドメインは独立して管理されているため、そのデータ処理方法は異なる場合があります。',
+      licenseText:'このウェブサイトおよびここに含まれるすべての素材は、作品の完全性を保護するために設計された制限的ライセンスの下で保護されています。コンテンツは非営利目的でのみ使用でき、そのような使用には元のソース uplgov.github.io/sixside への明確で目に見える帰属表示を含める必要があります。このウェブサイトのいかなる部分も、修正、翻案、変更、または派生作品の作成に使用することはできません。商業的使用はすべての状況下で厳しく禁止されています。明示的に許可された範囲を超える使用には、サイト所有者からの事前の書面による承認が必要です。'
     },
     ko: {
       emergencyLabel:'긴급:', nonEmergencyLabel:'비긴급:', reportEmerg:'긴급 신고',
@@ -1213,7 +1270,12 @@
       folderDate:'2026년 4월', chargerDate:'2026년 1월-2월', drinkDate:'2025년 4월-11월',
       folderDetail:'빨간색 지퍼. 플라스틱에 "2026 Biology"라고 쓰여 있음. GCSE 생물학 자료 포함. 보상: £10 (≈9.98 UCC). 제보는 009로.',
       chargerDetail:'노트북 충전기. 용의자: 곱슬머리의 흑인 남성, Ratcliffe on the Wreake, Charnwood, Leicestershire 근처에서 목격됨 (2026년 1월/2월). 목격자 신고. 제보는 009로.',
-      drinkDetail:'용의자: 곱슬머리의 흑인 남성, 충전기와 같은 장소. 2025년 4월-11월 사이 도난. 제보는 009로.'
+      drinkDetail:'용의자: 곱슬머리의 흑인 남성, 충전기와 같은 장소. 2025년 4월-11월 사이 도난. 제보는 009로.',
+      btnMLP:'고속도로 및 차선 순찰',
+      privacyPolicy:'개인정보 보호정책',
+      license:'라이선스',
+      privacyText:'국가 규정 제2133호 "정부 부서의 개인 정보 보호 및 사이버 보안 – 버전 2"(UPL 국회, 국가 법률)에 명시된 요구 사항에 따라, 정부 관련 온라인 포털은 모든 형태의 데이터 수집 또는 저장이 발생하려는 경우 사용자에게 명확하고 눈에 띄는 고지를 제공할 의무가 있습니다. 이 요구 사항은 사용자가 데이터 처리 활동을 시작하기 전에 완전히 정보를 얻고 자신의 정보가 어떻게 처리될 수 있는지 이해할 수 있도록 보장합니다.\n\n웹사이트 uplgov.github.io/sixside는 사용자 데이터, 파일 또는 자료를 저장, 기록 또는 보유하지 않습니다. 정보 제공 플랫폼으로만 운영되며 어떤 형태의 데이터 수집도 시작하지 않습니다.\n\n그러나 Sixside 산하에서 운영되는 특정 하위 도메인(경찰 부서를 포함한 특정 부서에서 관리하는 포털 등)은 자체 데이터 처리 메커니즘을 구현하고 운영 기능의 일부로 정보를 저장할 수 있습니다. 이러한 하위 도메인은 독립적으로 관리되므로 데이터 처리 방식이 다를 수 있습니다.',
+      licenseText:'이 웹사이트 및 여기에 포함된 모든 자료는 저작물의 무결성을 보호하기 위해 설계된 제한적 라이선스에 따라 보호됩니다. 콘텐츠는 비상업적 목적으로만 사용할 수 있으며, 그러한 사용에는 원본 출처 uplgov.github.io/sixside에 대한 명확하고 눈에 띄는 저작자 표시가 포함되어야 합니다. 이 웹사이트의 어떤 부분도 수정, 변경, 변형 또는 파생 저작물을 만드는 데 사용할 수 없습니다. 상업적 사용은 모든 상황에서 엄격히 금지됩니다. 명시적으로 허가된 범위를 넘는 사용은 사이트 소유자의 사전 서면 승인이 필요합니다.'
     },
     hi: {
       emergencyLabel:'आपातकाल:', nonEmergencyLabel:'गैर-आपातकाल:', reportEmerg:'आपातकाल रिपोर्ट करें',
@@ -1264,7 +1326,12 @@
       folderDate:'अप्रैल 2026', chargerDate:'जनवरी-फरवरी 2026', drinkDate:'अप्रैल 2025-नवंबर 2025',
       folderDetail:'लाल ज़िपर। प्लास्टिक पर "2026 Biology" लिखा है। GCSE जीव विज्ञान सामग्री शामिल है। पुरस्कार: £10 (≈9.98 UCC)। कोई सुराग 009 पर कॉल करें।',
       chargerDetail:'लैपटॉप चार्जर। संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, रैटक्लिफ ऑन द रीक, चार्नवुड, लीसेस्टरशायर के पास देखा गया (जनवरी/फरवरी 2026)। गवाह ने रिपोर्ट किया। कोई सुराग 009 पर कॉल करें।',
-      drinkDetail:'संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, चार्जर के समान स्थान। अप्रैल 2025 - नवंबर 2025 के बीच चोरी हुआ। कोई सुराग 009 पर कॉल करें।'
+      drinkDetail:'संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, चार्जर के समान स्थान। अप्रैल 2025 - नवंबर 2025 के बीच चोरी हुआ। कोई सुराग 009 पर कॉल करें।',
+      btnMLP:'मोटरवे और लेन गश्ती',
+      privacyPolicy:'गोपनीयता नीति',
+      license:'लाइसेंस',
+      privacyText:'राष्ट्रीय विनियमन 2133 "सरकारी विभागों के लिए गोपनीयता और साइबर सुरक्षा – संस्करण 2" (यूपीएल राष्ट्रीय संसद, राष्ट्रीय कानून) में निर्धारित आवश्यकताओं के अनुसार, सभी सरकारी संबद्ध ऑनलाइन पोर्टल डेटा संग्रह या भंडारण के किसी भी रूप के होने वाला होने पर उपयोगकर्ताओं को स्पष्ट और दृश्यमान सूचना प्रदान करने के लिए बाध्य हैं। यह आवश्यकता सुनिश्चित करती है कि उपयोगकर्ता पूरी तरह से सूचित हों और किसी भी डेटा प्रोसेसिंग गतिविधियों के शुरू होने से पहले यह समझ सकें कि उनकी जानकारी कैसे संभाली जा सकती है।\n\nवेबसाइट uplgov.github.io/sixside किसी भी उपयोगकर्ता डेटा, फ़ाइलों या सामग्रियों को संग्रहीत, रिकॉर्ड या बरकरार नहीं रखती है। यह विशेष रूप से एक सूचना मंच के रूप में कार्य करती है और किसी भी प्रकार का डेटा संग्रह शुरू नहीं करती है।\n\nहालाँकि, सिक्ससाइड छत्र के तहत काम करने वाले कुछ सबडोमेन - जैसे कि विशिष्ट विभागों (पुलिस विभाग सहित) द्वारा प्रशासित पोर्टल - अपने स्वयं के डेटा-हैंडलिंग तंत्र को लागू कर सकते हैं और अपने परिचालन कार्यों के हिस्से के रूप में जानकारी संग्रहीत कर सकते हैं। चूंकि ये सबडोमेन स्वतंत्र रूप से प्रबंधित किए जाते हैं, इसलिए उनके डेटा-प्रोसेसिंग अभ्यास भिन्न हो सकते हैं।',
+      licenseText:'यह वेबसाइट और इसमें निहित सभी सामग्री एक प्रतिबंधात्मक लाइसेंस के तहत संरक्षित हैं जो कार्य की अखंडता की रक्षा के लिए डिज़ाइन किया गया है। सामग्री का उपयोग केवल गैर-व्यावसायिक उद्देश्यों के लिए किया जा सकता है, और ऐसे किसी भी उपयोग में मूल स्रोत uplgov.github.io/sixside के लिए स्पष्ट और दृश्यमान श्रेय शामिल होना चाहिए। इस वेबसाइट के किसी भी हिस्से को संशोधित, अनुकूलित, बदला या व्युत्पन्न कार्य बनाने के लिए उपयोग नहीं किया जा सकता है। सभी परिस्थितियों में व्यावसायिक उपयोग सख्त वर्जित है। स्पष्ट रूप से दी गई अनुमतियों से परे किसी भी उपयोग के लिए साइट स्वामी से पूर्व लिखित प्राधिकरण की आवश्यकता होती है।'
     },
     'zh-Classical': {
       emergencyLabel:'警急:', nonEmergencyLabel:'常事:', reportEmerg:'報警急',
@@ -1315,9 +1382,22 @@
       folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
       folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
       chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
-      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。'
+      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。',
+      btnMLP:'公路騎警',
+      privacyPolicy:'隱私策',
+      license:'許可證',
+      privacyText:'依國家規第2133號《政府部門隱私與網絡安全 — 第二版》（UPL國會，國法）所定，凡與政府相關之在線門戶，於將行任何形式之數據收集或存儲時，皆有義務向用戶提供清晰可見之通知。此規確保用戶於任何數據處理活動開始前，能完全知情並理解其信息可能如何被處理。\n\n網站uplgov.github.io/sixside 不存儲、記錄或保留任何用戶數據、文件或材料。其僅作信息平台運作，且不啟動任何形式之數據收集。\n\n然，於Sixside體系下運營之某些子域名——例如由特定部門（含警察部門）管理之門戶——可能實施其自有之數據處理機制，並可能作為其運營功能之一部分存儲信息。由於此等子域名獨立管理，其數據處理實踐可能有所不同。',
+      licenseText:'本網站及其所含全部材料均受限制性許可證保護，該許可證旨在保障作品之完整性。網站內容僅可用於非商業目的，且任何此類使用皆須明確且顯著地標明原始來源：uplgov.github.io/sixside。本網站任何部分均不得修改、改編、更動或用於創作衍生作品。任何情況下均嚴格禁止商業用途。超出明確授權範圍之任何使用，均須事先獲得網站所有者之書面授權。'
     }
   };
+
+  for (let lang in translations) {
+    if (!translations[lang].btnMLP) translations[lang].btnMLP = translations.en.btnMLP;
+    if (!translations[lang].privacyPolicy) translations[lang].privacyPolicy = translations.en.privacyPolicy;
+    if (!translations[lang].license) translations[lang].license = translations.en.license;
+    if (!translations[lang].privacyText) translations[lang].privacyText = translations.en.privacyText;
+    if (!translations[lang].licenseText) translations[lang].licenseText = translations.en.licenseText;
+  }
 
   const SimpleLunar = (function() {
     const LUNAR_DATA = [
@@ -1623,7 +1703,8 @@
       { text: t.btn8, url: 'jointhepd.htm', isSpecial: false },
       { text: t.btn9, url: 'tothepd.htm', isSpecial: false },
       { text: 'The Cosmica', url: 'https://uplgov.github.io/the-cosmica/index.htm', isSpecial: true, fixedLabel: true },
-      { text: t.btn10, url: 'http://uplgov.github.io/sixside/police/thechief\'s.htm', isSpecial: true, fixedLabel: false }
+      { text: t.btn10, url: 'http://uplgov.github.io/sixside/police/thechief\'s.htm', isSpecial: true, fixedLabel: false },
+      { text: t.btnMLP, url: 'https://uplgov.github.io/sixside/police/mlp.htm', isSpecial: false }
     ];
     const container = document.getElementById('serviceButtonsGrid');
     if(!container) return;
@@ -1703,9 +1784,13 @@
      'respTimeVal','clearRateVal','respTrend','clearTrend','respLabel','clearLabel','footerText',
      'modalHead','directCallHint','serviceLabel','locationLabel','visibleLabel','optYes','optNo',
      'contactLabel','commentLabel','sosBtn','cancelModalBtn','locateBtn','contrastLabel','grayscaleLabel',
-     'saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle'].forEach(id => { 
+     'saturateLabel','crosshairLabel','cursorEnableLabel','resetAccBtn','langModalTitle',
+     'privacyPolicyBtn','licenseBtn','privacyModalTitle','licenseModalTitle'].forEach(id => { 
       let el = document.getElementById(id); if(el && t[id] !== undefined) el.innerText = t[id]; 
     });
+    
+    if (document.getElementById('privacyModalContent')) document.getElementById('privacyModalContent').innerText = t.privacyText;
+    if (document.getElementById('licenseModalContent')) document.getElementById('licenseModalContent').innerText = t.licenseText;
     
     document.getElementById('respTooltip') && (document.getElementById('respTooltip').innerText = t.respTooltip);
     document.getElementById('clearTooltip') && (document.getElementById('clearTooltip').innerText = t.clearTooltip);
@@ -1920,6 +2005,17 @@
   supportBtn.addEventListener('click', () => {
     window.open('https://uplgov.github.io/sixside/support-the-government.html', '_blank');
   });
+
+  function showPrivacyModal() {
+    document.getElementById('privacyModal').style.display = 'flex';
+  }
+  function showLicenseModal() {
+    document.getElementById('licenseModal').style.display = 'flex';
+  }
+  document.getElementById('privacyPolicyBtn').onclick = showPrivacyModal;
+  document.getElementById('licenseBtn').onclick = showLicenseModal;
+  document.getElementById('closePrivacyModal').onclick = () => document.getElementById('privacyModal').style.display = 'none';
+  document.getElementById('closeLicenseModal').onclick = () => document.getElementById('licenseModal').style.display = 'none';
 
   window.onload = function() {
     initMap();

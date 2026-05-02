@@ -349,7 +349,7 @@
       background: var(--bg-primary);
     }
 
-    /* 优雅的语言选择窗口 */
+    /* 优雅语言切换窗口 - 方形按钮 + 动画过渡 */
     .lang-modal {
       position: fixed;
       top: 0;
@@ -359,24 +359,25 @@
       background: rgba(0,0,0,0.85);
       backdrop-filter: blur(8px);
       z-index: 2000;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
+      visibility: hidden;
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: visibility 0.2s, opacity 0.25s ease;
     }
     .lang-modal.show {
-      display: flex;
+      visibility: visible;
       opacity: 1;
     }
     .lang-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 24px;
+      border-radius: 0;
       padding: 2rem;
       min-width: 280px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      transform: scale(0.95);
+      transform: scale(0.96);
       transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
     .lang-modal.show .lang-card {
@@ -396,7 +397,7 @@
       text-align: center;
       font-family: 'Georgia', 'Times New Roman', serif;
       font-size: 1rem;
-      border-radius: 40px;
+      border-radius: 0;
       transition: all 0.2s;
     }
     .lang-btn:hover {
@@ -412,6 +413,7 @@
       cursor: pointer;
       font-size: 0.8rem;
       text-decoration: underline;
+      font-family: 'Georgia', serif;
     }
 
     .container {
@@ -479,7 +481,7 @@
       color: #fff;
     }
 
-    /* 新增的 Find vehicle details 卡片 */
+    /* Find vehicle details 卡片 */
     .find-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -671,7 +673,6 @@
       border-color: var(--accent);
     }
 
-    /* 弹出窗口样式 (新窗口) */
     footer {
       text-align: center;
       padding: 50px;
@@ -735,7 +736,7 @@
   </div>
 </div>
 
-<!-- 优雅语言选择窗口 -->
+<!-- 语言切换窗口 - 保留方形按钮 + 动画过渡 -->
 <div id="langModal" class="lang-modal">
   <div class="lang-card">
     <div class="lang-grid">
@@ -799,7 +800,6 @@
               Additionally, the division conducts road inspections, traffic infrastructure hazard assessments, traffic security for major events, and public education campaigns. It provides continuous support for the long‑term stability of the state's transportation system. The division operates under principles of professionalism, consistency, and efficiency, striving to create a safe, orderly road environment for the public.</p>
             </div>
           </div>
-          <!-- 新增的 Find vehicle details 方框 -->
           <div class="find-card">
             <h3>Find vehicle details</h3>
             <div class="search-wrapper">
@@ -853,7 +853,9 @@
     { name: "Dodge Durango", img: "https://uplgov.github.io/sixside/police/images/cars/dodgedurango.png" },
     { name: "Ram Pickup", img: "https://uplgov.github.io/sixside/police/images/cars/dodgeram.png" },
     { name: "Ford Focus", img: "https://uplgov.github.io/sixside/police/images/cars/fordfocus.png" },
-    { name: "Gargale Quiseleon", img: "https://uplgov.github.io/sixside/police/images/cars/gargale.png" }
+    { name: "Gargale Quiseleon", img: "https://uplgov.github.io/sixside/police/images/cars/gargale.png" },
+    { name: "Komsomol Cygnus M1980", img: "https://uplgov.github.io/sixside/police/images/cars/KomsomolCygnus-M1980.png" },
+    { name: "Lada Priora Sedan", img: "https://uplgov.github.io/sixside/police/images/cars/Lada-PrioraSedan.png" }
   ];
 
   let currentVehicleList = [];
@@ -901,7 +903,6 @@
     });
   }
 
-  // 车牌搜索核心逻辑
   async function performPlateSearch() {
     const rawInput = document.getElementById('plateSearchInput').value;
     const cleaned = rawInput.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();

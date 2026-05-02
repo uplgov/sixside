@@ -1,1 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>SSPD | Highway Patrol Division — Sixside Police Department</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #10161f;
+      --text-primary: #e8edf5;
+      --text-secondary: #9aaebf;
+      --border-color: #1a2538;
+      --card-bg: #10161f;
+      --card-border: #222c38;
+      --btn-bg: #1e2a3a;
+      --accent-red: #cc3333;
+      --accent-green: #2ecc71;
+      --accent-amber: #f39c12;
+      --police-blue: #4a6b8c;
+      --cursor-color: rgba(204, 51, 51, 0.3);
+      --cursor-border: #cc3333;
+    }
+
+    body.light {
+      --bg-primary: #f4f6f9;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a2634;
+      --text-secondary: #3a4a5e;
+      --border-color: #d0d8e4;
+      --card-bg: #ffffff;
+      --card-border: #dce2ec;
+      --btn-bg: #eef2f7;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background 0.3s, color 0.2s;
+      overflow-x: hidden;
+    }
+
+    #cursor-highlight {
+      position: fixed;
+      pointer-events: none;
+      width: 50px;
+      height: 50px;
+      border: 2px solid var(--cursor-border);
+      background: var(--cursor-color);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      display: none;
+    }
+    #cursor-highlight::before,
+    #cursor-highlight::after {
+      content: '';
+      position: absolute;
+      background: #ffffff;
+    }
+    #cursor-highlight::before {
+      width: 18px;
+      height: 2px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #cursor-highlight::after {
+      width: 2px;
+      height: 18px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .filter-layer {
+      transition: filter 0.2s;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .quick-exit {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background: var(--accent-red);
+      color: #fff;
+      padding: 20px 8px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 9999;
+      border: 2px solid #fff;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      letter-spacing: 2px;
+      transition: 0.2s;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 0.9rem;
+    }
+    .quick-exit:hover {
+      background: #a00;
+      padding-right: 15px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-brand {
+      background: none;
+      border: none;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #ffffff;
+      cursor: pointer;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 1.1rem;
+      padding: 0;
+      outline: none;
+      user-select: none;
+    }
+    .nav-brand span {
+      color: var(--police-blue);
+      font-weight: normal;
+    }
+    .nav-tools {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    .acc-icon-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      filter: grayscale(1) contrast(2);
+    }
+    .tool-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 5px 15px;
+      cursor: pointer;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 0.8rem;
+      border-radius: 0;
+      transition: 0.2s;
+    }
+    .tool-btn:hover {
+      border-color: var(--police-blue);
+    }
+
+    .acc-panel {
+      position: absolute;
+      top: 70px;
+      right: 2rem;
+      width: 320px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 25px;
+      z-index: 2000;
+      display: none;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    .acc-panel.show {
+      display: block;
+    }
+    .acc-item {
+      margin-bottom: 15px;
+    }
+    .acc-item label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .acc-select,
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+      background: var(--bg-primary);
+    }
+
+    .lang-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.92);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .lang-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 320px;
+      background: var(--bg-secondary);
+      padding: 30px;
+      border: 1px solid var(--border-color);
+    }
+    .lang-btn {
+      background: var(--btn-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      cursor: pointer;
+      text-align: center;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 1rem;
+    }
+    .lang-btn:hover {
+      border-color: var(--police-blue);
+    }
+
+    .header-section {
+      text-align: center;
+      padding: 50px 0 30px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .header-section h1 {
+      font-size: 2.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    .header-section p {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 28px;
+      margin: 40px 0;
+    }
+    @media (max-width: 780px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .container {
+        padding: 0 1rem;
+      }
+    }
+
+    .hero-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 28px;
+      margin-bottom: 30px;
+    }
+    .button-group {
+      display: flex;
+      gap: 20px;
+      margin: 28px 0 18px;
+      flex-wrap: wrap;
+    }
+    .primary-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px 28px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: var(--text-primary);
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+    .primary-btn:hover {
+      border-color: var(--police-blue);
+      background: var(--police-blue);
+      color: #fff;
+    }
+
+    .side-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .img-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 16px;
+      text-align: center;
+    }
+    .img-card img {
+      width: 100%;
+      border-radius: 4px;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+
+    .intro-text {
+      background: rgba(0,0,0,0.2);
+      padding: 20px;
+      margin-top: 16px;
+      border-left: 4px solid var(--police-blue);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      line-height: 1.5;
+    }
+
+    .page-view {
+      display: none;
+    }
+    .active-page {
+      display: block;
+    }
+
+    .cars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 25px;
+      margin: 32px 0;
+    }
+    .car-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .car-btn img {
+      width: 100%;
+      max-height: 100px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+    .car-btn span {
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+    .car-btn:hover {
+      border-color: var(--police-blue);
+      transform: translateY(-2px);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin: 20px 0 10px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000dd;
+      backdrop-filter: blur(18px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--bg-secondary);
+      max-width: 85vw;
+      max-height: 85vh;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+    .modal-content img {
+      max-width: 100%;
+      max-height: 70vh;
+      border-radius: 4px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+    .modal-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--border-color);
+      padding: 8px 20px;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+    .modal-btn:hover {
+      border-color: var(--police-blue);
+    }
+
+    footer {
+      text-align: center;
+      padding: 50px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    #google_translate_element {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: none;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</head>
+<body>
+
+<div id="cursor-highlight"></div>
+
+<button class="quick-exit" data-i18n="leave">LEAVE THIS PAGE</button>
+
+<nav class="top-nav">
+  <button class="nav-brand" onclick="window.location.href='https://uplgov.github.io/sixside/police/index.htm'">SIXSIDE <span>| POLICE DEPARTMENT | HIGHWAY PATROL</span></button>
+  <div class="nav-tools">
+    <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
+    <button class="tool-btn" onclick="document.body.classList.toggle('light')" data-i18n="theme">THEME</button>
+    <button class="tool-btn" onclick="openLangModal()" data-i18n="lang">LANGUAGE</button>
+  </div>
+</nav>
+
+<div class="acc-panel" id="accPanel">
+  <div class="acc-item">
+    <label data-i18n="acc_contrast">Contrast</label>
+    <input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()">
+  </div>
+  <div class="acc-item">
+    <label data-i18n="acc_grayscale">Grayscale</label>
+    <input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()">
+  </div>
+  <div class="acc-item">
+    <label data-i18n="acc_cursor_color">Crosshair Color</label>
+    <select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()">
+      <option value="rgba(204,51,51,0.3)|#cc3333">Red</option>
+      <option value="rgba(52,152,219,0.3)|#3498db">Blue</option>
+      <option value="rgba(50,205,50,0.3)|#32cd32">Lime</option>
+      <option value="rgba(255,255,0,0.3)|#ffff00">Yellow</option>
+    </select>
+  </div>
+  <div class="acc-item">
+    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+      <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)">
+      <span data-i18n="acc_enable_cursor">Enable Crosshair Cursor</span>
+    </label>
+  </div>
+</div>
+
+<div class="lang-modal" id="langModal">
+  <div class="lang-grid">
+    <button class="lang-btn" onclick="setEnglish()">English (UK)</button>
+    <button class="lang-btn" onclick="setClassicalChinese()">華夏文言</button>
+    <button class="lang-btn" id="googleTranslateBtn">Google Translate</button>
+    <button class="tool-btn" style="margin-top: 10px;" onclick="closeLangModal()" data-i18n="close">Close</button>
+  </div>
+</div>
+
+<div id="google_translate_element"></div>
+
+<div class="filter-layer" id="mainFilter">
+  <div class="container">
+    <div id="homePage" class="page-view active-page">
+      <div class="header-section">
+        <h1 data-i18n="title">SSPD HIGHWAY PATROL DIVISION</h1>
+        <p data-i18n="sub">State Highway and Road Patrol — enforcement, rapid response, and public safety.</p>
+      </div>
+
+      <div class="main-grid">
+        <div>
+          <div class="hero-card">
+            <h2 style="margin-bottom: 15px;" data-i18n="welcome">Highway Patrol Division</h2>
+            <div class="button-group">
+              <button class="primary-btn" id="introBtnMain" data-i18n="intro_btn">Division Profile</button>
+              <button class="primary-btn" id="viewCarsBtnMain" data-i18n="view_fleet">View Fleet Vehicles</button>
+            </div>
+            <div id="introTextBlock" style="display: none;" class="intro-text">
+              <p><strong>SSPD Highway and Road Patrol Division</strong> is a core law enforcement entity within the state's traffic safety and public order framework. It is responsible for patrolling highways, expressways, main arteries, and interregional routes, as well as oversight and emergency response. The division's primary mission is to ensure road safety, maintain public order, and enhance emergency response capabilities, guaranteeing stable, orderly, and efficient road network operations under both daily and contingency circumstances.<br><br>
+              The Highway and Road Patrol enforces traffic laws on key segments, prosecutes serious violations including speeding, reckless driving, DUI, and illegal modifications. Officers respond to traffic collisions as first responders, directing traffic, securing scenes, conducting preliminary investigations, and coordinating rescue efforts. They serve as the frontline force in road safety management, vital to preserving public safety on state roads.<br><br>
+              For cross‑regional pursuits, major incident responses, or rapid mobility support, the Highway and Road Patrol performs coordinated tasks. Acting under official directives, they cooperate with other law enforcement branches to track suspect vehicles, contain routes, provide real‑time road intelligence, and assist interdiction operations, ensuring the safety and effectiveness of enforcement activities. Familiarity with road environments and high‑mobility equipment makes the division indispensable in inter‑agency cooperation.<br><br>
+              Additionally, the division conducts road inspections, traffic infrastructure hazard assessments, traffic security for major events, and public education campaigns. It provides continuous support for the long‑term stability of the state's transportation system. The division operates under principles of professionalism, consistency, and efficiency, striving to create a safe, orderly road environment for the public.</p>
+            </div>
+          </div>
+        </div>
+        <div class="side-cards">
+          <div class="img-card">
+            <img src="https://uplgov.github.io/sixside/police/images/6.jpeg" alt="Highway patrol field" loading="lazy">
+          </div>
+          <div class="img-card">
+            <img src="https://uplgov.github.io/sixside/police/images/cars/troope.png" alt="SSPD trooper vehicle" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="carsPage" class="page-view">
+      <span class="back-link" id="backToHomeFromCars" data-i18n="back">← Return to main page</span>
+      <h1 style="margin-top: 20px;" data-i18n="fleet_title">SSPD Fleet Inventory</h1>
+      <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 20px;" data-i18n="fleet_sub">"Inspect the beasts that run on asphalt — up close."</p>
+      <div class="cars-grid" id="carsGridContainer"></div>
+      <div style="background: rgba(0,0,0,0.2); padding: 20px; margin-top: 30px;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary);" data-i18n="fleet_notice">The SSPD periodically acquires eligible vehicles from the market, whether brand‑new or pre‑owned. These vehicles are subsequently refurbished or modified by authorised third‑party contractors. As a result, our fleet comprises a wide variety of models. This website displays only the most common types currently in service. You are welcome to arrange a visit to the SSPD car park, where you may view and photograph the vehicles in person.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer data-i18n="footer">
+  © 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame
+</footer>
+
+<div id="imageModal" class="modal">
+  <div class="modal-content">
+    <img id="modalLargeImg" src="" alt="Full resolution vehicle image">
+    <div class="modal-actions">
+      <button class="modal-btn" id="modalCloseBtn" data-i18n="modal_return">Return</button>
+      <button class="modal-btn" id="modalDownloadBtn" data-i18n="modal_download">Download Image</button>
+      <button class="modal-btn" id="modalRawBtn" data-i18n="modal_raw">View RAW</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const vehicleList = [
+    { name: "Jeep Wrangler Unlimited", img: "https://uplgov.github.io/sixside/police/images/cars/JeepWranglerUnlimited.png" },
+    { name: "Audi Q5", img: "https://uplgov.github.io/sixside/police/images/cars/audiq5.png" },
+    { name: "Buick Regal", img: "https://uplgov.github.io/sixside/police/images/cars/buickregal.png" },
+    { name: "Dodge Challenger", img: "https://uplgov.github.io/sixside/police/images/cars/dodgechallenger.jpg" },
+    { name: "Dodge Conqueror", img: "https://uplgov.github.io/sixside/police/images/cars/dodgeconqueror.png" },
+    { name: "Dodge Durango", img: "https://uplgov.github.io/sixside/police/images/cars/dodgedurango.png" },
+    { name: "Ram Pickup", img: "https://uplgov.github.io/sixside/police/images/cars/dodgeram.png" },
+    { name: "Ford Focus", img: "https://uplgov.github.io/sixside/police/images/cars/fordfocus.png" },
+    { name: "Gargale", img: "https://uplgov.github.io/sixside/police/images/cars/gargale.png" }
+  ];
+
+  const dict = {
+    en: {
+      leave: "LEAVE THIS PAGE", theme: "THEME", lang: "LANGUAGE", close: "Close",
+      acc_contrast: "Contrast", acc_grayscale: "Grayscale", acc_cursor_color: "Crosshair Color", acc_enable_cursor: "Enable Crosshair Cursor",
+      title: "SSPD HIGHWAY PATROL DIVISION", sub: "State Highway and Road Patrol — enforcement, rapid response, and public safety.",
+      welcome: "Highway Patrol Division", intro_btn: "Division Profile", view_fleet: "View Fleet Vehicles",
+      back: "← Return to main page", fleet_title: "SSPD Fleet Inventory", fleet_sub: "\"Inspect the beasts that run on asphalt — up close.\"",
+      fleet_notice: "The SSPD periodically acquires eligible vehicles from the market, whether brand‑new or pre‑owned. These vehicles are subsequently refurbished or modified by authorised third‑party contractors. As a result, our fleet comprises a wide variety of models. This website displays only the most common types currently in service. You are welcome to arrange a visit to the SSPD car park, where you may view and photograph the vehicles in person.",
+      footer: "© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame",
+      modal_return: "Return", modal_download: "Download Image", modal_raw: "View RAW"
+    },
+    "zh-Classical": {
+      leave: "急離此卷", theme: "晝夜", lang: "言", close: "閉",
+      acc_contrast: "明暗", acc_grayscale: "黑白", acc_cursor_color: "準星之色", acc_enable_cursor: "啟準星",
+      title: "SSPD 高速巡警司", sub: "州道騎警 — 執法、馳援、安民。",
+      welcome: "高速巡警司", intro_btn: "司署本末", view_fleet: "閱車輿",
+      back: "← 返主頁", fleet_title: "SSPD 車輿名錄", fleet_sub: "\"近觀吾部馳騁於瀝青之猛獸。\"",
+      fleet_notice: "SSPD 每歲市賈合用之車，或新或舊。付之良工繕修更造，故車隊雜陳。此錄所載，惟見役常類。欲親覽者，可約觀SSPD車場。",
+      footer: "© 2025-2026 六面省巡捕房 | 技護：Wareflame",
+      modal_return: "還", modal_download: "下圖", modal_raw: "觀原圖"
+    }
+  };
+
+  let currentLang = 'en';
+
+  function applyTranslation() {
+    const d = dict[currentLang];
+    if (!d) return;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (d[key]) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = d[key];
+        else el.innerText = d[key];
+      }
+    });
+  }
+
+  function setEnglish() {
+    currentLang = 'en';
+    closeLangModal();
+    applyTranslation();
+  }
+
+  function setClassicalChinese() {
+    currentLang = 'zh-Classical';
+    closeLangModal();
+    applyTranslation();
+  }
+
+  function openLangModal() {
+    document.getElementById('langModal').style.display = 'flex';
+  }
+  function closeLangModal() {
+    document.getElementById('langModal').style.display = 'none';
+  }
+
+  window.googleTranslateElementInit = function() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  };
+
+  document.getElementById('googleTranslateBtn').addEventListener('click', function() {
+    closeLangModal();
+    const widget = document.getElementById('google_translate_element');
+    widget.style.display = widget.style.display === 'block' ? 'none' : 'block';
+  });
+
+  function quickExit() {
+    window.open('https://www.apple.com/services/', '_blank');
+    window.location.replace('https://www.bbc.co.uk/iplayer');
+    setTimeout(() => {
+      history.pushState(null, '', location.href);
+      history.go(1);
+    }, 50);
+  }
+  document.querySelector('.quick-exit').onclick = quickExit;
+
+  function toggleAccPanel() {
+    document.getElementById('accPanel').classList.toggle('show');
+  }
+  function applyFilters() {
+    const c = document.getElementById('con-range').value;
+    const g = document.getElementById('gray-range').value;
+    document.getElementById('mainFilter').style.filter = `contrast(${c}) grayscale(${g})`;
+  }
+
+  let isMouseOn = false;
+  function toggleCursorAssist(on) {
+    isMouseOn = on;
+    const h = document.getElementById('cursor-highlight');
+    h.style.display = on ? 'block' : 'none';
+    document.body.style.cursor = on ? 'none' : 'default';
+    updateCursorStyle();
+  }
+  function updateCursorStyle() {
+    const [bg, border] = document.getElementById('cursor-color-select').value.split('|');
+    document.documentElement.style.setProperty('--cursor-color', bg);
+    document.documentElement.style.setProperty('--cursor-border', border);
+  }
+  document.addEventListener('mousemove', e => {
+    if (!isMouseOn) return;
+    const h = document.getElementById('cursor-highlight');
+    h.style.left = e.clientX + 'px';
+    h.style.top = e.clientY + 'px';
+  });
+
+  function renderCars() {
+    const container = document.getElementById('carsGridContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    vehicleList.forEach(car => {
+      const btnDiv = document.createElement('div');
+      btnDiv.className = 'car-btn';
+      btnDiv.innerHTML = `<img src="${car.img}" alt="${car.name}" loading="lazy"><span>${car.name}</span>`;
+      btnDiv.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openModalWithImage(car.img);
+      });
+      container.appendChild(btnDiv);
+    });
+  }
+
+  let currentModalImgSrc = '';
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalLargeImg');
+
+  function openModalWithImage(src) {
+    currentModalImgSrc = src;
+    modalImg.src = src;
+    modal.style.display = 'flex';
+  }
+  function closeModal() {
+    modal.style.display = 'none';
+  }
+  document.getElementById('modalCloseBtn')?.addEventListener('click', closeModal);
+  document.getElementById('modalDownloadBtn')?.addEventListener('click', () => {
+    if (currentModalImgSrc) {
+      const link = document.createElement('a');
+      link.href = currentModalImgSrc;
+      link.download = currentModalImgSrc.split('/').pop() || 'sspd_vehicle';
+      link.click();
+    }
+  });
+  document.getElementById('modalRawBtn')?.addEventListener('click', () => {
+    if (currentModalImgSrc) window.open(currentModalImgSrc, '_blank');
+  });
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  const homeDiv = document.getElementById('homePage');
+  const carsDiv = document.getElementById('carsPage');
+
+  function showHome() {
+    homeDiv.classList.add('active-page');
+    carsDiv.classList.remove('active-page');
+  }
+  function showCars() {
+    carsDiv.classList.add('active-page');
+    homeDiv.classList.remove('active-page');
+    renderCars();
+  }
+
+  document.getElementById('viewCarsBtnMain')?.addEventListener('click', showCars);
+  document.getElementById('backToHomeFromCars')?.addEventListener('click', showHome);
+
+  const introBtn = document.getElementById('introBtnMain');
+  const introBlock = document.getElementById('introTextBlock');
+  if (introBtn && introBlock) {
+    introBtn.addEventListener('click', () => {
+      const isVisible = introBlock.style.display === 'block';
+      introBlock.style.display = isVisible ? 'none' : 'block';
+    });
+  }
+
+  window.addEventListener('click', function(e) {
+    const panel = document.getElementById('accPanel');
+    const accBtn = document.querySelector('.acc-icon-btn');
+    if (panel && accBtn && !panel.contains(e.target) && e.target !== accBtn) {
+      panel.classList.remove('show');
+    }
+    if (e.target === document.getElementById('langModal')) {
+      closeLangModal();
+    }
+    const gtWidget = document.getElementById('google_translate_element');
+    const gtBtn = document.getElementById('googleTranslateBtn');
+    if (gtWidget && gtBtn && !gtWidget.contains(e.target) && e.target !== gtBtn && !gtBtn.contains(e.target)) {
+      gtWidget.style.display = 'none';
+    }
+  });
+
+  applyTranslation();
+  renderCars();
+</script>
+</body>
+</html>

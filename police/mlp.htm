@@ -43,7 +43,7 @@
     }
 
     body {
-      font-family: 'Georgia', 'Times New Roman', Times, serif;
+      font-family: 'Georgia', serif;
       background-color: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
@@ -89,7 +89,6 @@
       transition: filter 0.2s;
     }
 
-    /* 安全横幅区域 - 完全照搬 */
     #securityBanner {
       background: var(--sec-bg);
       border-bottom: 1px solid var(--sec-border);
@@ -228,7 +227,6 @@
       opacity: 0.7;
     }
 
-    /* 顶部导航栏 */
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -247,7 +245,7 @@
       letter-spacing: 1px;
       color: var(--text-primary);
       cursor: pointer;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 1.1rem;
       padding: 0;
       outline: none;
@@ -275,7 +273,7 @@
       color: var(--text-primary);
       padding: 5px 15px;
       cursor: pointer;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 0.8rem;
       border-radius: 0;
       transition: 0.2s;
@@ -284,7 +282,6 @@
       border-color: var(--accent);
     }
 
-    /* 右侧固定离开按钮 */
     .quick-exit {
       position: fixed;
       top: 50%;
@@ -303,7 +300,7 @@
       border-radius: 8px 0 0 8px;
       letter-spacing: 2px;
       transition: 0.2s;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 0.9rem;
     }
     .quick-exit:hover {
@@ -341,7 +338,7 @@
       background: var(--bg-primary);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
     }
     input[type="range"] {
       width: 100%;
@@ -349,7 +346,6 @@
       background: var(--bg-primary);
     }
 
-    /* 优雅语言切换窗口 - 方形按钮 + 动画过渡 */
     .lang-modal {
       position: fixed;
       top: 0;
@@ -395,7 +391,7 @@
       padding: 12px;
       cursor: pointer;
       text-align: center;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 1rem;
       border-radius: 0;
       transition: all 0.2s;
@@ -473,7 +469,7 @@
       cursor: pointer;
       transition: 0.2s;
       color: var(--text-primary);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
     }
     .primary-btn:hover {
       border-color: var(--accent);
@@ -481,7 +477,6 @@
       color: #fff;
     }
 
-    /* Find vehicle details 卡片 */
     .find-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -507,7 +502,7 @@
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
       color: var(--text-primary);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 0.9rem;
     }
     .search-wrapper button {
@@ -517,7 +512,7 @@
       padding: 12px 24px;
       cursor: pointer;
       color: var(--text-primary);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       transition: 0.2s;
     }
     .search-wrapper button:hover {
@@ -550,7 +545,7 @@
       padding: 20px;
       margin-top: 16px;
       border-left: 4px solid var(--accent);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       line-height: 1.5;
     }
 
@@ -579,7 +574,7 @@
       background: var(--bg-primary);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
       font-size: 0.9rem;
     }
 
@@ -606,7 +601,7 @@
     .car-btn span {
       font-weight: 600;
       font-size: 0.85rem;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
     }
     .car-btn:hover {
       border-color: var(--accent);
@@ -625,7 +620,7 @@
       color: var(--text-secondary);
       cursor: pointer;
       text-decoration: underline;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
     }
 
     .modal {
@@ -667,7 +662,7 @@
       padding: 8px 20px;
       cursor: pointer;
       color: var(--text-primary);
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'Georgia', serif;
     }
     .modal-btn:hover {
       border-color: var(--accent);
@@ -699,28 +694,28 @@
 
 <div id="cursor-highlight"></div>
 
-<button class="quick-exit" id="leaveBtn">LEAVE THIS PAGE</button>
+<button class="quick-exit" id="leaveBtn" data-i18n="leave">LEAVE THIS PAGE</button>
 
 <nav class="top-nav">
   <button class="nav-brand" id="brandHomeBtn">SIXSIDE <span>| POLICE DEPARTMENT | HIGHWAY PATROL</span></button>
   <div class="nav-tools">
     <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
-    <button class="tool-btn" id="themeToggleBtn">THEME</button>
-    <button class="tool-btn" id="openLangModalBtn">LANGUAGE</button>
+    <button class="tool-btn" id="themeToggleBtn" data-i18n="theme">THEME</button>
+    <button class="tool-btn" id="openLangModalBtn" data-i18n="lang">LANGUAGE</button>
   </div>
 </nav>
 
 <div class="acc-panel" id="accPanel">
   <div class="acc-item">
-    <label>Contrast</label>
+    <label data-i18n="acc_contrast">Contrast</label>
     <input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()">
   </div>
   <div class="acc-item">
-    <label>Grayscale</label>
+    <label data-i18n="acc_grayscale">Grayscale</label>
     <input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()">
   </div>
   <div class="acc-item">
-    <label>Crosshair Color</label>
+    <label data-i18n="acc_cursor_color">Crosshair Color</label>
     <select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()">
       <option value="rgba(204,51,51,0.3)|#cc3333">Red</option>
       <option value="rgba(52,152,219,0.3)|#3498db">Blue</option>
@@ -731,19 +726,18 @@
   <div class="acc-item">
     <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
       <input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)">
-      <span>Enable Crosshair Cursor</span>
+      <span data-i18n="acc_enable_cursor">Enable Crosshair Cursor</span>
     </label>
   </div>
 </div>
 
-<!-- 语言切换窗口 - 保留方形按钮 + 动画过渡 -->
 <div id="langModal" class="lang-modal">
   <div class="lang-card">
     <div class="lang-grid">
-      <button class="lang-btn" onclick="setEnglish()">English (UK)</button>
-      <button class="lang-btn" onclick="setClassicalChinese()">華夏文言</button>
+      <button class="lang-btn" id="englishLangBtn">English (UK)</button>
+      <button class="lang-btn" id="classicalLangBtn">華夏文言</button>
       <button class="lang-btn" id="googleTranslateBtn">Google Translate</button>
-      <button class="close-lang-btn" onclick="closeLangModal()">Close</button>
+      <button class="close-lang-btn" id="closeLangModalBtn">Close</button>
     </div>
   </div>
 </div>
@@ -782,16 +776,16 @@
   <div class="container">
     <div id="homePage" class="page-view active-page">
       <div class="header-section">
-        <h1>SSPD HIGHWAY PATROL DIVISION</h1>
-        <p>State Highway and Road Patrol — enforcement, rapid response, and public safety.</p>
+        <h1 data-i18n="title">SSPD HIGHWAY PATROL DIVISION</h1>
+        <p data-i18n="sub">State Highway and Road Patrol — enforcement, rapid response, and public safety.</p>
       </div>
       <div class="main-grid">
         <div>
           <div class="hero-card">
-            <h2 style="margin-bottom: 15px;">Highway Patrol Division</h2>
+            <h2 style="margin-bottom: 15px;" data-i18n="welcome">Highway Patrol Division</h2>
             <div class="button-group">
-              <button class="primary-btn" id="introBtnMain">Division Profile</button>
-              <button class="primary-btn" id="viewCarsBtnMain">View Fleet Vehicles</button>
+              <button class="primary-btn" id="introBtnMain" data-i18n="intro_btn">Division Profile</button>
+              <button class="primary-btn" id="viewCarsBtnMain" data-i18n="view_fleet">View Fleet Vehicles</button>
             </div>
             <div id="introTextBlock" style="display: none;" class="intro-text">
               <p><strong>SSPD Highway and Road Patrol Division</strong> is a core law enforcement entity within the state's traffic safety and public order framework. It is responsible for patrolling highways, expressways, main arteries, and interregional routes, as well as oversight and emergency response. The division's primary mission is to ensure road safety, maintain public order, and enhance emergency response capabilities, guaranteeing stable, orderly, and efficient road network operations under both daily and contingency circumstances.<br><br>
@@ -801,10 +795,10 @@
             </div>
           </div>
           <div class="find-card">
-            <h3>Find vehicle details</h3>
+            <h3 data-i18n="find_title">Find vehicle details (Nationwide)</h3>
             <div class="search-wrapper">
-              <input type="text" id="plateSearchInput" placeholder="Enter licence plate (e.g. TY168)">
-              <button id="searchPlateBtn">Search</button>
+              <input type="text" id="plateSearchInput" placeholder="Enter licence plate (e.g. 6832)">
+              <button id="searchPlateBtn" data-i18n="search_btn">Search</button>
             </div>
           </div>
         </div>
@@ -816,29 +810,29 @@
     </div>
 
     <div id="carsPage" class="page-view">
-      <span class="back-link" id="backToHomeFromCars">← Return to main page</span>
-      <h1 style="margin-top: 20px;">SSPD Fleet Inventory</h1>
-      <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 20px;">"Inspect the beasts that run on asphalt — up close."</p>
+      <span class="back-link" id="backToHomeFromCars" data-i18n="back">← Return to main page</span>
+      <h1 style="margin-top: 20px;" data-i18n="fleet_title">SSPD Fleet Inventory</h1>
+      <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 20px;" data-i18n="fleet_sub">"Inspect the beasts that run on asphalt — up close."</p>
       <div class="search-section">
         <div class="search-box"><input type="text" id="carSearchInput" placeholder="Search by model name..."></div>
       </div>
       <div class="cars-grid" id="carsGridContainer"></div>
       <div style="background: rgba(0,0,0,0.2); padding: 20px; margin-top: 30px;">
-        <p style="font-size: 0.85rem; color: var(--text-secondary);">The SSPD periodically acquires eligible vehicles from the market, whether brand‑new or pre‑owned. These vehicles are subsequently refurbished or modified by authorised third‑party contractors. As a result, our fleet comprises a wide variety of models. This website displays only the most common types currently in service. You are welcome to arrange a visit to the SSPD car park, where you may view and photograph the vehicles in person.</p>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);" data-i18n="fleet_notice">The SSPD periodically acquires eligible vehicles from the market, whether brand‑new or pre‑owned. These vehicles are subsequently refurbished or modified by authorised third‑party contractors. As a result, our fleet comprises a wide variety of models. This website displays only the most common types currently in service. You are welcome to arrange a visit to the SSPD car park, where you may view and photograph the vehicles in person.</p>
       </div>
     </div>
   </div>
 </div>
 
-<footer>© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</footer>
+<footer data-i18n="footer">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame</footer>
 
 <div id="imageModal" class="modal">
   <div class="modal-content">
     <img id="modalLargeImg" src="" alt="Full resolution vehicle image">
     <div class="modal-actions">
-      <button class="modal-btn" id="modalCloseBtn">Return</button>
-      <button class="modal-btn" id="modalDownloadBtn">Download Image</button>
-      <button class="modal-btn" id="modalRawBtn">View RAW</button>
+      <button class="modal-btn" id="modalCloseBtn" data-i18n="modal_return">Return</button>
+      <button class="modal-btn" id="modalDownloadBtn" data-i18n="modal_download">Download Image</button>
+      <button class="modal-btn" id="modalRawBtn" data-i18n="modal_raw">View RAW</button>
     </div>
   </div>
 </div>
@@ -1047,11 +1041,64 @@
     });
   }
 
-  function setEnglish() { closeLangModal(); document.documentElement.lang = 'en'; }
-  function setClassicalChinese() { closeLangModal(); document.documentElement.lang = 'zh'; }
+  const translations = {
+    en: {
+      leave: "LEAVE THIS PAGE", theme: "THEME", lang: "LANGUAGE", close: "Close",
+      acc_contrast: "Contrast", acc_grayscale: "Grayscale", acc_cursor_color: "Crosshair Color", acc_enable_cursor: "Enable Crosshair Cursor",
+      title: "SSPD HIGHWAY PATROL DIVISION", sub: "State Highway and Road Patrol — enforcement, rapid response, and public safety.",
+      welcome: "Highway Patrol Division", intro_btn: "Division Profile", view_fleet: "View Fleet Vehicles",
+      back: "← Return to main page", fleet_title: "SSPD Fleet Inventory", fleet_sub: "\"Inspect the beasts that run on asphalt — up close.\"",
+      fleet_notice: "The SSPD periodically acquires eligible vehicles from the market, whether brand‑new or pre‑owned. These vehicles are subsequently refurbished or modified by authorised third‑party contractors. As a result, our fleet comprises a wide variety of models. This website displays only the most common types currently in service. You are welcome to arrange a visit to the SSPD car park, where you may view and photograph the vehicles in person.",
+      footer: "© 2025-2026 SIXSIDE POLICE DEPARTMENT | Technical support by Wareflame",
+      modal_return: "Return", modal_download: "Download Image", modal_raw: "View RAW",
+      find_title: "Find vehicle details (Nationwide)", search_btn: "Search"
+    },
+    classical: {
+      leave: "急離此卷", theme: "晝夜", lang: "言", close: "閉",
+      acc_contrast: "明暗", acc_grayscale: "黑白", acc_cursor_color: "準星之色", acc_enable_cursor: "啟準星",
+      title: "SSPD 高速巡警司", sub: "州道騎警 — 執法、馳援、安民。",
+      welcome: "高速巡警司", intro_btn: "司署本末", view_fleet: "閱車輿",
+      back: "← 返主頁", fleet_title: "SSPD 車輿名錄", fleet_sub: "\"近觀吾部馳騁於瀝青之猛獸。\"",
+      fleet_notice: "SSPD 每歲市賈合用之車，或新或舊。付之良工繕修更造，故車隊雜陳。此錄所載，惟見役常類。欲親覽者，可約觀SSPD車場。",
+      footer: "© 2025-2026 六面省巡捕房 | 技護：Wareflame",
+      modal_return: "還", modal_download: "下圖", modal_raw: "觀原圖",
+      find_title: "尋車籍 (全國)", search_btn: "尋"
+    }
+  };
+
+  let currentLang = 'en';
+
+  function applyLanguage() {
+    const t = translations[currentLang];
+    if (!t) return;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = t[key];
+        else el.innerText = t[key];
+      }
+    });
+  }
+
+  function setEnglish() {
+    currentLang = 'en';
+    closeLangModal();
+    applyLanguage();
+  }
+
+  function setClassicalChinese() {
+    currentLang = 'classical';
+    closeLangModal();
+    applyLanguage();
+  }
+
   function openLangModal() { const m = document.getElementById('langModal'); m.classList.add('show'); }
   function closeLangModal() { const m = document.getElementById('langModal'); m.classList.remove('show'); }
+
+  document.getElementById('englishLangBtn')?.addEventListener('click', setEnglish);
+  document.getElementById('classicalLangBtn')?.addEventListener('click', setClassicalChinese);
   document.getElementById('openLangModalBtn')?.addEventListener('click', openLangModal);
+  document.getElementById('closeLangModalBtn')?.addEventListener('click', closeLangModal);
 
   window.googleTranslateElementInit = function() {
     new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
@@ -1083,6 +1130,7 @@
 
   document.getElementById('brandHomeBtn')?.addEventListener('click', () => { window.location.href = 'https://uplgov.github.io/sixside/police/index.htm'; });
 
+  applyLanguage();
   refreshVehicleList();
 </script>
 </body>

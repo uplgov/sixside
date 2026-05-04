@@ -43,7 +43,6 @@
     #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-    /* --- 新增：渐显动画 --- */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -53,7 +52,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- 新增：逃生按钮 CSS --- */
     .quick-exit {
       position: fixed; top: 50%; right: 0; transform: translateY(-50%);
       background: var(--accent-red); color: #fff; padding: 20px 8px;
@@ -75,7 +73,6 @@
     .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 70px; z-index: 1000; }
     
     .nav-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff; position: relative; cursor: pointer; }
-    /* --- 新增：浅色主题下的 Logo 黑色适配 --- */
     body.light .nav-brand { color: #000000; }
     
     .nav-brand span { color: var(--police-blue); cursor: pointer; }
@@ -148,7 +145,6 @@
     }
     
     .acc-panel { position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; display: none; border-radius: 8px; }
-    /* --- 新增：辅助面板弹出的过渡动画 --- */
     .acc-panel.show { display: block; animation: dropIn 0.25s ease-out forwards; }
 
     .acc-item { margin-bottom: 15px; }
@@ -299,7 +295,6 @@
       text-shadow: 0 0 10px rgba(74, 107, 140, 0.9), 0 0 20px rgba(204, 51, 51, 0.4);
     }
 
-    /* --- 新增：所有模态框的淡入与下拉过渡动画 --- */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10001; display: none; overflow-y: auto; padding: 20px; animation: fadeIn 0.25s ease-out; }
     .report-modal, .lost-modal, .lang-modal, .captcha-modal, .privacy-modal, .license-modal, .time-check-modal { background: var(--bg-secondary); border: 1px solid var(--border-color); max-width: 650px; margin: 0 auto; padding: 30px; border-radius: 12px; animation: dropIn 0.3s ease-out forwards; }
     
@@ -426,7 +421,6 @@
     .count-tag { position: absolute; bottom: -8px; right: -8px; background: #fff; color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.7rem; border: 2px solid #000; }
     .queue-msg { font-weight: bold; }
     
-    /* --- 修改：强制语言列表按照要求呈现 2 列 --- */
     .lang-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
     .lang-option { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; transition: 0.2s; }
     .lang-option:hover { background: var(--police-blue); transform: translateY(-2px); }
@@ -625,7 +619,6 @@
 <div class="modal-overlay" id="licenseModal"><div class="license-modal"><h2 id="licenseModalTitle">License</h2><div id="licenseModalContent" style="max-height: 60vh; overflow-y: auto; white-space: pre-wrap;"></div><button class="btn-action" id="closeLicenseModal">Close</button></div></div>
 
 <script>
-  // 新增：逃生功能 JS
   function quickExit() {
     window.open('https://www.google.com/search?q=singapore', '_blank');
     window.location.replace('https://www.google.com/search?q=Shetland');
@@ -682,11 +675,7 @@
       timeWarning:'Your inaccurate clock may cause some features to be unavailable.',
       continueBtn:'Continue to Website',
       reconnecting:'Reconnecting...',
-      folderName:'Transparent Folder', chargerName:'HP Laptop 45W Charger', drinkName:'Lucozade Drink', 
-      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025', 
-      folderDetail:'Red zipper. Permanent marker "2026 Biology" on plastic. Contains GCSE Biology materials. Reward: £10 (≈9.98 UCC). Any clues please call 009.', 
-      chargerDetail:'Laptop charger. Suspect: black male with curly black hair, seen near Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Witness reported. Any clues please call 009.', 
-      drinkDetail:'Suspect: black male with curly black hair, same location as charger. Stolen between Apr 2025 - Nov 2025. Any clues please call 009.',
+      lostEmptyMsg:'Currently no lost items.',  
       btnMLP:'Motorway & Lane Patrol',
       privacyPolicy:'Privacy Policy',
       license:'License',
@@ -739,11 +728,7 @@
       timeWarning:'您的时间不准可能导致某些功能不可用。',
       continueBtn:'继续访问网站',
       reconnecting:'重新加载连接...',
-      folderName:'透明文件夹', chargerName:'惠普电脑45瓦充电器', drinkName:'Lucozade饮料', 
-      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月', 
-      folderDetail:'红色拉链。透明塑料上用永久马克笔写着"2026 Biology"。内含GCSE生物资料。酬金：10英镑(≈9.98 UCC)。有线索请拨打009。', 
-      chargerDetail:'笔记本电脑充电器。嫌疑人：有黑色卷发的黑人男性，2026年1/2月出现在莱斯特郡查恩伍德拉特克利夫村附近。有目击证人。任何线索请拨打009。', 
-      drinkDetail:'嫌疑人：有黑色卷发的黑人男性，同充电器地点。2025年4月至11月间失窃。任何线索请拨打009。',
+      lostEmptyMsg:'目前没有丢失物品。',  
       btnMLP:'公路和道路骑警',
       privacyPolicy:'隐私政策',
       license:'许可证',
@@ -796,15 +781,11 @@
       timeWarning:'Su reloj inexacto puede causar que algunas funciones no estén disponibles.',
       continueBtn:'Continuar al Sitio Web',
       reconnecting:'Reconectando...',
-      folderName:'Carpeta Transparente', chargerName:'Cargador HP Laptop 45W', drinkName:'Bebida Lucozade',
-      folderDate:'Abril 2026', chargerDate:'Ene - Feb 2026', drinkDate:'Abr 2025 - Nov 2025',
-      folderDetail:'Cremallera roja. Marcador permanente "2026 Biology" en plastico. Contiene materiales de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Cualquier pista llame al 009.',
-      chargerDetail:'Cargador de portatil. Sospechoso: hombre negro con cabello rizado negro, visto cerca de Ratcliffe on the Wreake, Charnwood, Leicestershire (Ene/Feb 2026). Testigo reporto. Cualquier pista llame al 009.',
-      drinkDetail:'Sospechoso: hombre negro con cabello rizado negro, misma ubicacion que el cargador. Robado entre Abr 2025 - Nov 2025. Cualquier pista llame al 009.',
+      lostEmptyMsg:'Actualmente no hay objetos perdidos.',  
       btnMLP:'Patrulla de Autopistas y Carriles',
       privacyPolicy:'Política de Privacidad',
       license:'Licencia',
-      privacyText:'De acuerdo con los requisitos establecidos en la regulación nacional 2133 "Privacidad y Ciberseguridad para Departamentos Gubernamentales – Versión 2" (Parlamento Nacional UPL, ley nacional), todos los portales en línea afiliados al gobierno están obligados a proporcionar a los usuarios un aviso claro y visible cuando esté a punto de tener lugar cualquier forma de recopilación o almacenamiento de datos. Este requisito garantiza que los usuarios estén plenamente informados y puedan comprender cómo se puede manejar su información antes del inicio de cualquier actividad de procesamiento de datos.\n\nEl sitio web uplgov.github.io/sixside no almacena, registra ni retiene ningún dato, archivo o material del usuario. Opera únicamente como una plataforma informativa y no inicia ninguna forma de recopilación de datos.\n\nSin embargo, ciertos subdominios que operan bajo el paraguas de Sixside, como los portales administrados por departamentos específicos, incluido el departamento de policía, pueden implementar sus propios mecanismos de manejo de datos y pueden almacenar información como parte de sus funciones operativas. Como estos subdominios se gestionan de forma independiente, sus prácticas de procesamiento de datos pueden variar.',
+      privacyText:'De acuerdo con los requisitos establecidos en la regulación nacional 2133 "Privacidad y Ciberseguridad para Departamentos Gubernamentales – Versión 2" (Parlamento Nacional UPL, ley nacional), todos los portales en línea afiliados al gobierno están obligados a proporcionar a los usuarios un aviso claro y visible cuando esté a punto de tener lugar cualquier forma de recopilación o almacenamiento de datos. Este requisito garantiza que los usuarios estén totalmente informados y puedan comprender cómo sus información puede ser tratada antes del inicio de cualquier actividad de procesamiento de datos.\n\nEl sitio web uplgov.github.io/sixside no almacena, registra ni retiene ningún dato, archivo o material del usuario. Opera únicamente como una plataforma informativa y no inicia ninguna forma de recopilación de datos.\n\nSin embargo, ciertos subdominios que operan bajo el paraguas de Sixside, como los portales administrados por departamentos específicos, incluido el departamento de policía, pueden implementar sus propios mecanismos de manejo de datos y pueden almacenar información como parte de sus funciones operativas. Como estos subdominios se gestionan de forma independiente, sus prácticas de procesamiento de datos pueden variar.',
       licenseText:'Este sitio web y todos los materiales contenidos en el mismo están protegidos bajo una licencia restrictiva diseñada para salvaguardar la integridad de la obra. El contenido puede ser utilizado únicamente para fines no comerciales, y cualquier uso de este tipo debe incluir una atribución clara y visible a la fuente original: uplgov.github.io/sixside. Ninguna parte de este sitio web puede ser modificada, adaptada, alterada o utilizada para crear obras derivadas. El uso comercial está estrictamente prohibido bajo todas las circunstancias. Cualquier uso más allá de los permisos expresamente otorgados requiere la autorización previa por escrito del propietario del sitio.',
       quickExitBtn:'SALIR RÁPIDO'
     },
@@ -853,11 +834,7 @@
       timeWarning:'Ihre ungenaue Uhr kann dazu führen, dass einige Funktionen nicht verfügbar sind.',
       continueBtn:'Zur Website fortfahren',
       reconnecting:'Verbindung wird wiederhergestellt...',
-      folderName:'Transparente Mappe', chargerName:'HP Laptop 45W Ladegerat', drinkName:'Lucozade-Getrank',
-      folderDate:'April 2026', chargerDate:'Jan - Feb 2026', drinkDate:'Apr 2025 - Nov 2025',
-      folderDetail:'Roter ReiBverschluss. Permanentmarker "2026 Biology" auf Kunststoff. Enthalt GCSE-Biologiematerialien. Belohnung: £10 (≈9.98 UCC). Hinweise bitte unter 009.',
-      chargerDetail:'Laptop-Ladegerat. Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gesehen in der Nahe von Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Feb 2026). Zeuge gemeldet. Hinweise bitte unter 009.',
-      drinkDetail:'Verdachtiger: schwarzer Mann mit lockigem schwarzem Haar, gleicher Ort wie Ladegerat. Gestohlen zwischen Apr 2025 - Nov 2025. Hinweise bitte unter 009.',
+      lostEmptyMsg:'Derzeit keine verlorenen Gegenstände.',  
       btnMLP:'Autobahn- und Fahrspurstreife',
       privacyPolicy:'Datenschutzrichtlinie',
       license:'Lizenz',
@@ -910,11 +887,7 @@
       timeWarning:'Seu relógio inexato pode fazer com que algumas funções não estejam disponíveis.',
       continueBtn:'Continuar para o Site',
       reconnecting:'Reconectando...',
-      folderName:'Pasta Transparente', chargerName:'Carregador HP Laptop 45W', drinkName:'Bebida Lucozade',
-      folderDate:'Abril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Abr 2025 - Nov 2025',
-      folderDetail:'Ziper vermelho. Marcador permanente "2026 Biology" no plastico. Contem materiais de biologia GCSE. Recompensa: £10 (≈9.98 UCC). Qualquer pista ligue para 009.',
-      chargerDetail:'Carregador de laptop. Suspeito: homem negro com cabelo cacheado preto, visto perto de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Testemunha reportou. Qualquer pista ligue para 009.',
-      drinkDetail:'Suspeito: homem negro com cabelo cacheado preto, mesmo local do carregador. Roubado entre Abr 2025 - Nov 2025. Qualquer pista ligue para 009.',
+      lostEmptyMsg:'Atualmente não há itens perdidos.',  
       btnMLP:'Patrulha de Autoestradas e Vias',
       privacyPolicy:'Política de Privacidade',
       license:'Licença',
@@ -967,11 +940,7 @@
       timeWarning:'您的時間不準可能導致某些功能不可用。',
       continueBtn:'繼續訪問網站',
       reconnecting:'重新加載連接...',
-      folderName:'透明文件夾', chargerName:'惠普電腦45瓦充電器', drinkName:'Lucozade飲料',
-      folderDate:'2026年4月', chargerDate:'2026年1月至2月', drinkDate:'2025年4月至11月',
-      folderDetail:'紅色拉鏈。透明塑料上用永久馬克筆寫著"2026 Biology"。內含GCSE生物資料。酬金：10英鎊(≈9.98 UCC)。有線索請撥打009。',
-      chargerDetail:'筆記本電腦充電器。嫌疑人：有黑色卷發的黑人男性，2026年1/2月出現在萊斯特郡查恩伍德拉特克利夫村附近。有目擊證人。任何線索請撥打009。',
-      drinkDetail:'嫌疑人：有黑色卷發的黑人男性，同充電器地點。2025年4月至11月間失竊。任何線索請撥打009。',
+      lostEmptyMsg:'目前沒有丟失物品。',  
       btnMLP:'公路和道路騎警',
       privacyPolicy:'隱私政策',
       license:'許可證',
@@ -984,7 +953,7 @@
       callNote:'110/009 appel gratuit, aucune carte SIM requise (couverture cellulaire requise) | 110/009 signalement par SMS disponible',
       justice:'JUSTICE', professionalism:'PROFESSIONNALISME', protection:'PROTECTION',
       respTime:'TEMPS DE REPONSE MOYEN 2025', clearRate:'TAUX DE RESOLUTION MOYEN 2025',
-      respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartiteur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
+      respTooltip:'Désigne spécifiquement l\'intervalle de temps moyen entre le moment où l\'opérateur raccroche l\'appel d\'urgence et où le répartateur termine l\'affectation, et l\'arrivée du premier agent sur les lieux et la confirmation de l\'emplacement. Son calcul inclut généralement le temps de traitement de l\'appel et le temps de trajet, mais exclut le temps d\'intervention sur place. Cet indicateur est un KPI central mesurant la mobilité policière et la densité de couverture juridictionnelle ; des valeurs plus faibles indiquent une capacité de réponse aux urgences plus forte.',
       clearTooltip:'Dans une période statistique donnée, le pourcentage moyen obtenu en divisant le nombre d\'affaires légalement classées (résolues, transmises pour poursuites ou autrement traitées) par le nombre total d\'affaires enregistrées sur la même période. Notez que cet indicateur ne reflète pas directement si un crime a eu lieu ; il mesure uniquement l\'efficacité du traitement des affaires signalées. Dans le système Uniform Crime Reporting américain, le classement est généralement obtenu par arrestation ou moyens exceptionnels. C\'est un autre KPI central pour évaluer l\'efficacité des enquêtes et la qualité de la gestion de la sécurité publique.',
       respVal:'17m 04s', clearVal:'98.2%', respTrend:'6s vs 2024', clearTrend:'0.6% plus bas vs 2024',
       footerText:'© 2025-2026 SERVICE DE POLICE DE SIXSIDE | Support technique par Wareflame',
@@ -1024,11 +993,7 @@
       timeWarning:'Votre horloge inexacte peut rendre certaines fonctions indisponibles.',
       continueBtn:'Continuer vers le Site',
       reconnecting:'Reconnexion...',
-      folderName:'Dossier Transparent', chargerName:'Chargeur HP Laptop 45W', drinkName:'Boisson Lucozade',
-      folderDate:'Avril 2026', chargerDate:'Jan - Fev 2026', drinkDate:'Avr 2025 - Nov 2025',
-      folderDetail:'Fermeture eclair rouge. Marqueur permanent "2026 Biology" sur plastique. Contient du materiel de biologie GCSE. Recompense: £10 (≈9.98 UCC). Tout indice appelez le 009.',
-      chargerDetail:'Chargeur d\'ordinateur portable. Suspect: homme noir aux cheveux boucles noirs, vu pres de Ratcliffe on the Wreake, Charnwood, Leicestershire (Jan/Fev 2026). Temoin signale. Tout indice appelez le 009.',
-      drinkDetail:'Suspect: homme noir aux cheveux boucles noirs, meme endroit que le chargeur. Vole entre Avr 2025 - Nov 2025. Tout indice appelez le 009.',
+      lostEmptyMsg:'Actuellement aucun objet perdu.',  
       btnMLP:'Patrouille d\'Autoroute et de Voie',
       privacyPolicy:'Politique de Confidentialite',
       license:'Licence',
@@ -1081,11 +1046,7 @@
       timeWarning:'君時不準，或致部分功能不可用。',
       continueBtn:'繼續訪網',
       reconnecting:'重連中...',
-      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
-      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
-      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
-      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
-      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。',
+      lostEmptyMsg:'現無失物。',  
       btnMLP:'公路騎警',
       privacyPolicy:'隱私策',
       license:'許可證',
@@ -1138,11 +1099,7 @@
       timeWarning:'Неточные часы могут привести к недоступности некоторых функций.',
       continueBtn:'Продолжить на Сайт',
       reconnecting:'Переподключение...',
-      folderName:'Прозрачная папка', chargerName:'Зарядное устройство HP Laptop 45W', drinkName:'Напиток Lucozade',
-      folderDate:'Апрель 2026', chargerDate:'Янв - Фев 2026', drinkDate:'Апр 2025 - Ноя 2025',
-      folderDetail:'Красная молния. Перманентный маркер "2026 Biology" на пластике. Содержит материалы по биологии GCSE. Награда: £10 (≈9.98 UCC). Любые подсказки звоните 009.',
-      chargerDetail:'Зарядное устройство для ноутбука. Подозреваемый: чернокожий мужчина с вьющимися черными волосами, замечен недалеко от Рэтклифф-он-те-Рик, Чарнвуд, Лестершир (Янв/Фев 2026). Свидетель сообщил. Любые подсказки звоните 009.',
-      drinkDetail:'Подозреваемый: чернокожий мужчина с вьющимися черными волосами, то же место, что и зарядное устройство. Украдено в период с апреля 2025 по ноябрь 2025. Любые подсказки звоните 009.',
+      lostEmptyMsg:'В настоящее время нет потерянных предметов.',  
       btnMLP:'Патруль автомагистралей и полос',
       privacyPolicy:'Политика конфиденциальности',
       license:'Лицензия',
@@ -1195,11 +1152,7 @@
       timeWarning:'Таны цаг буруу тул зарим функц ажиллахгүй байж болно.',
       continueBtn:'Вэбсайт руу Үргэлжлүүлэх',
       reconnecting:'Дахин холбогдож байна...',
-      folderName:'Ил товч', chargerName:'HP Laptop 45W Цэнэглэгч', drinkName:'Lucozade Ундаа',
-      folderDate:'2026 оны 4-р сар', chargerDate:'2026 оны 1-2-р сар', drinkDate:'2025 оны 4-11-р сар',
-      folderDetail:'Улаан цахилгаан товч. Хуванцар дээр "2026 Biology" гэж бичсэн. GCSE биологийн материал агуулдаг. Шагнал: £10 (≈9.98 UCC). Холбоо барих 009.',
-      chargerDetail:'Зөөврийн компьютер цэнэглэгч. Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, Ратклифф он дэ Рийк, Чарнвуд, Лестершир (2026 оны 1-2-р сар). Гэрч мэдээлсэн. Холбоо барих 009.',
-      drinkDetail:'Сэжигтэн: буржгар хар үстэй хар арьстан эрэгтэй, цэнэглэгчтэй ижил байршил. 2025 оны 4-11-р сард хулгайлагдсан. Холбоо барих 009.',
+      lostEmptyMsg:'Одоогоор алдагдсан зүйл байхгүй.',  
       btnMLP:'Хурдны зам ба эгнээний эргүүл',
       privacyPolicy:'Нууцлалын бодлого',
       license:'Лиценз',
@@ -1252,11 +1205,7 @@
       timeWarning:'時計が不正確なため、一部の機能が利用できない可能性があります。',
       continueBtn:'サイトへ進む',
       reconnecting:'再接続中...',
-      folderName:'透明フォルダ', chargerName:'HPノートPC45W充電器', drinkName:'ルコザード飲料',
-      folderDate:'2026年4月', chargerDate:'2026年1月-2月', drinkDate:'2025年4月-11月',
-      folderDetail:'赤いジッパー。プラスチックに永久マーカーで「2026 Biology」と記載。GCSE生物学資料を含む。報奨金：£10 (≈9.98 UCC)。手がかりは009へ。',
-      chargerDetail:'ノートパソコン充電器。容疑者：黒い縮れ毛の黒人男性、ラトクリフ・オン・ザ・リーク、チャーンウッド、レスターシャー近郊で目撃（2026年1月/2月）。目撃者あり。手がかりは009へ。',
-      drinkDetail:'容疑者：黒い縮れ毛の黒人男性、充電器と同じ場所。2025年4月から11月の間に盗難。手がかりは009へ。',
+      lostEmptyMsg:'現在、紛失物はありません。',  
       btnMLP:'高速道路・車線パトロール',
       privacyPolicy:'プライバシーポリシー',
       license:'ライセンス',
@@ -1309,11 +1258,7 @@
       timeWarning:'시계가 부정확하여 일부 기능을 사용하지 못할 수 있습니다.',
       continueBtn:'웹사이트 계속하기',
       reconnecting:'다시 연결 중...',
-      folderName:'투명 폴더', chargerName:'HP 노트북 45W 충전기', drinkName:'루코자데 음료',
-      folderDate:'2026년 4월', chargerDate:'2026년 1월-2월', drinkDate:'2025년 4월-11월',
-      folderDetail:'빨간색 지퍼. 플라스틱에 "2026 Biology"라고 쓰여 있음. GCSE 생물학 자료 포함. 보상: £10 (≈9.98 UCC). 제보는 009로.',
-      chargerDetail:'노트북 충전기. 용의자: 곱슬머리의 흑인 남성, Ratcliffe on the Wreake, Charnwood, Leicestershire 근처에서 목격됨 (2026년 1월/2월). 목격자 신고. 제보는 009로.',
-      drinkDetail:'용의자: 곱슬머리의 흑인 남성, 충전기와 같은 장소. 2025년 4월-11월 사이 도난. 제보는 009로.',
+      lostEmptyMsg:'현재 분실물이 없습니다.',  
       btnMLP:'고속도로 및 차선 순찰',
       privacyPolicy:'개인정보 보호정책',
       license:'라이선스',
@@ -1366,15 +1311,11 @@
       timeWarning:'आपकी गलत घड़ी के कारण कुछ सुविधाएँ अनुपलब्ध हो सकती हैं।',
       continueBtn:'वेबसाइट पर जारी रखें',
       reconnecting:'पुनः कनेक्ट हो रहा है...',
-      folderName:'पारदर्शी फ़ोल्डर', chargerName:'HP लैपटॉप 45W चार्जर', drinkName:'ल्यूकोजेड पेय',
-      folderDate:'अप्रैल 2026', chargerDate:'जनवरी-फरवरी 2026', drinkDate:'अप्रैल 2025-नवंबर 2025',
-      folderDetail:'लाल ज़िपर। प्लास्टिक पर "2026 Biology" लिखा है। GCSE जीव विज्ञान सामग्री शामिल है। पुरस्कार: £10 (≈9.98 UCC)। कोई सुराग 009 पर कॉल करें।',
-      chargerDetail:'लैपटॉप चार्जर। संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, रैटक्लिफ ऑन द रीक, चार्नवुड, लीसेस्टरशायर के पास देखा गया (जनवरी/फरवरी 2026)। गवाह ने रिपोर्ट किया। कोई सुराग 009 पर कॉल करें।',
-      drinkDetail:'संदिग्ध: घुंघराले काले बालों वाला काला पुरुष, चार्जर के समान स्थान। अप्रैल 2025 - नवंबर 2025 के बीच चोरी हुआ। कोई सुराग 009 पर कॉल करें।',
+      lostEmptyMsg:'वर्तमान में कोई खोई हुई वस्तु नहीं है।',  
       btnMLP:'मोटरवे और लेन गश्ती',
       privacyPolicy:'गोपनीयता नीति',
       license:'लाइसेंस',
-      privacyText:'राष्ट्रीय विनियमन 2133 "सरकारी विभागों के लिए गोपनीयता और साइबर सुरक्षा – संस्करण 2" (यूपीएल राष्ट्रीय संसद, राष्ट्रीय कानून) में निर्धारित आवश्यकताओं के अनुसार, सभी सरकारी संबद्ध ऑनलाइन पोर्टल डेटा संग्रह या भंडारण के किसी भी रूप के होने वाला होने पर उपयोगकर्ताओं को स्पष्ट और दृश्यमान सूचना प्रदान करने के लिए बाध्य हैं। यह आवश्यकता सुनिश्चित करती है कि उपयोगकर्ता पूरी तरह से सूचित हों और किसी भी डेटा प्रोसेसिंग गतिविधियों के शुरू होने से पहले यह समझ सकें कि उनकी जानकारी कैसे संभाली जा सकती है。\n\nवेबसाइट uplgov.github.io/sixside किसी भी उपयोगकर्ता डेटा, फ़ाइलों या सामग्रियों को संग्रहीत, रिकॉर्ड या बरकरार नहीं रखती है। यह विशेष रूप से एक सूचना मंच के रूप में कार्य करती है और किसी भी प्रकार का डेटा संग्रह शुरू नहीं करती है。\n\nहालाँकि, सिक्ससाइड छत्र के तहत काम करने वाले कुछ सबडोमेन - जैसे कि विशिष्ट विभागों (पुलिस विभाग सहित) द्वारा प्रशासित पोर्टल - अपने स्वयं के डेटा-हैंडलिंग तंत्र को लागू कर सकते हैं और अपने परिचालन कार्यों के हिस्से के रूप में जानकारी संग्रहीत कर सकते हैं। चूंकि ये सबडोमेन स्वतंत्र रूप से प्रबंधित किए जाते हैं, इसलिए उनके डेटा-प्रोसेसिंग अभ्यास भिन्न हो सकते हैं।',
+      privacyText:'राष्ट्रीय विनियमन 2133 "सरकारी विभागों के लिए गोपनीयता और साइबर सुरक्षा – संस्करण 2" (यूपीएल राष्ट्रीय संसद, राष्ट्रीय कानून) में निर्धारित आवश्यकताओं के अनुसार, सभी सरकारी संबद्ध ऑनलाइन पोर्टल डेटा संग्रह या भंडारण के किसी भी रूप के होने वाला होने पर उपयोगकर्ताओं को स्पष्ट और दृश्यमान सूचना प्रदान करने के लिए बाध्य हैं। यह आवश्यकता सुनिश्चित करती है कि उपयोगकर्ता पूरी तरह से सूचित हों और किसी भी डेटा प्रोसेसिंग गतिविधियों के शुरू होने से पहले यह समझ सकें कि उनकी जानकारी कैसे संभाली जा सकती है।\n\nवेबसाइट uplgov.github.io/sixside किसी भी उपयोगकर्ता डेटा, फ़ाइलों या सामग्रियों को संग्रहीत, रिकॉर्ड या बरकरार नहीं रखती है। यह विशेष रूप से एक सूचना मंच के रूप में कार्य करती है और किसी भी प्रकार का डेटा संग्रह शुरू नहीं करती है।\n\nहालाँकि, सिक्ससाइड छत्र के तहत काम करने वाले कुछ सबडोमेन - जैसे कि विशिष्ट विभागों (पुलिस विभाग सहित) द्वारा प्रशासित पोर्टल - अपने स्वयं के डेटा-हैंडलिंग तंत्र को लागू कर सकते हैं और अपने परिचालन कार्यों के हिस्से के रूप में जानकारी संग्रहीत कर सकते हैं। चूंकि ये सबडोमेन स्वतंत्र रूप से प्रबंधित किए जाते हैं, इसलिए उनके डेटा-प्रोसेसिंग अभ्यास भिन्न हो सकते हैं।',
       licenseText:'यह वेबसाइट और इसमें निहित सभी सामग्री एक प्रतिबंधात्मक लाइसेंस के तहत संरक्षित हैं जो कार्य की अखंडता की रक्षा के लिए डिज़ाइन किया गया है। सामग्री का उपयोग केवल गैर-व्यावसायिक उद्देश्यों के लिए किया जा सकता है, और ऐसे किसी भी उपयोग में मूल स्रोत uplgov.github.io/sixside के लिए स्पष्ट और दृश्यमान श्रेय शामिल होना चाहिए। इस वेबसाइट के किसी भी हिस्से को संशोधित, अनुकूलित, बदला या व्युत्पन्न कार्य बनाने के लिए उपयोग नहीं किया जा सकता है। सभी परिस्थितियों में व्यावसायिक उपयोग सख्त वर्जित है। स्पष्ट रूप से दी गई अनुमतियों से परे किसी भी उपयोग के लिए साइट स्वामी से पूर्व लिखित प्राधिकरण की आवश्यकता होती है।',
       quickExitBtn:'तुरंत बाहर जाएं'
     },
@@ -1423,11 +1364,7 @@
       timeWarning:'君時不準，或致部分功能不可用。',
       continueBtn:'繼續訪網',
       reconnecting:'重連中...',
-      folderName:'透明夾', chargerName:'惠普腦充四十五瓦', drinkName:'樂可樂飲',
-      folderDate:'丙午年四月', chargerDate:'丙午年正月至二月', drinkDate:'乙巳年四月至十一月',
-      folderDetail:'紅牙。膠上書"2026 Biology"。內有GCSE生物料。賞十鎊(≈9.98 UCC)。有線索撥009。',
-      chargerDetail:'腦充。嫌：黑人卷髮，見於萊郡。有證。線索撥009。',
-      drinkDetail:'嫌：黑人卷髮，同充地。乙巳年四月至十一月間失。線索撥009。',
+      lostEmptyMsg:'現無失物。',  
       btnMLP:'公路騎警',
       privacyPolicy:'隱私策',
       license:'許可證',
@@ -1443,6 +1380,7 @@
     if (!translations[lang].license) translations[lang].license = translations.en.license;
     if (!translations[lang].privacyText) translations[lang].privacyText = translations.en.privacyText;
     if (!translations[lang].licenseText) translations[lang].licenseText = translations.en.licenseText;
+    if (!translations[lang].lostEmptyMsg) translations[lang].lostEmptyMsg = translations.en.lostEmptyMsg;
   }
 
   const SimpleLunar = (function() {
@@ -1769,6 +1707,11 @@
     });
   }
   
+  function showEmptyLostMessage() {
+    const t = translations[currentLang];
+    showToast(t.lostEmptyMsg || "Currently no lost items.");
+  }
+  
   function showCaptchaForLost() {
     const t = translations[currentLang];
     const captchaContainer = document.getElementById('lostCaptcha');
@@ -1785,26 +1728,9 @@
     document.getElementById('cancelCaptchaBtn').innerText = t.captchaCancel;
     document.getElementById('lostCaptchaError').innerText = '';
     document.getElementById('captchaModal').style.display = 'block';
-    pendingLostCallback = () => { showLostAndFoundContent(); };
+    pendingLostCallback = () => { showEmptyLostMessage(); };
   }
   
-  function showLostAndFoundContent() {
-    let t = translations[currentLang];
-    let items = [
-      { name: t.folderName, date: t.folderDate, detail: t.folderDetail },
-      { name: t.chargerName, date: t.chargerDate, detail: t.chargerDetail },
-      { name: t.drinkName, date: t.drinkDate, detail: t.drinkDetail }
-    ];
-    let html = '<div class="lost-grid">';
-    items.forEach(item => {
-      html += `<div class="lost-card" onclick="alert('${item.name}\\n\\n${item.detail}')"><div class="lost-header"><span class="lost-name">${item.name}</span><span class="lost-date">${item.date}</span></div></div>`;
-    });
-    html += `</div><div class="db-notice">${t.dbNotice}</div>`;
-    document.getElementById('lostDetailTitle').innerText = t.lostTitle;
-    document.getElementById('lostDetailContent').innerHTML = html;
-    document.getElementById('lostDetailModal').style.display = 'block';
-  }
-
   function updateServiceButtonsUI() {
     document.querySelectorAll('.service-option-btn').forEach(btn => {
       btn.classList.toggle('selected', selectedServices.includes(btn.getAttribute('data-service')));
@@ -1826,7 +1752,6 @@
     let t = translations[lang];
     if(!t) return;
     
-    /* 修正 footerText 引用，并添加 quickExitBtn 支持 */
     ['emergencyLabel','nonEmergencyLabel','callNote','wordJustice','wordProfessionalism','wordProtection',
      'respTimeVal','clearRateVal','respTrend','clearTrend','respLabel','clearLabel','footerText',
      'modalHead','directCallHint','serviceLabel','locationLabel','visibleLabel','optYes','optNo',

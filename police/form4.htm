@@ -1,468 +1,296 @@
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ERR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>SSPD | Citizen Service Portal</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --bg-primary: #0a0f1a;
-      --bg-secondary: #10161f;
-      --text-primary: #e8edf5;
-      --text-secondary: #9aaebf;
-      --border-color: #1f2a36;
-      --card-bg: #10161f;
-      --card-border: #222c38;
-      --btn-bg: #1e2a3a;
-      --accent: #5f7f9e;
-      --sec-bg: #071220;
-      --sec-border: #1a3a5c;
-      --sec-text: #7aabcc;
-      --sec-icon: #4a8ab0;
-      --quick-card: #0f1c2a;
-      --quick-border: #1e3248;
+      --bg-primary: #0a0f1a; --bg-secondary: #10161f; --text-primary: #e8edf5;
+      --text-secondary: #9aaebf; --border-color: #1a2538; --card-bg: #10161f;
+      --card-border: #222c38; --btn-bg: #1e2a3a; --accent-red: #cc3333;
+      --accent-green: #2ecc71; --accent-amber: #f39c12; --police-blue: #4a6b8c;
+      --cursor-color: rgba(204, 51, 51, 0.3); --cursor-border: #cc3333;
+      --transition-default: all 0.25s ease-out;
+      --transition-smooth: opacity 0.2s ease, transform 0.2s ease;
     }
-
-    body {
-      font-family: 'Georgia', 'Times New Roman', Times, serif;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    #securityBanner {
-      background: var(--sec-bg);
-      border-bottom: 1px solid var(--sec-border);
-    }
-
-    #securityFull {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, padding 0.45s ease;
-      padding: 0 2rem;
-    }
-
-    #securityFull.open {
-      max-height: 260px;
-      opacity: 1;
-      padding: 14px 2rem;
-    }
-
-    #securityFull-inner {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    #closeBannerBtn {
-      flex-shrink: 0;
-      margin-top: 2px;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: #cc3333;
-      border: none;
-      cursor: pointer;
-      position: relative;
-      transition: background 0.18s;
-    }
-
-    #closeBannerBtn::before, #closeBannerBtn::after {
-      content: '';
-      position: absolute;
-      width: 7px;
-      height: 1.5px;
-      background: transparent;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      transition: background 0.18s;
-    }
-
-    #closeBannerBtn::after {
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
-
-    #closeBannerBtn:hover {
-      background: #888;
-    }
-
-    #closeBannerBtn:hover::before, #closeBannerBtn:hover::after {
-      background: #fff;
-    }
-
-    .security-body {
-      flex: 1;
-    }
-
-    .security-body h3 {
-      font-size: 0.82rem;
-      font-weight: bold;
-      color: var(--sec-text);
-      margin-bottom: 10px;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.02em;
-    }
-
-    .security-items {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-
-    .security-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 0.75rem;
-      color: var(--sec-text);
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .security-item img {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      opacity: 0.85;
-      filter: hue-rotate(180deg) brightness(1.2);
-      flex-shrink: 0;
-    }
-
-    .security-item span {
-      opacity: 0.9;
-      line-height: 1.4;
-    }
-
-    #securityCollapsed {
-      padding: 7px 2rem;
-      font-size: 0.72rem;
-      color: var(--sec-text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.2s;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.01em;
-    }
-
-    #securityCollapsed:hover {
-      opacity: 0.7;
-    }
-
-    #securityCollapsed::before {
-      content: '›';
-      font-size: 0.9rem;
-      transition: transform 0.2s;
-    }
-
-    #securityCollapsed:hover::before {
-      transform: translateX(2px);
-    }
-
-    .maintenance-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      min-height: 60vh;
-      padding: 3rem 2rem;
-    }
-
-    .hero-word {
-      text-align: center;
-      position: relative;
-      max-width: 100%;
-    }
-
-    .main-word {
-      font-size: 7rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: white;
-      text-shadow: 0 0 25px rgba(255,255,255,0.4);
-      margin-bottom: 2rem;
-      word-break: break-word;
-      line-height: 1.2;
-    }
-
-    @media (max-width: 760px) {
-      .main-word {
-        font-size: 3.5rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .main-word {
-        font-size: 2.5rem;
-      }
-    }
-
-    .language-ring {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1.2rem 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .lang-item {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.55);
-      font-family: 'Georgia', monospace;
-      letter-spacing: 0.02em;
-      transition: color 0.2s, transform 0.15s;
-      white-space: nowrap;
-      cursor: default;
-    }
-
-    .lang-item:hover {
-      color: rgba(255, 255, 255, 0.9);
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 640px) {
-      .lang-item {
-        font-size: 0.7rem;
-        white-space: nowrap;
-      }
-      .language-ring {
-        gap: 0.8rem 1rem;
-      }
-    }
-
-    .footer-note {
-      text-align: center;
-      padding: 1.8rem;
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      border-top: 1px solid var(--border-color);
-      margin-top: 2rem;
-      letter-spacing: 0.5px;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.9rem 2rem;
-      border-bottom: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .home-button {
-      font-size: 1.15rem;
-      font-weight: bold;
-      background: none;
-      border: none;
-      color: var(--text-primary);
-      cursor: pointer;
-      font-family: 'Georgia', serif;
-      letter-spacing: 0.03em;
-      transition: color 0.15s;
-    }
-
-    .home-button:hover {
-      color: var(--accent);
-    }
-
-    .nav-divider {
-      color: var(--text-secondary);
-    }
-
-    .current-location {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-    }
-
-    .btn-square {
-      background: var(--btn-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.3rem 0.9rem;
-      cursor: pointer;
-      color: var(--text-primary);
-      font-size: 0.82rem;
-      font-family: 'Georgia', serif;
-      transition: border-color 0.15s, background 0.15s;
-    }
-
-    .btn-square:hover {
-      border-color: var(--accent);
-      background: var(--card-bg);
-    }
-
     body.light {
-      --bg-primary: #f4f6f9;
-      --bg-secondary: #ffffff;
-      --text-primary: #1a2634;
-      --text-secondary: #3a4a5e;
-      --border-color: #d0d8e4;
-      --card-bg: #ffffff;
-      --card-border: #dce2ec;
-      --btn-bg: #eef2f7;
-      --sec-bg: #e8f4fd;
-      --sec-border: #b8d8f0;
-      --sec-text: #2a5f80;
-      --quick-card: #f0f6ff;
-      --quick-border: #c8dff0;
+      --bg-primary: #f4f6f9; --bg-secondary: #ffffff; --text-primary: #1a2634;
+      --text-secondary: #3a4a5e; --border-color: #d0d8e4; --card-bg: #ffffff;
+      --card-border: #dce2ec; --btn-bg: #eef2f7;
     }
+    body { font-family: 'Georgia', serif; background-color: var(--bg-primary); color: var(--text-primary); transition: background 0.3s; overflow-x: hidden; }
+    
+    #cursor-highlight {
+      position: fixed; pointer-events: none; width: 50px; height: 50px;
+      border: 2px solid var(--cursor-border); background: var(--cursor-color);
+      border-radius: 50%; transform: translate(-50%, -50%); z-index: 10000; display: none;
+      transition: opacity 0.1s;
+    }
+    #cursor-highlight::before, #cursor-highlight::after { content: ''; position: absolute; background: #fff; }
+    #cursor-highlight::before { width: 18px; height: 2px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    #cursor-highlight::after { width: 2px; height: 18px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-    body.light .security-item img {
-      filter: none;
-      opacity: 0.7;
-    }
+    .filter-layer { transition: filter 0.2s; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
 
-    body.light .main-word {
-      color: #1a2634;
-      text-shadow: 0 0 15px rgba(0,0,0,0.1);
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000; }
+    .nav-brand {
+      background: none; border: none; font-weight: bold; letter-spacing: 1px; color: #ffffff;
+      cursor: pointer; font-family: inherit; font-size: 1.1rem; padding: 0; outline: none;
+      user-select: none;
     }
+    .nav-brand span { color: var(--police-blue); font-weight: normal; }
+    .nav-tools { display: flex; gap: 15px; align-items: center; }
+    .acc-icon-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; filter: grayscale(1) contrast(2); }
+    .tool-btn { background: var(--btn-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 5px 15px; cursor: pointer; font-family: inherit; font-size: 0.8rem; transition: var(--transition-default); }
+    .tool-btn:hover { background: var(--police-blue); border-color: var(--police-blue); }
+    
+    .acc-panel { 
+      position: absolute; top: 70px; right: 2rem; width: 320px; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 25px; z-index: 2000; 
+      opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+    .acc-panel.show { opacity: 1; transform: translateY(0); visibility: visible; }
+    
+    .acc-item { margin-bottom: 15px; }
+    .acc-item label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .acc-select, .form-input { width: 100%; padding: 10px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); font-family: inherit; }
 
-    body.light .lang-item {
-      color: rgba(26,38,52,0.55);
+    .lang-modal { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; 
+      display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s;
     }
+    .lang-modal.show { opacity: 1; visibility: visible; }
+    .lang-grid { 
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 500px; background: var(--bg-secondary); padding: 30px; border: 1px solid var(--border-color);
+      transform: scale(0.96); transition: transform 0.2s ease; opacity: 0;
+    }
+    .lang-modal.show .lang-grid { transform: scale(1); opacity: 1; }
+    .lang-btn { background: var(--btn-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; cursor: pointer; text-align: center; font-family: inherit; transition: var(--transition-default); }
+    .lang-btn:hover { background: var(--police-blue); border-color: var(--police-blue); }
 
-    body.light .lang-item:hover {
-      color: rgba(26,38,52,0.85);
+    .quick-exit {
+      position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+      background: var(--accent-red); color: #fff; padding: 20px 8px;
+      writing-mode: vertical-rl; text-orientation: mixed; font-weight: bold;
+      cursor: pointer; z-index: 9999; border: 2px solid #fff; border-right: none;
+      border-radius: 8px 0 0 8px; letter-spacing: 2px; transition: 0.2s; font-family: sans-serif;
     }
+    .quick-exit:hover { background: #a00; padding-right: 15px; }
+
+    .header-section { text-align: center; padding: 50px 0 30px; border-bottom: 1px solid var(--border-color); }
+    .header-section h1 { font-size: 2.5rem; letter-spacing: 1px; margin-bottom: 15px; text-transform: uppercase; }
+    .header-section p { color: var(--text-secondary); font-style: italic; }
+    
+    .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 40px 0; }
+    .service-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 20px; cursor: pointer; font-family: inherit; font-size: 1.1rem; transition: var(--transition-default); text-align: left; display: flex; justify-content: space-between; align-items: center; }
+    .service-btn:hover { border-color: var(--police-blue); background: var(--btn-bg); transform: translateY(-2px); }
+    .service-btn::after { content: '→'; color: var(--text-secondary); }
+
+    #selectionView { transition: opacity 0.2s ease; }
+    #detailContainer { 
+      display: none; margin: 40px 0; background: var(--card-bg); border: 1px solid var(--card-border); padding: 30px;
+      opacity: 0; transform: translateY(6px); transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    #detailContainer.visible { opacity: 1; transform: translateY(0); }
+    .back-btn { background: transparent; color: var(--text-secondary); border: none; cursor: pointer; text-decoration: underline; margin-bottom: 20px; font-family: inherit; font-size: 1rem; transition: color 0.15s; }
+    .back-btn:hover { color: var(--police-blue); }
+    .red-emergency { color: var(--accent-red); font-weight: bold; border-left: 4px solid var(--accent-red); background: rgba(204,51,51,0.08); padding: 15px; margin-bottom: 20px; }
+    .info-card { background: var(--bg-primary); border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px; border-radius: 4px; line-height: 1.5; }
+    .info-card p { margin: 10px 0; }
+    .inline-code { font-family: monospace; background: var(--btn-bg); padding: 2px 6px; border-radius: 4px; color: var(--accent-amber); }
+    hr { border-color: var(--border-color); margin: 20px 0; }
+    footer { text-align: center; padding: 50px; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem; }
+    
+    .fade-transition { transition: opacity 0.2s, transform 0.2s; }
   </style>
 </head>
 <body>
 
-<div id="securityBanner">
-  <div id="securityFull">
-    <div id="securityFull-inner">
-      <button id="closeBannerBtn" title="Close"></button>
-      <div class="security-body">
-        <h3 id="securityTitle">How do you know this website is safe?</h3>
-        <div class="security-items">
-          <div class="security-item">
-            <img src="https://uplgov.github.io/sixside/Government.png" alt="Official domain">
-            <span id="securityDomain">uplgov.github.io is the official and only domain of the UPL Government</span>
-          </div>
-          <div class="security-item">
-            <img src="https://uplgov.github.io/sixside/Lock.png" alt="Secure connection">
-            <span id="securityHttps">The lock icon and https:// in your browser mean your connection is encrypted and secure</span>
-          </div>
-          <div class="security-item">
-            <img src="https://uplgov.github.io/sixside/Rubbishbin.png" alt="No data storage">
-            <span id="securityNoStorage">This portal does not store any data. According to the 2133 "Privacy and Cybersecurity for Government Departments - Version 2" regulation, government portals must visibly indicate when data storage is about to begin.</span>
-          </div>
-        </div>
+<div id="cursor-highlight"></div>
+<button class="quick-exit" onclick="quickExit()" data-i18n="leave">LEAVE THIS PAGE</button>
+
+<nav class="top-nav">
+  <button class="nav-brand" onclick="window.location.reload()">SIXSIDE <span>| POLICE DEPARTMENT</span></button>
+  <div class="nav-tools">
+    <button class="acc-icon-btn" onclick="toggleAccPanel()">♿️</button>
+    <button class="tool-btn" onclick="document.body.classList.toggle('light')" data-i18n="theme">THEME</button>
+    <button class="tool-btn" onclick="openLangModal()" data-i18n="lang">LANGUAGE</button>
+  </div>
+  <div class="acc-panel" id="accPanel">
+    <div class="acc-item"><label data-i18n="acc_contrast">Contrast</label><input type="range" id="con-range" min="0.5" max="2" step="0.1" value="1" oninput="applyFilters()"></div>
+    <div class="acc-item"><label data-i18n="acc_grayscale">Grayscale</label><input type="range" id="gray-range" min="0" max="1" step="0.1" value="0" oninput="applyFilters()"></div>
+    <div class="acc-item"><label data-i18n="acc_cursor_color">Crosshair Color</label><select id="cursor-color-select" class="acc-select" onchange="updateCursorStyle()"><option value="rgba(204,51,51,0.3)|#cc3333">Red</option><option value="rgba(52,152,219,0.3)|#3498db">Blue</option><option value="rgba(50,205,50,0.3)|#32cd32">Lime</option><option value="rgba(255,255,0,0.3)|#ffff00">Yellow</option></select></div>
+    <div class="acc-item"><label style="display:flex; align-items:center; gap:10px; cursor: pointer;"><input type="checkbox" id="cursor-cb" onchange="toggleCursorAssist(this.checked)"> <span data-i18n="acc_enable_cursor">Enable Crosshair Cursor</span></label></div>
+  </div>
+</nav>
+
+<div class="lang-modal" id="langModal">
+  <div class="lang-grid">
+    <h3 style="grid-column: 1 / -1; color: #fff; margin-bottom: 15px;" data-i18n="select_lang">Select Language</h3>
+    <button class="lang-btn" onclick="setLang('en')">English (UK)</button><button class="lang-btn" onclick="setLang('es')">Español</button>
+    <button class="lang-btn" onclick="setLang('zh-Hans')">简体白话</button><button class="lang-btn" onclick="setLang('de')">Deutsch</button>
+    <button class="lang-btn" onclick="setLang('pt')">Português</button><button class="lang-btn" onclick="setLang('zh-Hant')">正體官話</button>
+    <button class="lang-btn" onclick="setLang('fr')">Français</button><button class="lang-btn" onclick="setLang('zh-Classical')">简体文言</button>
+    <button class="lang-btn" onclick="setLang('ru')">Русский</button><button class="lang-btn" onclick="setLang('zh-Huaxia')">華夏文言</button>
+    <button class="lang-btn" onclick="setLang('mn')">Монгол</button><button class="lang-btn" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn" onclick="setLang('ko')">한국어</button><button class="lang-btn" onclick="setLang('hi')">हिन्दी</button>
+    <button class="tool-btn" style="grid-column:1/-1; margin-top:15px;" onclick="closeLangModal()" data-i18n="close">Close</button>
+  </div>
+</div>
+
+<div class="filter-layer" id="mainFilter">
+  <div class="container">
+    <div id="selectionView">
+      <div class="header-section">
+        <h1 data-i18n="portal_title">SSPD CITIZEN SERVICE PORTAL</h1>
+        <p data-i18n="portal_sub">Choose a service option below. For life-threatening emergencies, always call 110.</p>
       </div>
+      <div class="service-grid" id="serviceGrid"></div>
     </div>
-  </div>
-  <div id="securityCollapsed">
-    <span id="securityCollapsedText">Learn why this page is safe</span>
-  </div>
-</div>
-
-<div class="top-bar">
-  <div class="nav-left">
-    <button class="home-button" id="homeBtn">Sixside</button>
-    <span class="nav-divider">|</span>
-    <span class="current-location" id="currentLocation">Technical Notice</span>
-  </div>
-  <div class="toolbar">
-    <button class="btn-square" id="themeToggleBtn">Dark/Light</button>
-  </div>
-</div>
-
-<div class="maintenance-container">
-  <div class="hero-word">
-    <div class="main-word">Under maintenance</div>
-    <div class="language-ring">
-      <span class="lang-item" data-lang="zh-hans">正在维护</span>
-      <span class="lang-item" data-lang="zh-hant">正在維護</span>
-      <span class="lang-item" data-lang="zh-classical">維護之中</span>
-      <span class="lang-item" data-lang="zh-wenyan">維修之中</span>
-      <span class="lang-item" data-lang="hi">रखरखाव में</span>
-      <span class="lang-item" data-lang="es">En mantenimiento</span>
-      <span class="lang-item" data-lang="mn">Засварт орж байна</span>
-      <span class="lang-item" data-lang="ru">На обслуживании</span>
-      <span class="lang-item" data-lang="pt">Em manutenção</span>
-      <span class="lang-item" data-lang="ko">유지보수 중</span>
-      <span class="lang-item" data-lang="ja">メンテナンス中</span>
-      <span class="lang-item" data-lang="fr">En maintenance</span>
-      <span class="lang-item" data-lang="de">In Wartung</span>
+    <div id="detailContainer">
+      <button class="back-btn" onclick="goBack()" data-i18n="back">← Back to services</button>
+      <div id="dynamicContent"></div>
     </div>
   </div>
 </div>
-
-<div class="footer-note">
-  <span>ERR · Service temporarily unavailable · Please check back later.</span>
-</div>
+<footer data-i18n="footer">© 2025-2026 SIXSIDE POLICE DEPARTMENT | Citizen Support & Transparency</footer>
 
 <script>
-  (function() {
-    let bannerOpen = false;
+  const dict = {
+    "en":{ leave:"LEAVE THIS PAGE",theme:"THEME",lang:"LANGUAGE",close:"Close",select_lang:"Select Language",acc_contrast:"Contrast",acc_grayscale:"Grayscale",acc_cursor_color:"Crosshair Color",acc_enable_cursor:"Enable Crosshair Cursor",back:"← Back to services",footer:"© 2025-2026 SIXSIDE POLICE DEPARTMENT | Citizen Support & Transparency",portal_title:"SSPD CITIZEN SERVICE PORTAL",portal_sub:"Choose a service option below. For life-threatening emergencies, always call 110.",
+      s1:"Report vehicle collision / accident",s2:"Request biometric identification data",s3:"Request case update",s4:"Request compensation for police misconduct",s5:"Personal information",
+      acc_red_title:"This is NOT the place to report a traffic collision",acc_red_warning:"If: someone is injured or dead, the vehicle may catch fire, persons cannot reach a safe area, someone is preparing or committing a crime — please call 110 immediately. For non-emergencies, you may call 009.",
+      record_info:"If you have an accident reference number (format: C/refXXXXXXXXXXXXX/Year): you can contact SSPD, the attending officer, or SSPD HIGHWAY PATROL DIVISION by phone, letter, or email.",
+      no_record:"If you do NOT have an accident reference number: please use your name, mobile number, license plate or vessel registration number, then contact SSPD, attending officer, or SSPD HIGHWAY PATROL DIVISION by phone, letter, or email. Alternatively, you may contact your insurer to obtain a temporary number like: CtempX/refXXXXXXX/Year.",
+      biometric_text:"Anyone may request this option. You need to schedule an appointment, either in person at SSPD or via the internet. The process takes approximately 11 minutes. Fee: 1.99 UCC for the first request within 200 days; any further request within 200 days costs 3.99 UCC.",
+      case_update_text:"If the case is designated confidential, only persons related to the case may request updates. Otherwise, anyone may request. Please call 009 and press 332 to continue.",
+      compensation_text:"Usually, after you file a complaint against an officer, a liaison will contact you. If 28 days have passed since you received SSPD investigation notice and no follow-up, please call 009 and press 2203. Note: after a compensation amount is confirmed, interest accrues from the moment of misconduct at a floating annual rate of 6.43%–7.03% until transfer to your bank account. If you did not provide a bank account when filing, the floating annual rate is 4%–4.5% from the time of misconduct until you provide your account. You remain anonymous — you will NOT receive any compensation.",
+      personal_closed:"This channel is currently closed."
+    },
+    "zh-Hans":{ leave:"离开此网页",theme:"主题",lang:"语言",close:"关闭",select_lang:"选择语言",acc_contrast:"对比度",acc_grayscale:"灰度",acc_cursor_color:"准星颜色",acc_enable_cursor:"启用高亮鼠标准星",back:"← 返回服务",footer:"© 2025-2026 六面省警察局 | 公民服务与透明",portal_title:"SSPD 公民服务门户",portal_sub:"在下方选择一项服务。危及生命的紧急情况请拨打110。",
+      s1:"报告交通工具撞击或事故",s2:"要求我的生物特征识别数据",s3:"要求案件更新",s4:"要求因为警员失职的赔偿",s5:"个人信息",
+      acc_red_title:"这里不是报告交通事故的地方",acc_red_warning:"如果：有人受伤或死亡、交通工具可能起火、人员无法抵达安全地带、有人准备或正在实施犯罪——请立即拨打110。非紧急您可以拨打009。",
+      record_info:"如果您有一个交通事故记录号码（格式示例: C/refXXXXXXXXXXXXX/年份）：您可以直接通过电话、信件或者邮件联系SSPD、出警的警官或者SSPD HIGHWAY PATROL DIVISION。",
+      no_record:"如果您没有交通事故记录号码：请使用您的姓名、手机号、车牌号或船只注册号，然后通过电话、信件或者邮件联系SSPD、出警的警官或者SSPD HIGHWAY PATROL DIVISION。或者您也可以联系保险提供商，让他们给您申请一个临时号码，格式如：CtempX/refXXXXXXX/年份。",
+      biometric_text:"任何人都可以申请此选项。您需要预定一个会面，可以是前往SSPD或者通过互联网。整个过程大概需要11分钟。200天内的第一次申请需要付费1.99UCC，超过一次的需要付费3.99UCC。",
+      case_update_text:"如果案件被要求保密，只有和案件有关的人员才能要求更新。如果不是，则所有人都可以要求。请您拨打009然后按下332继续。",
+      compensation_text:"通常，在您投诉警员后会有专员主动联系您。然后，在您收到SSPD启动调查的28天后仍然没有后续请拨打009然后按下2203继续。请注意，当确认赔偿金额以后，我们会从警员失职的那一刻以年化利率6.43%-7.03%（区间浮动）计算利息，直到转账到您的银行账户。如果您在投诉警员的时候没有提供转账账户，我们会从警员失职的那一刻以年化利率4%-4.5%（区间浮动）计算，直到提供了您的银行账户。使用匿名，您不会收到任何赔偿。",
+      personal_closed:"此通道当前已关闭"
+    },
+    "zh-Hant":{ leave:"離開此網頁",theme:"主題",lang:"語言",close:"關閉",select_lang:"選擇語言",acc_contrast:"對比度",acc_grayscale:"灰度",acc_cursor_color:"準星顏色",acc_enable_cursor:"啟用高亮鼠標準星",back:"← 返回服務",footer:"© 2025-2026 六面省警察局 | 公民服務與透明",portal_title:"SSPD 公民服務門戶",portal_sub:"在下方選擇一項服務。危及生命的緊急情況請撥打110。",s1:"報告交通工具撞擊或事故",s2:"要求我的生物特徵識別數據",s3:"要求案件更新",s4:"要求因為警員失職的賠償",s5:"個人信息",acc_red_title:"這裡不是報告交通事故的地方",acc_red_warning:"如果：有人受傷或死亡、交通工具可能起火、人員無法抵達安全地帶、有人準備或正在實施犯罪——請立即撥打110。非緊急您可以撥打009。",record_info:"如果您有一個交通事故記錄號碼（格式示例: C/refXXXXXXXXXXXXX/年份）：您可以直接通過電話、信件或者郵件聯繫SSPD、出警的警官或者SSPD HIGHWAY PATROL DIVISION。",no_record:"如果您沒有交通事故記錄號碼：請使用您的姓名、手機號、車牌號或船隻註冊號，然後通過電話、信件或者郵件聯繫SSPD、出警的警官或者SSPD HIGHWAY PATROL DIVISION。或者您也可以聯繫保險提供商，讓他們給您申請一個臨時號碼，格式如：CtempX/refXXXXXXX/年份。",biometric_text:"任何人都可以申請此選項。您需要預定一個會面，可以是前往SSPD或者通過互聯網。整個過程大概需要11分鐘。200天內的第一次申請需要付費1.99UCC，超過一次的需要付費3.99UCC。",case_update_text:"如果案件被要求保密，只有和案件有關的人員才能要求更新。如果不是，則所有人都可以要求。請您撥打009然後按下332繼續。",compensation_text:"通常，在您投訴警員後會有專員主動聯繫您。然後，在您收到SSPD啟動調查的28天後仍然沒有後續請撥打009然後按下2203繼續。請注意，當確認賠償金額以後，我們會從警員失職的那一刻以年化利率6.43%-7.03%（區間浮動）計算利息，直到轉帳到您的銀行帳戶。如果您在投訴警員的時候沒有提供轉帳帳戶，我們會從警員失職的那一刻以年化利率4%-4.5%（區間浮動）計算，直到提供了您的銀行帳戶。使用匿名，您不會收到任何賠償。",personal_closed:"此通道當前已關閉"},
+    "es": { leave:"SALIR",theme:"TEMA",lang:"IDIOMA",close:"Cerrar",select_lang:"Seleccionar Idioma",acc_contrast:"Contraste",acc_grayscale:"Grises",acc_cursor_color:"Color de mira",acc_enable_cursor:"Activar mira",back:"← Volver",footer:"© 2025-2026 SIXSIDE PD | Apoyo Ciudadano",portal_title:"PORTAL SSPD",portal_sub:"Seleccione un servicio. Emergencias: 110",s1:"Reportar accidente/colisión",s2:"Solicitar datos biométricos",s3:"Solicitar actualización de caso",s4:"Solicitar compensación por mala conducta",s5:"Información personal",acc_red_title:"Este NO es el lugar para reportar un accidente",acc_red_warning:"Si: heridos, vehículo arde, zona insegura, delito en curso → llame 110. No emergencia: 009",record_info:"N° referencia accidente (C/refXXX/año): contacte SSPD, oficial o División de Patrulla.",no_record:"Sin referencia: use nombre, teléfono, matrícula, contacte SSPD o aseguradora para número temporal CtempX/refXXX/año.",biometric_text:"Cita presencial o en línea, 11 min. Primera solicitud en 200 días: 1.99 UCC, adicional: 3.99 UCC.",case_update_text:"Caso confidencial solo partes; si no, cualquiera. Llame 009 y presione 332.",compensation_text:"Queja contra oficial: tras 28 días sin seguimiento llame 009+2203. Interés flotante 6.43%-7.03% (con cuenta) o 4%-4.5% sin cuenta hasta proveerla. Anónimo = sin compensación.",personal_closed:"Este canal está cerrado"},
+    "fr":{ leave:"QUITTER",theme:"THÈME",lang:"LANGUE",close:"Fermer",select_lang:"Choisir",acc_contrast:"Contraste",acc_grayscale:"Niveaux gris",acc_cursor_color:"Couleur",acc_enable_cursor:"Activer",back:"← Retour",footer:"© 2025-2026 SSPD",portal_title:"PORTAIL SSPD",portal_sub:"Choisir service. Urgence: 110",s1:"Accident/collision",s2:"Données biométriques",s3:"Mise à jour dossier",s4:"Indemnisation faute agent",s5:"Infos perso",acc_red_title:"PAS pour accident",acc_red_warning:"Blessés, feu, danger, crime → 110. Non-urgence:009",record_info:"N° réf C/refXXX/année: contacter SSPD",no_record:"Sans réf: nom, téléphone, plaque → SSPD ou assureur (CtempX/refXXX/année)",biometric_text:"Rendez-vous (11min). 1.99 UCC (200j), sinon 3.99 UCC.",case_update_text:"Confidentiel: parties. Sinon public. Appelez 009+332",compensation_text:"28j sans suivi → 009+2203. Taux 6.43%-7.03% (avec compte) ou 4%-4.5% sans. Anonyme = pas de compensation.",personal_closed:"Fermé"},
+    "de":{ leave:"VERLASSEN",theme:"THEMA",lang:"SPRACHE",close:"Schließen",select_lang:"Sprache",acc_contrast:"Kontrast",acc_grayscale:"Graustufen",acc_cursor_color:"Farbe",acc_enable_cursor:"Fadenkreuz",back:"← Zurück",footer:"© SSPD",portal_title:"SSPD BÜRGERSERVICE",portal_sub:"Wählen Sie Dienst. Notfall 110",s1:"Unfall melden",s2:"Biometriedaten",s3:"Fallaktualisierung",s4:"Entschädigung bei Fehlverhalten",s5:"Persönliche Daten",acc_red_title:"Kein Unfallbericht hier",acc_red_warning:"Verletzte, Feuer, Gefahr, Straftat → 110. Nicht-Notfall:009",record_info:"Unfallnummer C/refXXX/Jahr: kontaktieren Sie SSPD",no_record:"Ohne Nummer: Name, Telefon, Kennzeichen → SSPD oder Versicherer (CtempX/refXXX/Jahr)",biometric_text:"Termin (11 Min). 1.99 UCC (200T), danach 3.99 UCC.",case_update_text:"Vertraulich: Beteiligte. Sonst jeder. Rufen 009+332",compensation_text:"Nach 28 Tagen ohne Fortschritt: 009+2203. Zinssatz 6.43%-7.03% (mit Konto) sonst 4%-4.5%. Anonym=keine Zahlung.",personal_closed:"Geschlossen"},
+    "pt":{ leave:"SAIR",theme:"TEMA",lang:"IDIOMA",close:"Fechar",select_lang:"Selecionar",acc_contrast:"Contraste",acc_grayscale:"Escala cinza",acc_cursor_color:"Cor mira",acc_enable_cursor:"Ativar mira",back:"← Voltar",footer:"© SSPD",portal_title:"PORTAL SSPD",s1:"Acidente/colisão",s2:"Dados biométricos",s3:"Atualização caso",s4:"Indenização por má conduta",s5:"Informações pessoais",acc_red_title:"NÃO é para acidente",acc_red_warning:"Feridos, fogo, perigo, crime → 110. Não emergência:009",record_info:"Nº referência C/refXXX/ano: contate SSPD",no_record:"Sem nº: nome, telefone, placa → SSPD ou seguradora (CtempX/refXXX/ano)",biometric_text:"Agendamento (11min). 1.99 UCC (200d), depois 3.99 UCC",case_update_text:"Confidencial: envolvidos. Demais: público. Ligue 009+332",compensation_text:"Após 28 dias sem retorno: 009+2203. Taxa 6.43%-7.03% (c/ conta) ou 4%-4.5% (s/ conta). Anônimo = sem compensação.",personal_closed:"Encerrado"},
+    "ru":{ leave:"ВЫЙТИ",theme:"ТЕМА",lang:"ЯЗЫК",close:"Закрыть",select_lang:"Выбрать",acc_contrast:"Контраст",acc_grayscale:"Ч/Б",acc_cursor_color:"Цвет",acc_enable_cursor:"Вкл. прицел",back:"← Назад",footer:"© SSPD",portal_title:"ПОРТАЛ SSPD",s1:"ДТП",s2:"Биометрия",s3:"Обновление дела",s4:"Компенсация за халатность",s5:"Личные данные",acc_red_title:"НЕ для ДТП",acc_red_warning:"Раненые, пожар, опасность, преступление →110. Не экстренно:009",record_info:"Номер C/refXXX/год: свяжитесь с SSPD",no_record:"Без номера: имя, телефон, номер авто → SSPD/страховщик (CtempX/refXXX/год)",biometric_text:"Встреча (11 мин). Первый раз 1.99 UCC, повторно 3.99 UCC",case_update_text:"Конфиденциально: участники. Иначе: позвоните 009+332",compensation_text:"28 дней без ответа: 009+2203. Ставка 6.43%-7.03% (счет есть) или 4%-4.5% (нет). Аноним = без выплат.",personal_closed:"Канал закрыт"},
+    "ja":{ leave:"終了",theme:"テーマ",lang:"言語",close:"閉じる",select_lang:"言語選択",acc_contrast:"コントラスト",acc_grayscale:"グレースケール",acc_cursor_color:"カーソル色",acc_enable_cursor:"カーソル有効",back:"← 戻る",footer:"© SSPD",portal_title:"SSPD市民サービス",portal_sub:"サービスを選択。緊急時110へ",s1:"衝突事故報告",s2:"生体認証データ要求",s3:"案件更新要求",s4:"警察官の違法行為補償要求",s5:"個人情報",acc_red_title:"交通事故報告ではありません",acc_red_warning:"負傷者、火災、危険、犯罪中→110。非緊急009へ",record_info:"事故参照番号(C/refXXX/年): SSPDへ連絡",no_record:"番号なし: 氏名・電話・ナンバー→保険会社へ(CtempX/refXXX/年)",biometric_text:"予約必要(約11分)。200日以内初回1.99UCC、以降3.99UCC。",case_update_text:"秘密案件は関係者のみ。009＋332へ",compensation_text:"調査開始28日後進展なし→009+2203。利率6.43-7.03%(口座あり)又は4-4.5%(なし)。匿名＝補償なし",personal_closed:"閉鎖中"},
+    "ko":{ leave:"나가기",theme:"테마",lang:"언어",close:"닫기",select_lang:"언어선택",acc_contrast:"대비",acc_grayscale:"흑백",acc_cursor_color:"커서색",acc_enable_cursor:"커서 활성화",back:"← 뒤로",footer:"© SSPD",portal_title:"SSPD 시민 서비스",s1:"교통사고 신고",s2:"생체 인식 데이터 요청",s3:"사건 업데이트 요청",s4:"경찰관 직무유실 보상 요청",s5:"개인정보",acc_red_title:"교통사고 신고 창구 아님",acc_red_warning:"부상/사망, 화재 위험, 범죄 진행 → 110, 비긴급 009",record_info:"사고번호 C/refXXX/년: SSPD 연락",no_record:"번호없음: 이름,전화,차량번호→보험사(CtempX/refXXX/년)",biometric_text:"예약 11분 소요. 200일내 첫 1.99UCC, 이후 3.99UCC",case_update_text:"비밀사건은 관계자만. 009+332",compensation_text:"28일 후 연락없음→009+2203. 이율 6.43-7.03%(계좌有) 또는 4-4.5%(無). 익명=보상없음",personal_closed:"폐쇄됨"},
+    "hi":{ leave:"बाहर जाएं",theme:"थीम",lang:"भाषा",close:"बंद करें",select_lang:"भाषा चुनें",acc_contrast:"कंट्रास्ट",acc_grayscale:"ग्रे",acc_cursor_color:"कर्सर रंग",acc_enable_cursor:"कर्सर सक्षम",back:"← वापस",footer:"© SSPD",portal_title:"SSPD नागरिक सेवा",s1:"दुर्घटना रिपोर्ट करें",s2:"बायोमेट्रिक डेटा",s3:"मामले की जानकारी",s4:"पुलिस क्षतिपूर्ति",s5:"व्यक्तिगत जानकारी",acc_red_title:"यह दुर्घटना रिपोर्ट स्थान नहीं",acc_red_warning:"हताहत, आग, खतरा, अपराध→110, गैर-आपात 009",record_info:"दुर्घटना संदर्भ C/refXXX/वर्ष: SSPD से संपर्क करें",no_record:"बिना संदर्भ: नाम, मोबाइल, नंबर प्लेट->बीमा कंपनी(CtempX/refXXX/वर्ष)",biometric_text:"अपॉइंटमेंट(11मिनट)। पहली बार 1.99UCC, बाद 3.99UCC",case_update_text:"गोपनीय मामले में संबंधित व्यक्ति, अन्य: 009+332",compensation_text:"28 दिन बाद कोई सूचना नहीं→009+2203। ब्याज दर 6.43-7.03% (खाता हो) या 4-4.5% (न हो)। गुमनाम = कोई मुआवजा नहीं",personal_closed:"बंद"},
+    "zh-Classical":{ leave:"急離",theme:"晝夜",lang:"言語",close:"閉",select_lang:"擇語",acc_contrast:"明暗",acc_grayscale:"灰度",acc_cursor_color:"準星色",acc_enable_cursor:"啟準星",back:"← 返",footer:"©六面警署",s1:"具狀車馬撞擊",s2:"求身契數據",s3:"求案進展",s4:"求償捕快失職",s5:"身契",acc_red_title:"非報車馬碰撞之所",acc_red_warning:"死傷、火患、危境、犯案即呼110；緩呼009",record_info:"若有案號C/refXXXX/年: 聯SSPD",no_record:"無號: 姓名、手機、車牌號聯SSPD或保險商(CtempX/refXXX/年)",biometric_text:"預約(11分)。初次1.99UCC,復3.99UCC",case_update_text:"密案限相關人。撥009+332",compensation_text:"廿八日無續訊→009+2203。利率6.43%-7.03%(有賬戶)或4%-4.5%(無)。匿名則無償。",personal_closed:"此道閉矣"},
+    "zh-Huaxia":{ leave:"急離",theme:"晝夜",lang:"雅言",close:"閉",select_lang:"擇語",acc_contrast:"明暗",acc_grayscale:"墨色",acc_cursor_color:"準星",acc_enable_cursor:"啟準星",back:"← 還",footer:"©六面巡捕房",s1:"報車馬衝撞",s2:"求身紋之記",s3:"求案牘更新",s4:"求償捕快失職",s5:"私屬",acc_red_title:"非報車馬碰撞之所",acc_red_warning:"死傷、火起、犯危、罪現→110，緩者009",record_info:"案號C/refXXXX/年: 聯SSPD",no_record:"無號:姓名、手機、舟車號→聯SSPD或保商(CtempX/refXXX/年)",biometric_text:"預約十一分。初需1.99UCC，再需3.99UCC",case_update_text:"密案惟當事人。撥009加332",compensation_text:"廿八日無音→009+2203。周息率6.43%-7.03%(有賬)或4%-4.5%(無賬)，匿名無償。",personal_closed:"此徑已閉"},
+    "mn":{ leave:"ГАРАХ",theme:"Сэдэв",lang:"ХЭЛ",close:"Хаах",select_lang:"Сонгох",acc_contrast:"Тод",acc_grayscale:"Саарал",acc_cursor_color:"Өнгө",acc_enable_cursor:"Идэвхжүүлэх",back:"← Буцах",footer:"© SSPD",portal_title:"SSPD ҮЙЛЧИЛГЭЭ",s1:"Тээврийн хэрэгсэл мөргөлдөөн",s2:"Биометрийн өгөгдөл",s3:"Хэргийн мэдээлэл",s4:"Нөхөн төлбөр (цагдаа)",s5:"Хувийн мэдээлэл",acc_red_title:"Энэ нь зам тээврийн осол биш",acc_red_warning:"Гэмтэл, гал, аюул, гэмт хэрэг→110. Яаралтай бус 009",record_info:"Дугаар C/refXXX/жил: SSPD-тай холбогдох",no_record:"Дугааргүй: нэр, утас, дугаар -> даатгагч (CtempX/refXXX/жил)",biometric_text:"Цаг товлох (11мин). Эхний хүсэлт 1.99UCC, дараагийн 3.99UCC",case_update_text:"Нууц хэрэг: зөвхөн холбогдолтой хүмүүс. 009+332",compensation_text:"28 хоног дуудлагагүй бол 009+2203. Хүү 6.43-7.03% (данстай) эсвэл 4-4.5% (дансгүй). Нэр нууц = нөхөн төлбөргүй",personal_closed:"Хаалттай"}
+  };
 
-    function openBanner() {
-      document.getElementById("securityFull").classList.add("open");
-      document.getElementById("securityCollapsed").style.display = "none";
-      bannerOpen = true;
+  let currentLang = 'en';
+
+  function applyTranslation() {
+    const d = dict[currentLang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if(d[key]) { if(el.tagName==='INPUT' || el.tagName==='TEXTAREA') el.placeholder=d[key]; else el.innerText=d[key]; }
+    });
+    renderServices();
+  }
+
+  const services = [
+    { id:"collision", key:"s1" }, { id:"biometric", key:"s2" }, { id:"case_update", key:"s3" }, { id:"compensation", key:"s4" }, { id:"personal", key:"s5" }
+  ];
+  function renderServices() {
+    const grid = document.getElementById('serviceGrid');
+    grid.innerHTML = '';
+    const d = dict[currentLang];
+    services.forEach(serv => {
+      const btn = document.createElement('button');
+      btn.className = 'service-btn';
+      btn.innerText = d[serv.key];
+      btn.onclick = () => openServiceDetail(serv.id);
+      grid.appendChild(btn);
+    });
+  }
+
+  function openServiceDetail(serviceId) {
+    const selectionDiv = document.getElementById('selectionView');
+    const detailDiv = document.getElementById('detailContainer');
+    selectionDiv.style.opacity = '0';
+    setTimeout(() => {
+      selectionDiv.style.display = 'none';
+      detailDiv.style.display = 'block';
+      setTimeout(() => { detailDiv.classList.add('visible'); }, 10);
+    }, 150);
+    const contentDiv = document.getElementById('dynamicContent');
+    const d = dict[currentLang];
+
+    if(serviceId === 'collision') {
+      contentDiv.innerHTML = `
+        <div class="red-emergency"><strong>${d.acc_red_title}</strong><br><br>${d.acc_red_warning}</div>
+        <div class="info-card"><p>${d.record_info}</p><p class="inline-code" style="display:inline-block;">C/refXXXXXXXXXXXXX/2025</p></div>
+        <div class="info-card"><p>${d.no_record}</p><p class="inline-code">CtempX/refXXXXXXX/2025</p></div>
+      `;
     }
-
-    function closeBanner() {
-      document.getElementById("securityFull").classList.remove("open");
-      document.getElementById("securityCollapsed").style.display = "flex";
-      bannerOpen = false;
+    else if(serviceId === 'biometric') {
+      contentDiv.innerHTML = `<div class="info-card"><p>${d.biometric_text}</p></div>`;
     }
-
-    document.getElementById("closeBannerBtn").onclick = function(e) {
-      e.stopPropagation();
-      closeBanner();
-    };
-    document.getElementById("securityCollapsed").onclick = openBanner;
-    document.getElementById("securityCollapsed").style.display = "flex";
-
-    setTimeout(function() {
-      if (!bannerOpen) openBanner();
-    }, 500);
-
-    const toggleBtn = document.getElementById("themeToggleBtn");
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", function() {
-        document.body.classList.toggle("light");
-      });
+    else if(serviceId === 'case_update') {
+      contentDiv.innerHTML = `<div class="info-card"><p>${d.case_update_text}</p></div>`;
     }
-
-    const homeBtn = document.getElementById("homeBtn");
-    if (homeBtn) {
-      homeBtn.addEventListener("click", function() {
-        window.location.reload();
-      });
+    else if(serviceId === 'compensation') {
+      contentDiv.innerHTML = `<div class="info-card"><p>${d.compensation_text}</p></div>`;
     }
-  })();
+    else if(serviceId === 'personal') {
+      contentDiv.innerHTML = `<div class="info-card"><p style="color: var(--accent-red); font-weight:bold;">${d.personal_closed}</p></div>`;
+    }
+    window.scrollTo(0,0);
+  }
+
+  function goBack() {
+    const detailDiv = document.getElementById('detailContainer');
+    const selectionDiv = document.getElementById('selectionView');
+    detailDiv.classList.remove('visible');
+    setTimeout(() => {
+      detailDiv.style.display = 'none';
+      selectionDiv.style.display = 'block';
+      setTimeout(() => { selectionDiv.style.opacity = '1'; }, 10);
+    }, 200);
+  }
+
+  function quickExit() { window.open('https://www.google.com', '_blank'); window.location.replace('https://www.bbc.com/news'); }
+  
+  function toggleAccPanel() { 
+    const panel = document.getElementById('accPanel'); 
+    panel.classList.toggle('show'); 
+  }
+  
+  function openLangModal() { 
+    const modal = document.getElementById('langModal'); 
+    modal.classList.add('show'); 
+  }
+  function closeLangModal() { 
+    const modal = document.getElementById('langModal'); 
+    modal.classList.remove('show'); 
+  }
+  
+  function applyFilters() { const c=document.getElementById('con-range').value, g=document.getElementById('gray-range').value; document.getElementById('mainFilter').style.filter=`contrast(${c}) grayscale(${g})`; }
+  let isMouseOn=false;
+  function toggleCursorAssist(on) { isMouseOn=on; const h=document.getElementById('cursor-highlight'); h.style.display=on?'block':'none'; document.body.style.cursor=on?'none':'default'; updateCursorStyle(); }
+  function updateCursorStyle() { const [bg,border]=document.getElementById('cursor-color-select').value.split('|'); document.documentElement.style.setProperty('--cursor-color', bg); document.documentElement.style.setProperty('--cursor-border', border); }
+  document.addEventListener('mousemove',e=>{ if(!isMouseOn) return; const h=document.getElementById('cursor-highlight'); h.style.left=e.clientX+'px'; h.style.top=e.clientY+'px'; });
+  function setLang(l) { currentLang=l; closeLangModal(); applyTranslation(); }
+
+  document.getElementById('selectionView').style.opacity = '1';
+  renderServices();
+  applyTranslation();
 </script>
 </body>
 </html>
